@@ -13,6 +13,7 @@ const UploadCSV = () => {
 
   // Handle file selection and  format validation
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError("");
     const selectedFile = e.target.files?.[0];
 
     // Step 1: Validate file type
@@ -78,15 +79,13 @@ const UploadCSV = () => {
     setIsUploading(true);
     setError("");
 
-    // Parse the CSV file
     Papa.parse(file, {
       complete: (result: { data: React.SetStateAction<unknown[]> }) => {
-        // Assuming the data is in JSON format, you can perform any additional processing here
         setParsedData(result.data);
         setIsUploading(false);
       },
-      header: true, // Assuming the CSV has headers
-      skipEmptyLines: true, // Skip any empty lines in the CSV
+      header: true,
+      skipEmptyLines: true,
     });
   };
 
@@ -122,10 +121,8 @@ const UploadCSV = () => {
         Upload Parsed Data
       </button>
 
-      {/* Show errors */}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* Display parsed data (optional) */}
       {parsedData.length > 0 && (
         <div>
           <h2>Parsed Data:</h2>
