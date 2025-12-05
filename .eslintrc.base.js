@@ -1,0 +1,18 @@
+module.exports = {
+  root: true,
+  env: {
+    es2021: true,
+    node: true,
+    browser: true,
+  },
+  parserOptions: {
+    ecmaVersion: 12,
+    sourceType: 'module',
+  },
+  extends: ['eslint:recommended', 'plugin:prettier/recommended'],
+  rules: {
+    'prettier/prettier': ['error'],
+    'no-unused-vars': 'warn',
+    'no-console': 'off',
+  },
+};

@@ -1,0 +1,22 @@
+{
+  "name": "penny-monorepo",
+  "private": true,
+  "scripts": {
+    "lint": "npm run lint:ui && npm run lint:service",
+    "lint:ui": "cd ui && eslint 'src/**/*.{ts,tsx,js,jsx}'",
+    "lint:service": "cd service && eslint 'src/**/*.ts'",
+    "format": "npm run format:ui && npm run format:service",
+    "format:ui": "cd ui && prettier --write 'src/**/*.{ts,tsx,js,jsx,json,css,scss,md}'",
+    "format:service": "cd service && prettier --write 'src/**/*.ts'",
+    "type-check": "npm run type-check:ui && npm run type-check:service",
+    "type-check:ui": "cd ui && tsc --noEmit",
+    "type-check:service": "cd service && tsc --noEmit",
+    "test": "npm run test:ui && npm run test:service",
+    "test:ui": "cd ui && npm run test",
+    "test:service": "cd service && npm run test",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
