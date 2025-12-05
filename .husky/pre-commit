@@ -1,5 +1,4 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
 
 # Example for your monorepo
 CHANGED=$(git diff --cached --name-only --relative)
