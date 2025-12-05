@@ -8,11 +8,24 @@ install:
 	npm install
 
 check-env:
-	npm run check-env
-
-setup-env:
-	@echo "Setting up environment files..."
-	@if [ -f ./.env.example]
+	@if [ ! -f .env ]; then \
+		echo ".env file is missing!"; \
+		exit 1; \
+	fi
+	@if [ ! -f .env.example ]; then \
+		echo ".env.example file is missing!"; \
+		exit 1; \
+	fi
+	@echo "Checking .env keys..."
+	@missing_keys=$$(grep -v '^\s*#' .env.example | cut -d '=' -f1 | while read key; do \
+		grep -q "^$$key=" .env || echo $$key; \
+	done); \
+	if [ -n "$$missing_keys" ]; then \
+		echo "Missing keys in .env:"; \
+		echo "$$missing_keys"; \
+		exit 1; \
+	fi
+	@echo "All env keys are present!"
 
 dev: check-env
 	npm run start:dev

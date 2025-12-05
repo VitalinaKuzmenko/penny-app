@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "check-env": "node scripts/check-env.js",
+    "check-env": "make check-env",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start:debug": "npm run check-env && nest start --debug --watch",
     "start": "npm run check-env && nest start",
