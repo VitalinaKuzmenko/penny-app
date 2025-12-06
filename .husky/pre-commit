@@ -1,14 +1,13 @@
 #!/bin/sh
 
-# Example for your monorepo
 CHANGED=$(git diff --cached --name-only --relative)
 
 if echo "$CHANGED" | grep -q '^ui/'; then
   echo "Running UI lint and type-check..."
-  cd ui && npm run lint && npm run type-check
+  (cd ui && npm run lint && npm run type-check)
 fi
 
 if echo "$CHANGED" | grep -q '^server/'; then
   echo "Running Service lint and type-check..."
-  cd service && npm run lint && npm run type-check
+  (cd server && npm run lint && npm run type-check)
 fi
