@@ -8,6 +8,7 @@ ConfigModule.forRoot({
   load: [configuration],
   validationSchema: Joi.object({
     PORT: Joi.number().default(8080),
+    DATABASE_URL: Joi.string().required(),
   }),
 });
 async function bootstrap() {
