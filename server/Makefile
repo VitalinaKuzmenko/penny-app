@@ -27,7 +27,22 @@ check-env:
 	fi
 	@echo "All env keys are present!"
 
-dev: check-env
+db-up:
+	docker compose up -d
+
+db-down:
+	docker compose down
+
+db-logs:
+	docker compose logs -f penny-db
+
+prisma-generate:
+	npx prisma generate
+
+prisma-push:
+	npx prisma db push
+
+dev: check-env db-up prisma-generate
 	npm run start:dev
 
 build: install check-env
@@ -51,8 +66,5 @@ lint-fix:
 format:
 	npm run format
 
-docker-build:
-	docker build -t $(APP_NAME) .
 
-docker-run:
-	docker run -p 3000:3000 $(APP_NAME)
+
