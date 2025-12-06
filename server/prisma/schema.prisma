@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum Currency {
+  USD
+  EUR
+  UAH
+  GBP
+  PLN
+}
+
+generator client {
+  provider = "prisma-client"
+  previewFeatures = ["relationJoins"]
+  logLevel = "query"
+  output   = "../src/prisma/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String         @id @default(uuid())
+  userName    String         @map("user_name")
+  userSurname String         @map("user_surname")
+  userEmail   String         @unique @map("user_email")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  accounts    Account[]
+  categories  Category[]
+  transactions Transaction[]
+}
+
+model Account {
+  id        String      @id @default(uuid())
+  name      String
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  userId    String      @map("user_id")
+  user      User        @relation(fields: [userId], references: [id])
+
+  transactions Transaction[]
+
+  @@unique([userId, name])
+}
+
+model Category {
+  id        String      @id @default(uuid())
+  name      String
+  icon      String?
+  color     String?
+  isDefault Boolean     @default(false) @map("is_default")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  userId    String      @map("user_id")
+  user      User        @relation(fields: [userId], references: [id])
+
+  transactions Transaction[]
+
+  @@unique([userId, name])
+}
+
+model Transaction {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  description  String?
+  amount       Decimal  @db.Decimal(12, 2)
+  currency     Currency
+  type         TransactionType
+  date         DateTime
+
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+
+  categoryId   String
+  category     Category   @relation(fields: [categoryId], references: [id])
+
+  accountId    String
+  account      Account    @relation(fields: [accountId], references: [id])
+
+  @@index([userId, date])
+  @@index([accountId, date])
+  @@index([categoryId, date])
+}
+
+
