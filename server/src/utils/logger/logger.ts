@@ -12,6 +12,10 @@ export class WinstonLogger implements LoggerService, OnModuleInit {
   private static instance: WinstonLogger;
   private logger: Logger;
 
+  constructor() {
+    this.logger = new Logger();
+  }
+
   async onModuleInit() {
     this.logger = await this.createLoggerClient();
   }
@@ -92,7 +96,7 @@ export class WinstonLogger implements LoggerService, OnModuleInit {
                   });
                 }),
               ),
-              onConnectionError: (err) => console.error(err),
+              onConnectionError: (err: Error) => console.error(err),
             }),
           ],
           silent,

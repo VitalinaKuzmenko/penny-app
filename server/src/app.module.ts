@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 
 import { LoggerModule } from './utils/logger/logger.module';
 import { TraceMiddleware } from './utils/logger/trace.middleware';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [LoggerModule],
+  imports: [LoggerModule, PrismaModule],
   controllers: [AppController],
   providers: [AppService],
 })

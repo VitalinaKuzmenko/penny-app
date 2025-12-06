@@ -21,7 +21,8 @@ generator client {
   provider = "prisma-client"
   previewFeatures = ["relationJoins"]
   logLevel = "query"
-  output   = "../generated/prisma"
+  output   = "../src/prisma/generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
