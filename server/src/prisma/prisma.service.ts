@@ -1,14 +1,23 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
 
-import { PrismaClient } from './generated/prisma/client';
 import { WinstonLogger } from 'src/utils/logger/logger';
+
+import { PrismaClient } from './generated/prisma/client';
+import { parse } from 'pg-connection-string';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
-  private readonly logger: WinstonLogger;
-  constructor() {
-    const adapter = new PrismaPg(process.env.DATABASE_URL!);
+  constructor(private readonly logger: WinstonLogger) {
+    const config = parse(process.env.DATABASE_URL!);
+    const adapter = new PrismaPg({
+      host: config.host,
+      port: Number(config.port),
+      user: config.user,
+      password: config.password,
+      database: config.database,
+    });
+
     super({
       adapter,
       log: ['info', 'warn', 'error'],
