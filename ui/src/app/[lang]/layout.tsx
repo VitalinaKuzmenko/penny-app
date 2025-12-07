@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { ThemeProvider } from '../providers/ThemeProvider';
+import { ThemeProvider } from '../../providers/ThemeProvider';
+
+export async function generateStaticParams() {
+  return [{ lang: 'en' }, { lang: 'ru' }, { lang: 'ua' }];
+}
 
 export const metadata: Metadata = {
   title: 'Penny App',
