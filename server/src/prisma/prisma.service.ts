@@ -1,9 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { Logger } from 'winston';
+
+import { PrismaClient } from './generated/prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  private readonly logger = new Logger();
   constructor() {
     const adapter = new PrismaPg(process.env.DATABASE_URL!);
     super({
@@ -15,9 +18,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
     try {
       await this.$connect();
-      console.log('✅ Prisma connected to PostgreSQL');
+      this.logger.info('✅ Prisma connected to PostgreSQL');
     } catch (error) {
-      console.error('❌ Prisma connection error:', error);
+      this.logger.error('❌ Prisma connection error:', error);
       throw error;
     }
   }
