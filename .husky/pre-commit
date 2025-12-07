@@ -8,6 +8,6 @@ if echo "$CHANGED" | grep -q '^ui/'; then
 fi
 
 if echo "$CHANGED" | grep -q '^server/'; then
-  echo "Running Service lint and type-check..."
+  echo "Running Server lint and type-check..."
   (cd server && npm run lint && npm run type-check)
 fi
