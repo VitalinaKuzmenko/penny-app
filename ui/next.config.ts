@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    appDir: true, // enable the experimental app directory
-  },
-  // ...other options here
+  // turbopack: {
+  //   root: path.join(__dirname), // points to the Next.js app root
+  // },
 };
 
 module.exports = nextConfig;
