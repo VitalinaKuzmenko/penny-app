@@ -4,7 +4,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '../../providers/ThemeProvider';
 
 export async function generateStaticParams() {
-  return [{ lang: 'en-US' }, { lang: 'ru-RU' }, { lang: 'ua-UA' }];
+  return [{ lang: 'en' }, { lang: 'ru' }, { lang: 'ua' }];
 }
 
 export const metadata: Metadata = {
