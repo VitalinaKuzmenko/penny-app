@@ -1,10 +1,10 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { parse } from 'pg-connection-string';
 
 import { WinstonLogger } from 'src/utils/logger/logger';
 
 import { PrismaClient } from './generated/prisma/client';
-import { parse } from 'pg-connection-string';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
