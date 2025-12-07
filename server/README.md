@@ -97,3 +97,89 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+Sure! Here's a clean README section in Markdown format for your project:
+
+## Database & Prisma Guide
+
+#### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+#### 2. Set up the Database
+
+Make sure your PostgreSQL database is running (e.g., via Docker):
+
+```bash
+docker-compose up -d
+```
+
+Check your .env file for the correct DATABASE_URL:
+
+```bash
+DATABASE_URL="postgresql://test_user:test_password@localhost:5432/penny?schema=public"
+```
+
+#### 3. Update Prisma Schema
+
+Modify your `prisma/schema.prisma` as needed (add/remove models, fields, enums, etc.).
+
+#### 4. Generate Prisma Client
+
+After schema changes, generate Prisma client:
+
+```bash
+make generate
+# or
+npx prisma generate
+```
+
+#### 5. Create a Migration (Development)
+
+```bash
+make migrate-dev
+# or
+npx prisma migrate dev --name <migration_name>
+```
+
+This creates a migration file in prisma/migrations and applies it to your local database.
+
+#### 6. Reset the Database (if needed)
+
+Use this if your database schema is out-of-sync or you want to reset development DB:
+
+```bash
+make migrate-reset
+# or
+npx prisma migrate reset --force
+```
+
+## ⚠️ All data will be lost when resetting!
+
+#### 7. Push Schema Without Migrations
+
+Use this to sync the schema without generating a migration (useful for prototyping):
+
+```bash
+make db-push
+# or
+npx prisma db push
+```
+
+#### 8. Check Migration Status
+
+```bash
+make migrate-status
+# or
+npx prisma migrate status
+```
+
+#### 9. Access Database Shell
+
+```bash
+make db
+# or
+npx prisma db shell
+```

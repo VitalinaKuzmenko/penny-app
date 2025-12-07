@@ -1,11 +1,23 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { parse } from 'pg-connection-string';
+
+import { WinstonLogger } from 'src/utils/logger/logger';
+
+import { PrismaClient } from './generated/prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
-  constructor() {
-    const adapter = new PrismaPg(process.env.DATABASE_URL!);
+  constructor(private readonly logger: WinstonLogger) {
+    const config = parse(process.env.DATABASE_URL!);
+    const adapter = new PrismaPg({
+      host: config.host,
+      port: Number(config.port),
+      user: config.user,
+      password: config.password,
+      database: config.database,
+    });
+
     super({
       adapter,
       log: ['info', 'warn', 'error'],
@@ -15,15 +27,15 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
     try {
       await this.$connect();
-      console.log('✅ Prisma connected to PostgreSQL');
+      this.logger.info('✅ Prisma connected to PostgreSQL');
     } catch (error) {
-      console.error('❌ Prisma connection error:', error);
+      this.logger.error('❌ Prisma connection error:', error as Error);
       throw error;
     }
   }
 
   async onModuleDestroy() {
     await this.$disconnect();
-    console.log('🔌 Prisma disconnected from PostgreSQL');
+    this.logger.info('🔌 Prisma disconnected from PostgreSQL');
   }
 }

@@ -1,8 +1,10 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import Joi from 'joi';
+
+import { AppModule } from './app.module';
 import configuration from './config/configuration';
-import * as Joi from 'joi';
 
 ConfigModule.forRoot({
   load: [configuration],
@@ -15,8 +17,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(process.env.PORT ?? 8080);
 
+  // eslint-disable-next-line no-console
   console.log(
     `Application is running on: http://localhost:${process.env.PORT ?? 8080}`,
+  );
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // strips unknown properties
+      forbidNonWhitelisted: true,
+      transform: true, // convert primitive types
+    }),
   );
 }
 bootstrap();

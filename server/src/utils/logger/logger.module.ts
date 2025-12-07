@@ -1,4 +1,5 @@
 import { Module, Global } from '@nestjs/common';
+
 import { WinstonLogger } from './logger';
 
 @Global()

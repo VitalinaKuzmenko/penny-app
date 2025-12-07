@@ -1,8 +1,9 @@
 import { Injectable, LoggerService, OnModuleInit } from '@nestjs/common';
 import * as winston from 'winston';
 import { Logger } from 'winston';
-import { LogLevel } from './logger-interfaces';
+
 import { AsyncContext } from './async-context';
+import { LogLevel } from './logger-interfaces';
 
 // eslint-disable-next-line
 const LokiTransport = require('winston-loki');
