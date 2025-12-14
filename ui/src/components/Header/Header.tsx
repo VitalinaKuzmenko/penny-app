@@ -1,8 +1,9 @@
 import { getDictionary } from 'ui/src/utils/getDictionary';
 import { Navbar } from '../Navbar';
+import { LanguageType } from 'ui/src/utils/interfaces';
 
 interface HeaderProps {
-  lang: 'en' | 'ru' | 'ua';
+  lang: LanguageType;
 }
 
 // Server component can be async

@@ -3,7 +3,7 @@ import './globals.css';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '../../providers/ThemeProvider';
 import Header from 'ui/src/components/Header/Header';
-import { LanguageType } from 'ui/src/utils/interfaces';
+import { availableLanguages, LanguageType } from 'ui/src/utils/interfaces';
 
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ru' }, { lang: 'ua' }];
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 const normalizeLocale = (lang: string): LanguageType => {
-  return ['en', 'ru', 'ua'].includes(lang) ? (lang as LanguageType) : 'en';
+  return availableLanguages.includes(lang as LanguageType) ? (lang as LanguageType) : 'en';
 };
 
 export default async function RootLayout({
