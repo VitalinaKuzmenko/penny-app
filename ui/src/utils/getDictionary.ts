@@ -1,4 +1,5 @@
 import 'server-only';
+import { LanguageType } from './interfaces';
 
 const dictionaries = {
   en: () => import('../dictionaries/en.json').then((module) => module.default),
@@ -6,4 +7,4 @@ const dictionaries = {
   ua: () => import('../dictionaries/ua.json').then((module) => module.default),
 };
 
-export const getDictionary = async (locale: 'en' | 'ru' | 'ua') => dictionaries[locale]();
+export const getDictionary = async (locale: LanguageType) => dictionaries[locale]();

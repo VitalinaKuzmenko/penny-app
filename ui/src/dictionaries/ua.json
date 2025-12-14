@@ -1,5 +1,10 @@
 {
-  "Homepage": {
-    "header": "Ласкаво просимо до Penny App!"
+  "HOMEPAGE": {
+    "HEADER": "Ласкаво просимо до Penny App!",
+    "PAGES": {
+      "HOME": "Головна",
+      "UPLOAD_CSV": "Завантажити CSV",
+      "PENNYS_VIEW": "Перегляд Penny"
+    }
   }
 }

@@ -1,5 +1,11 @@
 {
-  "Homepage": {
-    "header": "Welcome to Penny App!"
+  "HOMEPAGE": {
+    "HEADER": "Welcome to Penny App!",
+    "PAGES": {
+      "HOME": "Home",
+      "UPLOAD_CSV": "Upload CSV",
+      "PENNYS_VIEW": "Penny's View",
+      "SIGN_IN": "Sign In"
+    }
   }
 }

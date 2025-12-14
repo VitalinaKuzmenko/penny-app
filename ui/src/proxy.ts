@@ -2,20 +2,22 @@
 import { NextResponse } from 'next/server';
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
+import { availableLanguages } from './utils/interfaces';
 
-const locales = ['en', 'ru', 'ua'];
 const defaultLocale = 'en';
 
 export function getLocale(request: Request) {
   const headers = Object.fromEntries(request.headers.entries());
   const languages = new Negotiator({ headers }).languages();
-  return match(languages, locales, defaultLocale);
+  return match(languages, availableLanguages, defaultLocale);
 }
 
 export function proxy(request: any) {
   // Check if there is any supported locale in the pathname
   const { pathname } = request.nextUrl;
-  const pathnameHasLocale = locales.some((locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`);
+  const pathnameHasLocale = availableLanguages.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
+  );
 
   if (pathnameHasLocale) return;
 

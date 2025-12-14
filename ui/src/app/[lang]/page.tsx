@@ -1,13 +1,12 @@
 import { Button, Typography } from '@mui/material';
 import { getDictionary } from '../../utils/getDictionary';
-import LanguageSwitcher from 'ui/src/components/LanguageSwitcher';
+import { LanguageType } from 'ui/src/utils/interfaces';
 
-export default async function Page({ params }: { params: Promise<{ lang: 'en' | 'ru' | 'ua' }> }) {
+export default async function Page({ params }: { params: Promise<{ lang: LanguageType }> }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
   return (
-    <main style={{ padding: 20 }}>
-      <LanguageSwitcher />
+    <div>
       <Typography
         variant="h4"
         gutterBottom
@@ -19,7 +18,7 @@ export default async function Page({ params }: { params: Promise<{ lang: 'en' | 
         variant="body1"
         gutterBottom
       >
-        {dict.Homepage.header}
+        {dict.HOMEPAGE.HEADER}
       </Typography>
 
       <Button
@@ -28,6 +27,6 @@ export default async function Page({ params }: { params: Promise<{ lang: 'en' | 
       >
         Get Started
       </Button>
-    </main>
+    </div>
   );
 }
