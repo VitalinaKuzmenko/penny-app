@@ -19,7 +19,7 @@ export default async function Page({ params }: { params: Promise<{ lang: 'en' | 
         variant="body1"
         gutterBottom
       >
-        {dict.Homepage.header}
+        {dict.HOMEPAGE.HEADER}
       </Typography>
 
       <Button
