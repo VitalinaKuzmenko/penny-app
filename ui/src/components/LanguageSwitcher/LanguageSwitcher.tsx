@@ -4,7 +4,7 @@ import { usePathname, useRouter, useParams } from 'next/navigation';
 import { availableLanguages, LanguageType } from '../../utils/interfaces';
 import { FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
-export default function LanguageSwitcher() {
+export const LanguageSwitcher = () => {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
@@ -73,4 +73,4 @@ export default function LanguageSwitcher() {
       </FormControl>
     </div>
   );
-}
+};

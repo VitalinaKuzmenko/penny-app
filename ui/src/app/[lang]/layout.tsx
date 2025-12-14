@@ -4,6 +4,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '../../providers/ThemeProvider';
 import Header from 'ui/src/components/Header/Header';
 import { availableLanguages, LanguageType } from 'ui/src/utils/interfaces';
+import { Footer } from 'ui/src/components/Footer/Footer';
 
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ru' }, { lang: 'ua' }];
@@ -34,7 +35,8 @@ export default async function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider>
             <Header lang={lang} />
-            {children}
+            <main style={{ flex: 1, padding: '20px' }}>{children}</main>
+            <Footer />
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

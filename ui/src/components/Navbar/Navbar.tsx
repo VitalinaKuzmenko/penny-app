@@ -15,7 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Image from 'next/image';
 import logo from '../../../public/penny_logo.svg';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
+import { LanguageSwitcher } from '../LanguageSwitcher/LanguageSwitcher';
 
 interface NavbarProps {
   pages: string[];
@@ -133,7 +133,7 @@ export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
           </Box>
           <Box sx={{ flexGrow: 0, display: 'flex', gap: '15px', alignItems: 'center' }}>
             <LanguageSwitcher />
-            <Tooltip title="Sign In">
+            <Tooltip title={signInPageName}>
               <Box>
                 <IconButton
                   size="large"
