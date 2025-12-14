@@ -11,5 +11,10 @@ export default async function Header({ lang }: HeaderProps) {
   const dict = await getDictionary(lang);
   const pages = [dict.HOMEPAGE.PAGES.HOME, dict.HOMEPAGE.PAGES.UPLOAD_CSV, dict.HOMEPAGE.PAGES.PENNYS_VIEW];
 
-  return <Navbar pages={pages} />;
+  return (
+    <Navbar
+      pages={pages}
+      signInPageName={dict.HOMEPAGE.PAGES.SIGN_IN}
+    />
+  );
 }

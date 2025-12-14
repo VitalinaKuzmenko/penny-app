@@ -4,7 +4,8 @@
     "PAGES": {
       "HOME": "Home",
       "UPLOAD_CSV": "Upload CSV",
-      "PENNYS_VIEW": "Penny's View"
+      "PENNYS_VIEW": "Penny's View",
+      "SIGN_IN": "Sign In"
     }
   }
 }

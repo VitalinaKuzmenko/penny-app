@@ -18,8 +18,9 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 
 interface NavbarProps {
   pages: string[];
+  signInPageName: string;
 }
-export const Navbar: React.FC<NavbarProps> = ({ pages }) => {
+export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -132,7 +133,6 @@ export const Navbar: React.FC<NavbarProps> = ({ pages }) => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Login">
               <Box sx={{ display: 'flex' }}>
-                <Typography sx={{ mr: 1 }}>Login</Typography>
                 <IconButton
                   size="large"
                   aria-label="account of current user"
@@ -144,6 +144,7 @@ export const Navbar: React.FC<NavbarProps> = ({ pages }) => {
                 >
                   <AccountCircle />
                 </IconButton>
+                <Typography sx={{ ml: 1 }}>{signInPageName}</Typography>
               </Box>
             </Tooltip>
           </Box>
