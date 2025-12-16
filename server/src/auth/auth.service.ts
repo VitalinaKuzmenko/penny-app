@@ -8,24 +8,40 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from '../prisma/generated/prisma/client';
 import { UsersService } from '../users/users.service';
+import { WinstonLogger } from '../utils/logger/logger';
+
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly logger: WinstonLogger,
   ) {}
 
-  async register(
-    email: string,
-    password: string,
-    userName?: string,
-    userSurname?: string,
-  ) {
+  async register(input: RegisterDto) {
+    const { email, password, userName, userSurname } = input;
+
+    this.logger.info('AuthService.register called', {
+      email,
+      userName,
+      userSurname,
+    });
+
     const existingUser = await this.usersService.findByEmail(email);
-    if (existingUser) throw new BadRequestException('Email already in use');
+    if (existingUser) {
+      this.logger.warn('Registration failed: email already in use', { email });
+      throw new BadRequestException('Email already in use');
+    }
+
+    this.logger.debug('Hashing password', { email });
 
     const passwordHash = await bcrypt.hash(password, 10);
+
+    this.logger.debug('Creating user in database', { email });
+
     const user = await this.usersService.create(
       email,
       passwordHash,
@@ -33,29 +49,73 @@ export class AuthService {
       userSurname,
     );
 
+    this.logger.info('User registered successfully', {
+      userId: user.id,
+      email,
+    });
+
     return this.signToken(user);
   }
 
-  async login(email: string, password: string) {
+  async login(input: LoginDto) {
+    const { email, password } = input;
+    this.logger.info('AuthService.login called', { email });
+
     const user = await this.usersService.findByEmail(email);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      this.logger.warn('Login failed: user not found', { email });
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) throw new UnauthorizedException('Invalid credentials');
+    if (!valid) {
+      this.logger.warn('Login failed: invalid password', {
+        userId: user.id,
+        email,
+      });
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    this.logger.info('Login successful', {
+      userId: user.id,
+      email,
+    });
 
     return this.signToken(user);
   }
 
   private signToken(user: User) {
-    const payload = { sub: user.id, email: user.userEmail };
-    return {
-      accessToken: this.jwtService.sign(payload),
+    this.logger.debug('Signing JWT token', {
+      userId: user.id,
+      email: user.userEmail,
+    });
+
+    const payload = {
+      sub: user.id,
+      email: user.userEmail,
     };
+
+    const accessToken = this.jwtService.sign(payload);
+
+    this.logger.debug('JWT token generated', { userId: user.id });
+
+    return { accessToken };
   }
 
   async me(userId: string) {
+    this.logger.info('AuthService.me called', { userId });
+
     const user = await this.usersService.findById(userId);
-    if (!user) throw new UnauthorizedException();
+    if (!user) {
+      this.logger.warn('AuthService.me failed: user not found', { userId });
+      throw new UnauthorizedException();
+    }
+
+    this.logger.info('AuthService.me success', {
+      userId: user.id,
+      email: user.userEmail,
+    });
+
     return user;
   }
 }

@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
@@ -15,26 +17,13 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  register(
-    @Body()
-    body: {
-      email: string;
-      password: string;
-      userName?: string;
-      userSurname?: string;
-    },
-  ) {
-    return this.authService.register(
-      body.email,
-      body.password,
-      body.userName,
-      body.userSurname,
-    );
+  register(@Body() input: RegisterDto) {
+    return this.authService.register(input);
   }
 
   @Post('login')
-  login(@Body() body: { email: string; password: string }) {
-    return this.authService.login(body.email, body.password);
+  login(@Body() input: LoginDto) {
+    return this.authService.login(input);
   }
 
   @UseGuards(JwtAuthGuard)
