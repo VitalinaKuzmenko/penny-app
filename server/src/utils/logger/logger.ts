@@ -60,7 +60,7 @@ export class WinstonLogger implements LoggerService, OnModuleInit {
       format: winston.format.combine(
         winston.format.errors({ stack: true }),
         winston.format.printf(({ level, message, ...meta }) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
           const { version, ...metaWithoutVersion } = meta;
           return `${level} ${message} ${
             Object.keys(metaWithoutVersion).length
