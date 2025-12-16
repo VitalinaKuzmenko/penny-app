@@ -13,6 +13,13 @@ import { WinstonLogger } from '../utils/logger/logger';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
+export interface UserInfo {
+  id: string;
+  userEmail: string;
+  userName: string;
+  userSurname: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -21,7 +28,7 @@ export class AuthService {
     private readonly logger: WinstonLogger,
   ) {}
 
-  async register(input: RegisterDto) {
+  async register(input: RegisterDto): Promise<{ accessToken: string }> {
     const { email, password, userName, userSurname } = input;
 
     this.logger.info('AuthService.register called', {
@@ -57,7 +64,7 @@ export class AuthService {
     return this.signToken(user);
   }
 
-  async login(input: LoginDto) {
+  async login(input: LoginDto): Promise<{ accessToken: string }> {
     const { email, password } = input;
     this.logger.info('AuthService.login called', { email });
 
@@ -102,7 +109,7 @@ export class AuthService {
     return { accessToken };
   }
 
-  async me(userId: string) {
+  async getUserProfile(userId: string): Promise<UserInfo> {
     this.logger.info('AuthService.me called', { userId });
 
     const user = await this.usersService.findById(userId);
@@ -116,6 +123,13 @@ export class AuthService {
       email: user.userEmail,
     });
 
-    return user;
+    const userInfo: UserInfo = {
+      id: user.id,
+      userEmail: user.userEmail,
+      userName: user.userName,
+      userSurname: user.userSurname,
+    };
+
+    return userInfo;
   }
 }
