@@ -132,4 +132,32 @@ export class AuthService {
 
     return userInfo;
   }
+
+  async validateOAuthLogin({
+    provider,
+    providerId,
+    email,
+    userName,
+    userSurname,
+  }: {
+    provider: string;
+    providerId: string;
+    email: string;
+    userName?: string;
+    userSurname?: string;
+  }) {
+    let user = await this.usersService.findByProviderId(provider, providerId);
+
+    if (!user) {
+      user = await this.usersService.createOAuthUser({
+        provider,
+        providerId,
+        email,
+        userName,
+        userSurname,
+      });
+    }
+
+    return this.signToken(user);
+  }
 }

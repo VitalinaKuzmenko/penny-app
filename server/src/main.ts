@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import cookieParser from 'cookie-parser';
 import Joi from 'joi';
 
 import { AppModule } from './app.module';
@@ -11,11 +12,17 @@ ConfigModule.forRoot({
   validationSchema: Joi.object({
     PORT: Joi.number().default(8080),
     DATABASE_URL: Joi.string().required(),
+    GOOGLE_CLIENT_ID: Joi.string().required(),
+    GOOGLE_CLIENT_SECRET: Joi.string().required(),
+    GOOGLE_CALLBACK_URL: Joi.string().required(),
+    UI_APP_URL: Joi.string().required(),
   }),
 });
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(process.env.PORT ?? 8080);
+
+  app.use(cookieParser());
 
   // eslint-disable-next-line no-console
   console.log(
