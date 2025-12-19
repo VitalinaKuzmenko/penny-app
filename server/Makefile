@@ -45,6 +45,12 @@ prisma-generate:
 	@echo "Generating Prisma client..."
 	DATABASE_URL=$(DATABASE_URL) npx prisma generate
 
+# Apply migrations in production (safe)
+prisma-migrate-deploy:
+	@echo "Deploying Prisma migrations..."
+	DATABASE_URL=$(DATABASE_URL) npx prisma migrate deploy
+
+
 # Push schema to DB without migrations
 prisma-push:
 	@echo "Pushing schema to DB..."
