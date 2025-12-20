@@ -21,6 +21,8 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
     'plugin:prettier/recommended',
+     'prettier',            
+    'plugin:prettier/recommended', 
   ],
 
   rules: {
