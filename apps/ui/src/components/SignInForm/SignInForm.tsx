@@ -16,6 +16,7 @@ import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { loginSchema, type LoginInput } from 'schemas';
 import { useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
 
 interface SignInFormProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,6 +25,7 @@ interface SignInFormProps {
 
 export default function SignInForm({ signInPageText }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const router = useRouter();
 
   const {
     register,
@@ -32,6 +34,14 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
   });
+
+  const handleSignUpClick = () => {
+    router.push('/register');
+  };
+
+  const handleGoogleSignInClick = () => {
+    // TODO: call google sign in API
+  };
 
   const onSubmit = async (data: LoginInput) => {
     console.log('Sign in data:', data);
@@ -111,7 +121,11 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
           {signInPageText.NEW_USER_TITLE}
         </Typography>
 
-        <CustomButton variantType="secondary" fullWidth>
+        <CustomButton
+          variantType="secondary"
+          fullWidth
+          onClick={handleSignUpClick}
+        >
           {signInPageText.SIGN_UP_BUTTON}
         </CustomButton>
       </Box>
@@ -119,7 +133,11 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
       <Divider sx={{ my: 6, height: 2, bgcolor: 'primary.light' }} />
 
       <Box textAlign="center">
-        <CustomButton variantType="other" fullWidth>
+        <CustomButton
+          variantType="other"
+          fullWidth
+          onClick={handleGoogleSignInClick}
+        >
           {signInPageText.CONTINUE_WITH_GOOGLE_BUTTON}
         </CustomButton>
       </Box>
