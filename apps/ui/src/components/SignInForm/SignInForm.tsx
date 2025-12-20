@@ -1,10 +1,29 @@
 'use client';
 
 import { Box, Button, Divider, TextField, Typography, Stack } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { loginSchema, type LoginInput } from 'schemas';
 
 export default function SignInForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginInput) => {
+    console.log('Sign in data:', data);
+    // TODO: call login API
+  };
+
   return (
     <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
       sx={{
         width: '100%',
         p: 4,
@@ -23,14 +42,14 @@ export default function SignInForm() {
       </Typography>
 
       {/* Sign In Form */}
-      <Stack
-        spacing={2}
-        mt={2}
-      >
+      <Stack spacing={2} mt={2}>
         <TextField
-          label="Username"
+          label="Email"
           fullWidth
-          autoComplete="username"
+          autoComplete="email"
+          error={!!errors.email}
+          helperText={errors.email?.message}
+          {...register('email')}
         />
 
         <TextField
@@ -38,14 +57,19 @@ export default function SignInForm() {
           type="password"
           fullWidth
           autoComplete="current-password"
+          error={!!errors.password}
+          helperText={errors.password?.message}
+          {...register('password')}
         />
 
         <Button
+          type="submit"
           variant="contained"
           size="large"
           fullWidth
+          disabled={isSubmitting}
         >
-          Sign in
+          Sign In
         </Button>
       </Stack>
 
@@ -55,7 +79,6 @@ export default function SignInForm() {
       <Box textAlign="center">
         <Typography
           variant="h5"
-          align="center"
           gutterBottom
         >
           New User

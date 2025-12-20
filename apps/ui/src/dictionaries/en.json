@@ -8,5 +8,20 @@
       "SIGN_IN": "Sign In"
     }
   },
-  "HOMEPAGE": {}
+  "HOMEPAGE": {},
+  "SIGN_IN": {
+    "FORM": {
+      "EMAIL": "Email",
+      "PASSWORD": "Password",
+      "SIGN_IN_TITLE": "Sign In",
+      "SIGN_IN_FORM_VALIDATION": {
+        "EMAIL": {
+          "INVALID": "Invalid email"
+        },
+        "PASSWORD": {
+          "REQUIRED": "Password is required"
+        }
+      }
+    }
+  }
 }

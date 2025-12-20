@@ -1,9 +1,13 @@
 import { z } from 'zod';
 
 export const registerSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().email({
+    message: 'errors.email.invalid',
+  }),
 
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string().min(8, {
+    message: 'errors.password.required',
+  }),
 
   userName: z.string().min(1).optional(),
 
