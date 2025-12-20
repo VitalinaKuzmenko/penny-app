@@ -14,5 +14,8 @@ module.exports = {
   },
   rules: {
     'react/react-in-jsx-scope': 'off',
+
+    // Allow `any` in this package
+    '@typescript-eslint/no-explicit-any': 'off',
   },
 };

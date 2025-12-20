@@ -21,8 +21,8 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
     'plugin:prettier/recommended',
-     'prettier',            
-    'plugin:prettier/recommended', 
+    'prettier',
+    'plugin:prettier/recommended',
   ],
 
   rules: {
@@ -33,15 +33,27 @@ module.exports = {
     'unused-imports/no-unused-imports': 'error',
     'unused-imports/no-unused-vars': [
       'warn',
-      { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
     ],
 
     // --- Import order ---
     'import/order': [
       'error',
       {
-        'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
-        'alphabetize': { order: 'asc', caseInsensitive: true },
+        groups: [
+          'builtin',
+          'external',
+          'internal',
+          'parent',
+          'sibling',
+          'index',
+        ],
+        alphabetize: { order: 'asc', caseInsensitive: true },
         'newlines-between': 'always',
       },
     ],
@@ -49,5 +61,8 @@ module.exports = {
     // --- General improvements ---
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     '@typescript-eslint/no-unused-vars': 'off', // replaced by unused-imports
+
+    // --- Allow `any` ---
+    '@typescript-eslint/no-explicit-any': 'off',
   },
 };

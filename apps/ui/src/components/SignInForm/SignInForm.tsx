@@ -90,8 +90,11 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
           autoComplete="current-password"
           error={!!errors.password}
           helperText={
-            errors.password &&
-            signInPageText.FORM.SIGN_IN_FORM_VALIDATION.PASSWORD.REQUIRED
+            errors.password?.message
+              ? signInPageText.FORM.SIGN_IN_FORM_VALIDATION.PASSWORD[
+                  errors.password.message.split('.').pop()!.toUpperCase()
+                ]
+              : ''
           }
           {...register('password')}
           InputProps={{

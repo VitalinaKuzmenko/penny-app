@@ -20,12 +20,40 @@
           "INVALID": "Invalid email"
         },
         "PASSWORD": {
-          "REQUIRED": "Password is required"
+          "REQUIRED": "Password is required",
+          "MIN_LENGTH": "Password must be at least 8 characters"
         }
       }
     },
     "NEW_USER_TITLE": "New User",
     "SIGN_UP_BUTTON": "Create Account",
     "CONTINUE_WITH_GOOGLE_BUTTON": "Continue with Google"
+  },
+  "REGISTER_PAGE": {
+    "FORM": {
+      "CREATE_ACCOUNT_TITLE": "Create your account",
+      "ALREADY_HAVE_ACCOUNT": "Already have an account?",
+      "SIGN_IN_BUTTON": "Sign In",
+      "EMAIL_FIELD": "Email",
+      "PASSWORD_FIELD": "Password",
+      "USERNAME_FIELD": "First Name",
+      "USER_SURNAME_FIELD": "Last Name",
+      "CREATE_ACCOUNT_BUTTON": "Yes, create account!",
+      "REGISTER_FORM_VALIDATION": {
+        "EMAIL": {
+          "INVALID": "Invalid email"
+        },
+        "PASSWORD": {
+          "REQUIRED": "Password is required",
+          "MIN_LENGTH": "Password must be at least 8 characters"
+        },
+        "USERNAME": {
+          "REQUIRED": "First name is required"
+        },
+        "USER_SURNAME": {
+          "REQUIRED": "Last name is required"
+        }
+      }
+    }
   }
 }

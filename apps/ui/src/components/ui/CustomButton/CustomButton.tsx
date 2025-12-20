@@ -2,32 +2,40 @@
 
 import { Button, ButtonProps, CircularProgress } from '@mui/material';
 import React from 'react';
-import { styleMap } from './styleMap';
+import { styleMap, sizeMap } from './styleMap';
 
 interface CustomButtonProps extends ButtonProps {
   loading?: boolean;
   variantType?: 'primary' | 'secondary' | 'other';
-  fullWidth?: boolean;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
-  loading = false,
   children,
-  disabled,
+  loading = false,
   variantType = 'primary',
+  size = 'medium',
   fullWidth = false,
-
+  sx,
+  disabled,
   ...rest
 }) => {
+  // Merge the variant + size + user-provided sx
+  const mergedSx = {
+    ...(styleMap[variantType] || {}),
+    ...(sizeMap[size] || {}),
+    ...(sx || {}),
+  };
+
   return (
     <Button
       {...rest}
-      disabled={disabled || loading}
+      size={size}
       fullWidth={fullWidth}
+      disabled={disabled || loading}
       endIcon={
         loading ? <CircularProgress size={20} color="inherit" /> : undefined
       }
-      sx={styleMap[variantType]}
+      sx={mergedSx}
     >
       {children}
     </Button>
