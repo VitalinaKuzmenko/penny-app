@@ -1,9 +1,10 @@
 'use client';
 
-import { Box, Button, Divider, TextField, Typography, Stack } from '@mui/material';
+import { Box, Divider, TextField, Typography, Stack } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { loginSchema, type LoginInput } from 'schemas';
 
 export default function SignInForm() {
@@ -26,26 +27,26 @@ export default function SignInForm() {
       onSubmit={handleSubmit(onSubmit)}
       sx={{
         width: '100%',
-        p: 4,
-        borderRadius: 2,
-        boxShadow: 3,
+        mx: 'auto',
+        p: 5,
+        borderRadius: 5,
+        boxShadow: 10,
         bgcolor: 'background.paper',
       }}
     >
-      {/* Title */}
       <Typography
         variant="h4"
         align="center"
         gutterBottom
+        sx={{ fontWeight: 600 }}
       >
         Sign In
       </Typography>
 
-      {/* Sign In Form */}
-      <Stack spacing={2} mt={2}>
+      <Stack spacing={2} mt={3}>
         <TextField
           label="Email"
-          fullWidth
+          // fullWidth
           autoComplete="email"
           error={!!errors.email}
           helperText={errors.email?.message}
@@ -55,52 +56,40 @@ export default function SignInForm() {
         <TextField
           label="Password"
           type="password"
-          fullWidth
           autoComplete="current-password"
           error={!!errors.password}
           helperText={errors.password?.message}
           {...register('password')}
         />
 
-        <Button
+        <CustomButton
           type="submit"
-          variant="contained"
-          size="large"
-          fullWidth
-          disabled={isSubmitting}
+          variantType="primary"
+          loading={isSubmitting}
         >
           Sign In
-        </Button>
+        </CustomButton>
       </Stack>
 
-      {/* New User Section */}
-      <Divider sx={{ my: 3 }} />
+      <Divider sx={{ my: 6, height: 2, bgcolor: 'primary.light' }} />
 
       <Box textAlign="center">
-        <Typography
-          variant="h5"
-          gutterBottom
-        >
+        <Typography variant="h5" gutterBottom sx={{ my: 2, fontWeight: 600 }}>
           New User
         </Typography>
 
-        <Button
-          variant="outlined"
-          fullWidth
-        >
+        <CustomButton variantType="secondary" fullWidth>
           Create Account
-        </Button>
+        </CustomButton>
       </Box>
 
-      {/* Continue with Google */}
-      <Divider sx={{ my: 3 }} />
+      <Divider sx={{ my: 6, height: 2, bgcolor: 'primary.light' }} />
 
-      <Button
-        variant="outlined"
-        fullWidth
-      >
-        Continue with Google
-      </Button>
+      <Box textAlign="center">
+        <CustomButton variantType="other" fullWidth>
+          Continue with Google
+        </CustomButton>
+      </Box>
     </Box>
   );
 }
