@@ -1,6 +1,6 @@
 module.exports = {
   extends: [
-    '../.eslintrc.base.js',
+    '../../.eslintrc.base.js',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
     'next/core-web-vitals',

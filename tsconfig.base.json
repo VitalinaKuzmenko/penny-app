@@ -11,6 +11,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@schemas/*": ["packages/schemas/*"]
+    }
   }
 }
