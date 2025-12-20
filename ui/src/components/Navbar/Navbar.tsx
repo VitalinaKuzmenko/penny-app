@@ -15,7 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Image from 'next/image';
 import logo from '../../../public/penny_logo.svg';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import { LanguageSwitcher } from '../LanguageSwitcher/LanguageSwitcher';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher';
 
 interface NavbarProps {
   pages: string[];
@@ -142,7 +142,7 @@ export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
                   aria-haspopup="true"
                   color="inherit"
                   sx={{ p: 0 }}
-                  href="/login"
+                  href="/signin"
                 >
                   <AccountCircle />
                   <Typography sx={{ ml: 1 }}>{signInPageName}</Typography>

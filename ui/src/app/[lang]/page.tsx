@@ -1,6 +1,6 @@
 import { Button, Typography } from '@mui/material';
-import { getDictionary } from '../../utils/getDictionary';
-import { LanguageType } from 'ui/src/utils/interfaces';
+import { getDictionary } from '@/utils/getDictionary';
+import { LanguageType } from '@/utils/interfaces';
 
 export default async function Page({ params }: { params: Promise<{ lang: LanguageType }> }) {
   const { lang } = await params;

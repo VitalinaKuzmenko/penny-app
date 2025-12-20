@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { ThemeProvider } from '../../providers/ThemeProvider';
-import Header from 'ui/src/components/Header/Header';
-import { availableLanguages, LanguageType } from 'ui/src/utils/interfaces';
-import { Footer } from 'ui/src/components/Footer/Footer';
+import { ThemeProvider } from '@/providers/ThemeProvider';
+import Header from '@/components/Header/Header';
+import { availableLanguages, LanguageType } from '@/utils/interfaces';
+import { Footer } from '@/components/Footer/Footer';
 
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ru' }, { lang: 'ua' }];

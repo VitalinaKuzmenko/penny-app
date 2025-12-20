@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter, useParams } from 'next/navigation';
-import { availableLanguages, LanguageType } from '../../utils/interfaces';
+import { availableLanguages, LanguageType } from '@/utils/interfaces';
 import { FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
 export const LanguageSwitcher = () => {

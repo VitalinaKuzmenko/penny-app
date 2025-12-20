@@ -1,6 +1,6 @@
-import { getDictionary } from 'ui/src/utils/getDictionary';
-import { Navbar } from '../Navbar/Navbar';
-import { LanguageType } from 'ui/src/utils/interfaces';
+import { getDictionary } from '@/utils/getDictionary';
+import { Navbar } from '@/components/Navbar/Navbar';
+import { LanguageType } from '@/utils/interfaces';
 
 interface HeaderProps {
   lang: LanguageType;
