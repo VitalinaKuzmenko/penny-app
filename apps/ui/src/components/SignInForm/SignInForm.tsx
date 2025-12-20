@@ -1,11 +1,21 @@
 'use client';
 
-import { Box, Divider, TextField, Typography, Stack } from '@mui/material';
+import {
+  Box,
+  Divider,
+  TextField,
+  Typography,
+  Stack,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { loginSchema, type LoginInput } from 'schemas';
+import { useState } from 'react';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 interface SignInFormProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,6 +23,8 @@ interface SignInFormProps {
 }
 
 export default function SignInForm({ signInPageText }: SignInFormProps) {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
   const {
     register,
     handleSubmit,
@@ -25,6 +37,8 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
     console.log('Sign in data:', data);
     // TODO: call login API
   };
+
+  const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
   return (
     <Box
@@ -62,7 +76,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
 
         <TextField
           label={signInPageText.FORM.PASSWORD_FIELD}
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           autoComplete="current-password"
           error={!!errors.password}
           helperText={
@@ -70,6 +84,15 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
             signInPageText.FORM.SIGN_IN_FORM_VALIDATION.PASSWORD.REQUIRED
           }
           {...register('password')}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleTogglePassword} edge="end">
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
 
         <CustomButton
