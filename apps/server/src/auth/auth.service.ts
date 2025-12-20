@@ -5,13 +5,11 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { LoginInput, RegisterInput } from 'schemas';
 
 import { User } from '../prisma/generated/prisma/client';
 import { UsersService } from '../users/users.service';
 import { WinstonLogger } from '../utils/logger/logger';
-
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
 
 export interface UserInfo {
   id: string;
@@ -28,7 +26,7 @@ export class AuthService {
     private readonly logger: WinstonLogger,
   ) {}
 
-  async register(input: RegisterDto): Promise<{ accessToken: string }> {
+  async register(input: RegisterInput): Promise<{ accessToken: string }> {
     const { email, password, userName, userSurname } = input;
 
     this.logger.info('AuthService.register called', {
@@ -64,7 +62,7 @@ export class AuthService {
     return this.signToken(user);
   }
 
-  async login(input: LoginDto): Promise<{ accessToken: string }> {
+  async login(input: LoginInput): Promise<{ accessToken: string }> {
     const { email, password } = input;
     this.logger.info('AuthService.login called', { email });
 

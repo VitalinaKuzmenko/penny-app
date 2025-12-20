@@ -13,10 +13,9 @@ import {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
+import { LoginInput, RegisterInput } from 'schemas';
 
 import { AuthService, UserInfo } from './auth.service';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 export interface AuthenticatedRequest extends ExpressRequest {
@@ -32,12 +31,12 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  register(@Body() input: RegisterDto): Promise<{ accessToken: string }> {
+  register(@Body() input: RegisterInput): Promise<{ accessToken: string }> {
     return this.authService.register(input);
   }
 
   @Post('login')
-  login(@Body() input: LoginDto): Promise<{ accessToken: string }> {
+  login(@Body() input: LoginInput): Promise<{ accessToken: string }> {
     return this.authService.login(input);
   }
 
