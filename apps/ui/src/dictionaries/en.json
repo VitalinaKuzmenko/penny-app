@@ -9,11 +9,12 @@
     }
   },
   "HOMEPAGE": {},
-  "SIGN_IN": {
+  "SIGN_IN_PAGE": {
     "FORM": {
-      "EMAIL": "Email",
-      "PASSWORD": "Password",
       "SIGN_IN_TITLE": "Sign In",
+      "EMAIL_FIELD": "Email",
+      "PASSWORD_FIELD": "Password",
+      "SIGN_IN_BUTTON": "Sign In",
       "SIGN_IN_FORM_VALIDATION": {
         "EMAIL": {
           "INVALID": "Invalid email"
@@ -22,6 +23,9 @@
           "REQUIRED": "Password is required"
         }
       }
-    }
+    },
+    "NEW_USER_TITLE": "New User",
+    "SIGN_UP_BUTTON": "Create Account",
+    "CONTINUE_WITH_GOOGLE_BUTTON": "Continue with Google"
   }
 }

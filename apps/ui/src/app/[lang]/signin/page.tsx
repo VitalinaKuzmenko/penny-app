@@ -1,7 +1,19 @@
 import { Container, Box } from '@mui/material';
 import SignInForm from '@/components/SignInForm/SignInForm';
+import { LanguageType } from '@/utils/interfaces';
+import { getDictionary } from '@/utils/getDictionary';
 
-export default function SignInPage() {
+export default async function SignInPage({
+  params,
+}: {
+  params: Promise<{ lang: LanguageType }>;
+}) {
+  const { lang } = await params;
+
+  const dict = await getDictionary(lang);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const signInPageText: Record<string, any> = dict.SIGN_IN_PAGE;
+
   return (
     <Container maxWidth="sm">
       <Box
@@ -12,7 +24,7 @@ export default function SignInPage() {
           justifyContent: 'center',
         }}
       >
-        <SignInForm />
+        <SignInForm signInPageText={signInPageText} />
       </Box>
     </Container>
   );

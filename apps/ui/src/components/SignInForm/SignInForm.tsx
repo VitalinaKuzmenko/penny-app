@@ -7,7 +7,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { loginSchema, type LoginInput } from 'schemas';
 
-export default function SignInForm() {
+interface SignInFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  signInPageText: Record<string, any>;
+}
+
+export default function SignInForm({ signInPageText }: SignInFormProps) {
   const {
     register,
     handleSubmit,
@@ -40,25 +45,30 @@ export default function SignInForm() {
         gutterBottom
         sx={{ fontWeight: 600 }}
       >
-        Sign In
+        {signInPageText.FORM.SIGN_IN_TITLE}
       </Typography>
 
       <Stack spacing={2} mt={3}>
         <TextField
-          label="Email"
-          // fullWidth
+          label={signInPageText.FORM.EMAIL_FIELD}
           autoComplete="email"
           error={!!errors.email}
-          helperText={errors.email?.message}
+          helperText={
+            errors.email &&
+            signInPageText.FORM.SIGN_IN_FORM_VALIDATION.EMAIL.INVALID
+          }
           {...register('email')}
         />
 
         <TextField
-          label="Password"
+          label={signInPageText.FORM.PASSWORD_FIELD}
           type="password"
           autoComplete="current-password"
           error={!!errors.password}
-          helperText={errors.password?.message}
+          helperText={
+            errors.password &&
+            signInPageText.FORM.SIGN_IN_FORM_VALIDATION.PASSWORD.REQUIRED
+          }
           {...register('password')}
         />
 
@@ -67,7 +77,7 @@ export default function SignInForm() {
           variantType="primary"
           loading={isSubmitting}
         >
-          Sign In
+          {signInPageText.FORM.SIGN_IN_BUTTON}
         </CustomButton>
       </Stack>
 
@@ -75,11 +85,11 @@ export default function SignInForm() {
 
       <Box textAlign="center">
         <Typography variant="h5" gutterBottom sx={{ my: 2, fontWeight: 600 }}>
-          New User
+          {signInPageText.NEW_USER_TITLE}
         </Typography>
 
         <CustomButton variantType="secondary" fullWidth>
-          Create Account
+          {signInPageText.SIGN_UP_BUTTON}
         </CustomButton>
       </Box>
 
@@ -87,7 +97,7 @@ export default function SignInForm() {
 
       <Box textAlign="center">
         <CustomButton variantType="other" fullWidth>
-          Continue with Google
+          {signInPageText.CONTINUE_WITH_GOOGLE_BUTTON}
         </CustomButton>
       </Box>
     </Box>
