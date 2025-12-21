@@ -6,7 +6,7 @@ export interface RegisterResponse {
 }
 
 export function registerUser(input: RegisterInput) {
-  return apiFetch<RegisterResponse, RegisterInput>('/auth/register', {
+  return apiFetch<{ success: true }, RegisterInput>('/auth/register', {
     method: 'POST',
     body: input,
   });

@@ -6,6 +6,10 @@
       "UPLOAD_CSV": "Upload CSV",
       "PENNYS_VIEW": "Penny's View",
       "SIGN_IN": "Sign In"
+    },
+    "TOOLTIP": {
+      "SIGN_IN": "Sign In",
+      "SIGN_IN_USER": "Go to Profile"
     }
   },
   "HOMEPAGE": {},

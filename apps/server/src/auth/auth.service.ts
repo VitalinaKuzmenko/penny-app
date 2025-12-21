@@ -5,18 +5,11 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { LoginInput, RegisterInput } from 'schemas';
+import { LoginInput, RegisterInput, UserInfo } from 'schemas';
 
 import { User } from '../prisma/generated/prisma/client';
 import { UsersService } from '../users/users.service';
 import { WinstonLogger } from '../utils/logger/logger';
-
-export interface UserInfo {
-  id: string;
-  userEmail: string;
-  userName: string;
-  userSurname: string;
-}
 
 @Injectable()
 export class AuthService {
@@ -111,15 +104,17 @@ export class AuthService {
   }
 
   async getUserProfile(userId: string): Promise<UserInfo> {
-    this.logger.info('AuthService.me called', { userId });
+    this.logger.info('AuthService.profile called', { userId });
 
     const user = await this.usersService.findById(userId);
     if (!user) {
-      this.logger.warn('AuthService.me failed: user not found', { userId });
+      this.logger.warn('AuthService.profile failed: user not found', {
+        userId,
+      });
       throw new UnauthorizedException();
     }
 
-    this.logger.info('AuthService.me success', {
+    this.logger.info('AuthService.profile success', {
       userId: user.id,
       email: user.userEmail,
     });

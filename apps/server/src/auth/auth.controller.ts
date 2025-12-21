@@ -13,9 +13,9 @@ import {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
-import { LoginInput, RegisterInput } from 'schemas';
+import { LoginInput, RegisterInput, UserInfo } from 'schemas';
 
-import { AuthService, UserInfo } from './auth.service';
+import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 export interface AuthenticatedRequest extends ExpressRequest {
@@ -31,13 +31,45 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  register(@Body() input: RegisterInput): Promise<{ accessToken: string }> {
-    return this.authService.register(input);
+  async register(
+    @Body() input: RegisterInput,
+    @Res({ passthrough: true }) res: ExpressResponse,
+  ): Promise<{ success: true }> {
+    const { accessToken } = await this.authService.register(input);
+
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    });
+
+    return { success: true };
   }
 
   @Post('login')
-  login(@Body() input: LoginInput): Promise<{ accessToken: string }> {
-    return this.authService.login(input);
+  async login(
+    @Body() input: LoginInput,
+    @Res({ passthrough: true }) res: ExpressResponse,
+  ) {
+    const { accessToken } = await this.authService.login(input);
+
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      path: '/',
+    });
+
+    return { message: 'Logged in successfully' };
+  }
+
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: ExpressResponse) {
+    res.clearCookie('access_token', { path: '/' });
+    return { success: true };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -58,7 +90,7 @@ export class AuthController {
     @Req() req: AuthenticatedRequest,
     @Res() res: ExpressResponse,
   ) {
-    const jwt = req.user['accessToken'];
+    const jwt = req.user['access_token'];
 
     // Set HTTP-only cookie
     res.cookie('access_token', jwt, {

@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { registerSchema, type RegisterInput } from 'schemas';
-import { registerUser } from '@/api/auth';
+import { registerUser } from '@/api/lib/auth';
 import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
@@ -43,8 +43,7 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
 
   const onSubmit = async (data: RegisterInput) => {
     try {
-      const result = await registerUser(data);
-      localStorage.setItem('accessToken', result.accessToken);
+      await registerUser(data);
 
       router.push('/');
     } catch (err: any) {

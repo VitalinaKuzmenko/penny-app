@@ -23,6 +23,7 @@ export async function apiFetch<TResponse, TBody = unknown>(
       'Content-Type': 'application/json',
       ...options?.headers,
     },
+    credentials: 'include',
     body: options?.body ? JSON.stringify(options.body) : undefined,
   });
 

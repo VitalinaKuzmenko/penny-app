@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import * as React from 'react';
@@ -16,13 +18,24 @@ import Image from 'next/image';
 import logo from '../../../public/penny_logo.svg';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher';
+import { UserInfo } from 'schemas';
+import { useEffect } from 'react';
 
 interface NavbarProps {
-  pages: string[];
-  signInPageName: string;
+  headerText: Record<string, any>;
+  userData: UserInfo | null;
 }
-export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+export const Navbar: React.FC<NavbarProps> = ({ headerText, userData }) => {
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
+    null,
+  );
+  const [user, setUser] = React.useState<UserInfo | null>(null);
+
+  const pages = [
+    headerText.PAGES.HOME,
+    headerText.PAGES.UPLOAD_CSV,
+    headerText.PAGES.PENNYS_VIEW,
+  ];
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -31,6 +44,10 @@ export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
+  useEffect(() => {
+    setUser(userData);
+  }, [userData]);
 
   return (
     <AppBar position="static">
@@ -51,12 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
               textDecoration: 'none',
             }}
           >
-            <Image
-              src={logo}
-              alt="logo"
-              width={90}
-              height={90}
-            />
+            <Image src={logo} alt="logo" width={90} height={90} />
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -87,10 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                >
+                <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
@@ -113,12 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
               textDecoration: 'none',
             }}
           >
-            <Image
-              src={logo}
-              alt="logo"
-              width={90}
-              height={90}
-            />
+            <Image src={logo} alt="logo" width={90} height={90} />
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
@@ -131,9 +135,22 @@ export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
               </Button>
             ))}
           </Box>
-          <Box sx={{ flexGrow: 0, display: 'flex', gap: '15px', alignItems: 'center' }}>
+          <Box
+            sx={{
+              flexGrow: 0,
+              display: 'flex',
+              gap: '15px',
+              alignItems: 'center',
+            }}
+          >
             <LanguageSwitcher />
-            <Tooltip title={signInPageName}>
+            <Tooltip
+              title={
+                user
+                  ? headerText.TOOLTIP.SIGN_IN_USER
+                  : headerText.TOOLTIP.SIGN_IN
+              }
+            >
               <Box>
                 <IconButton
                   size="large"
@@ -142,10 +159,12 @@ export const Navbar: React.FC<NavbarProps> = ({ pages, signInPageName }) => {
                   aria-haspopup="true"
                   color="inherit"
                   sx={{ p: 0 }}
-                  href="/signin"
+                  href={user ? `/profile` : `/signin`}
                 >
                   <AccountCircle />
-                  <Typography sx={{ ml: 1 }}>{signInPageName}</Typography>
+                  <Typography sx={{ ml: 1 }}>
+                    {user ? user.userName : headerText.PAGES.SIGN_IN}
+                  </Typography>
                 </IconButton>
               </Box>
             </Tooltip>
