@@ -1,6 +1,9 @@
 'use client';
 
-import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
+import {
+  ThemeProvider as MuiThemeProvider,
+  createTheme,
+} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ReactNode } from 'react';
 
@@ -9,36 +12,49 @@ export const theme = createTheme({
     mode: 'light',
     primary: {
       main: '#041646',
-      light: '#263476',
-      dark: '#03123d',
-      contrastText: '#ffffff',
+      light: '#3B4A8A',
+      dark: '#020B2D',
+      contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#00B1C2',
-      light: '#26bfce',
-      dark: '#009eaf',
-      contrastText: '#ffffff',
+      main: '#f36919ff',
+      light: '#ffaf72ff',
+      dark: '#C2410C',
+      contrastText: '#1F2937',
     },
     success: {
       main: '#10B981',
+      light: '#6EE7B7',
+      dark: '#047857',
     },
     warning: {
       main: '#F59E0B',
+      light: '#FCD34D',
+      dark: '#B45309',
     },
     error: {
       main: '#EF4444',
+      light: '#FCA5A5',
+      dark: '#B91C1C',
+    },
+    info: {
+      main: '#38BDF8',
+    },
+    background: {
+      default: '#D1D5DB',
+      paper: '#FFFFFF',
     },
     grey: {
-      50: '#f8f9fa',
-      100: '#f1f3f5',
-      200: '#e9ecef',
-      300: '#dee2e6',
-      400: '#ced4da',
-      500: '#adb5bd',
-      600: '#6c757d',
-      700: '#495057',
-      800: '#343a40',
-      900: '#212529',
+      50: '#F9FAFB',
+      100: '#F3F4F6',
+      200: '#E5E7EB',
+      300: '#D1D5DB',
+      400: '#9CA3AF',
+      500: '#6B7280',
+      600: '#4B5563',
+      700: '#374151',
+      800: '#1F2937',
+      900: '#111827',
     },
   },
 });
