@@ -1,7 +1,7 @@
 // components/ui/Banner.tsx
 'use client';
 
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Alert, AlertTitle, Collapse, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { UiError } from '@/types/interfaces';
@@ -17,17 +17,14 @@ const ErrorBanner: FC<ErrorBannerProps> = ({
   onClose,
   colorMode = 'light',
 }) => {
-  const [open, setOpen] = useState<boolean>(!!error);
-
   if (!error) return null;
 
   const handleClose = () => {
-    setOpen(false);
     onClose?.();
   };
 
   return (
-    <Collapse in={open}>
+    <Collapse in={true}>
       {colorMode === 'light' && (
         <Alert
           severity={error.severity ?? 'error'}

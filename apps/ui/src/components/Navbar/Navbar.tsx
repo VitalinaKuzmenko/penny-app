@@ -19,7 +19,6 @@ import logo from '../../../public/penny_logo.svg';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher';
 import { UserInfo } from 'schemas';
-import { useEffect } from 'react';
 
 interface NavbarProps {
   headerText: Record<string, any>;
@@ -29,8 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText, userData }) => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null,
   );
-  const [user, setUser] = React.useState<UserInfo | null>(null);
-
+  const user = userData;
   const pages = [
     headerText.PAGES.HOME,
     headerText.PAGES.UPLOAD_CSV,
@@ -44,10 +42,6 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText, userData }) => {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
-
-  useEffect(() => {
-    setUser(userData);
-  }, [userData]);
 
   return (
     <AppBar position="static">

@@ -80,7 +80,8 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
         onSubmit={handleSubmit(onSubmit)}
         sx={{
           width: '100%',
-          maxWidth: 450,
+          minWidth: { xs: '100%', sm: 550 },
+          maxWidth: { xs: '100%', sm: 550 },
           mx: 'auto',
           mb: 2,
           p: 5,

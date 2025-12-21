@@ -55,6 +55,8 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
     try {
       await loginUser(data);
 
+      router.refresh();
+
       router.push('/');
     } catch (err: any) {
       if (err.data?.field && err.data?.code) {
@@ -86,8 +88,10 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
         onSubmit={handleSubmit(onSubmit)}
         sx={{
           width: '100%',
+          minWidth: { xs: '100%', sm: 550 },
+          maxWidth: { xs: '100%', sm: 550 },
           mx: 'auto',
-          p: 5,
+          p: { xs: 2, sm: 5 },
           borderRadius: 5,
           boxShadow: 10,
           bgcolor: 'background.paper',

@@ -66,5 +66,19 @@
         }
       }
     }
+  },
+  "PROFILE_PAGE": {
+    "TITLE": "Profile",
+    "NAME": "Name",
+    "EMAIL": "Email",
+    "SIGN_OUT": "Sign out",
+    "NOT_SIGNED_IN": "You are not signed in",
+    "SIGN_IN_BUTTON": "Sign In",
+    "ERRORS": {
+      "SIGN_OUT": {
+        "TITLE": "Failed to sign out",
+        "MESSAGE": "Failed to sign out. Please try again in a minute."
+      }
+    }
   }
 }
