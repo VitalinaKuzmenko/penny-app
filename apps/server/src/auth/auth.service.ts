@@ -37,8 +37,11 @@ export class AuthService {
 
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
-      this.logger.warn('Registration failed: email already in use', { email });
-      throw new BadRequestException('Email already in use');
+      this.logger.warn('Registration failed: Email already exists', { email });
+      throw new BadRequestException({
+        field: 'email',
+        code: 'auth.email_exists',
+      });
     }
 
     this.logger.debug('Hashing password', { email });

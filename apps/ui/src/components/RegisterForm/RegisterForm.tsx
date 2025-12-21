@@ -18,6 +18,10 @@ import { useRouter } from 'next/navigation';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { registerSchema, type RegisterInput } from 'schemas';
+import { registerUser } from '@/api/auth';
+import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
+import { UiError } from '@/types/interfaces';
+import ErrorBanner from '../ErrorBanner/ErrorBanner';
 
 interface RegisterPageProps {
   registerPageText: Record<string, any>;
@@ -25,19 +29,43 @@ interface RegisterPageProps {
 
 export default function RegisterPage({ registerPageText }: RegisterPageProps) {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState<UiError | null>(null);
 
   const {
     register,
     handleSubmit,
+    setError: setFormError,
     formState: { errors, isSubmitting },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
   });
 
   const onSubmit = async (data: RegisterInput) => {
-    console.log('Register data:', data);
-    // TODO: call register API
+    try {
+      const result = await registerUser(data);
+      localStorage.setItem('accessToken', result.accessToken);
+
+      router.push('/');
+    } catch (err: any) {
+      if (err.data?.field && err.data?.code) {
+        const translatedMessage = getNestedDict(
+          registerPageText.FORM.ERRORS,
+          err.data.code.toUpperCase(),
+        );
+
+        setFormError(err.data.field, {
+          type: 'server',
+          message: translatedMessage ?? 'Unknown error',
+        });
+        return;
+      }
+
+      setError({
+        title: registerPageText.FORM.ERRORS.GENERAL.TITLE,
+        message: registerPageText.FORM.ERRORS.GENERAL.MESSAGE,
+      });
+    }
   };
 
   const handleTogglePassword = () => setShowPassword((prev) => !prev);
@@ -47,112 +75,133 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
   };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmit)}
-      sx={{
-        width: '100%',
-        maxWidth: 450,
-        mx: 'auto',
-        p: 5,
-        borderRadius: 5,
-        boxShadow: 10,
-        bgcolor: 'background.paper',
-      }}
-    >
-      {/* Title */}
-      <Typography
-        variant="h4"
-        align="center"
-        gutterBottom
-        sx={{ fontWeight: 600 }}
+    <Box>
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{
+          width: '100%',
+          maxWidth: 450,
+          mx: 'auto',
+          mb: 2,
+          p: 5,
+          borderRadius: 5,
+          boxShadow: 10,
+          bgcolor: 'background.paper',
+        }}
       >
-        {registerPageText.FORM.CREATE_ACCOUNT_TITLE}
-      </Typography>
-
-      {/* Subtitle */}
-      <Stack spacing={1} alignItems="center" mb={5} mt={3}>
-        <Typography variant="body2" align="center">
-          {registerPageText.FORM.ALREADY_HAVE_ACCOUNT}
+        {/* Title */}
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
+          sx={{ fontWeight: 600 }}
+        >
+          {registerPageText.FORM.CREATE_ACCOUNT_TITLE}
         </Typography>
-        <CustomButton
-          variantType="secondary"
-          size="small"
-          onClick={handleSignInClick}
-        >
-          {registerPageText.FORM.SIGN_IN_BUTTON}
-        </CustomButton>
-      </Stack>
 
-      {/* Form Fields */}
-      <Stack spacing={2}>
-        <TextField
-          label={registerPageText.FORM.EMAIL_FIELD}
-          autoComplete="email"
-          error={!!errors.email}
-          helperText={
-            errors.email &&
-            registerPageText.FORM.REGISTER_FORM_VALIDATION.EMAIL.INVALID
-          }
-          {...register('email')}
-        />
+        {/* Subtitle */}
+        <Stack spacing={1} alignItems="center" mb={5} mt={3}>
+          <Typography variant="body2" align="center">
+            {registerPageText.FORM.ALREADY_HAVE_ACCOUNT}
+          </Typography>
+          <CustomButton
+            variantType="secondary"
+            size="small"
+            onClick={handleSignInClick}
+          >
+            {registerPageText.FORM.SIGN_IN_BUTTON}
+          </CustomButton>
+        </Stack>
 
-        <TextField
-          label={registerPageText.FORM.PASSWORD_FIELD}
-          type={showPassword ? 'text' : 'password'}
-          autoComplete="new-password"
-          error={!!errors.password}
-          helperText={
-            errors.password?.message
-              ? registerPageText.FORM.REGISTER_FORM_VALIDATION.PASSWORD[
-                  errors.password.message.split('.').pop()!.toUpperCase()
-                ]
-              : ''
-          }
-          {...register('password')}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleTogglePassword} edge="end">
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+        {/* Form Fields */}
+        <Stack spacing={2}>
+          <TextField
+            label={registerPageText.FORM.EMAIL_FIELD}
+            autoComplete="email"
+            error={!!errors.email}
+            helperText={
+              errors.email && errors.email.message
+                ? getTranslatedError(
+                    errors.email.message,
+                    registerPageText.FORM,
+                  )
+                : ''
+            }
+            {...register('email')}
+          />
 
-        <TextField
-          label={registerPageText.FORM.USERNAME_FIELD}
-          autoComplete="username"
-          error={!!errors.userName}
-          helperText={
-            errors.userName &&
-            registerPageText.FORM.REGISTER_FORM_VALIDATION.USERNAME.REQUIRED
-          }
-          {...register('userName')}
-        />
+          <TextField
+            label={registerPageText.FORM.PASSWORD_FIELD}
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            error={!!errors.password}
+            helperText={
+              errors.password && errors.password.message
+                ? getTranslatedError(
+                    errors.password.message,
+                    registerPageText.FORM,
+                  )
+                : ''
+            }
+            {...register('password')}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleTogglePassword} edge="end">
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
 
-        <TextField
-          label={registerPageText.FORM.USER_SURNAME_FIELD}
-          autoComplete="family-name"
-          error={!!errors.userSurname}
-          helperText={
-            errors.userSurname &&
-            registerPageText.FORM.REGISTER_FORM_VALIDATION.USER_SURNAME.REQUIRED
-          }
-          {...register('userSurname')}
-        />
+          <TextField
+            label={registerPageText.FORM.USERNAME_FIELD}
+            autoComplete="username"
+            error={!!errors.userName}
+            helperText={
+              errors.userName && errors.userName.message
+                ? getTranslatedError(
+                    errors.userName.message,
+                    registerPageText.FORM,
+                  )
+                : ''
+            }
+            {...register('userName')}
+          />
 
-        {/* Submit Button */}
-        <CustomButton
-          type="submit"
-          variantType="primary"
-          fullWidth
-          loading={isSubmitting}
-        >
-          {registerPageText.FORM.CREATE_ACCOUNT_BUTTON}
-        </CustomButton>
-      </Stack>
+          <TextField
+            label={registerPageText.FORM.USER_SURNAME_FIELD}
+            autoComplete="family-name"
+            error={!!errors.userSurname}
+            helperText={
+              errors.userSurname && errors.userSurname.message
+                ? getTranslatedError(
+                    errors.userSurname.message,
+                    registerPageText.FORM,
+                  )
+                : ''
+            }
+            {...register('userSurname')}
+          />
+
+          {/* Submit Button */}
+          <CustomButton
+            type="submit"
+            variantType="primary"
+            fullWidth
+            loading={isSubmitting}
+          >
+            {registerPageText.FORM.CREATE_ACCOUNT_BUTTON}
+          </CustomButton>
+        </Stack>
+      </Box>
+      <ErrorBanner
+        error={error}
+        onClose={() => setError(null)}
+        colorMode="color"
+      />
     </Box>
   );
 }

@@ -39,7 +39,11 @@
       "USERNAME_FIELD": "First Name",
       "USER_SURNAME_FIELD": "Last Name",
       "CREATE_ACCOUNT_BUTTON": "Yes, create account!",
-      "REGISTER_FORM_VALIDATION": {
+      "ERRORS": {
+        "GENERAL": {
+          "TITLE": "Something went wrong",
+          "MESSAGE": "Please try again later."
+        },
         "EMAIL": {
           "INVALID": "Invalid email"
         },
@@ -52,6 +56,9 @@
         },
         "USER_SURNAME": {
           "REQUIRED": "Last name is required"
+        },
+        "AUTH": {
+          "EMAIL_EXISTS": "This email is already registered"
         }
       }
     }

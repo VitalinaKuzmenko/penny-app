@@ -20,9 +20,15 @@ ConfigModule.forRoot({
 });
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 8080);
 
   app.use(cookieParser());
+
+  app.enableCors({
+    origin: process.env.UI_APP_URL ?? 'http://localhost:3000',
+    credentials: true,
+  });
+
+  await app.listen(process.env.PORT ?? 8080);
 
   // eslint-disable-next-line no-console
   console.log(

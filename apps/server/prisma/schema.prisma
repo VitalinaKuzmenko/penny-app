@@ -34,7 +34,7 @@ model User {
   userName    String         @map("user_name")
   userSurname String         @map("user_surname")
   userEmail   String         @unique @map("user_email")
-  passwordHash String?        @map("password_hash")
+  passwordHash String?       @map("password_hash")
   provider     String?       @map("provider")      
   providerId   String?       @map("provider_id") 
   createdAt   DateTime       @default(now()) @map("created_at")
