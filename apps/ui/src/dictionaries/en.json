@@ -27,6 +27,12 @@
           "REQUIRED": "Password is required",
           "MIN_LENGTH": "Password must be at least 8 characters"
         }
+      },
+      "ERRORS": {
+        "GENERAL": {
+          "TITLE": "Something went wrong",
+          "MESSAGE": "Please try again later."
+        }
       }
     },
     "NEW_USER_TITLE": "New User",

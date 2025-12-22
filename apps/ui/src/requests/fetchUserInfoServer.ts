@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { UserInfo } from 'schemas';
 
-export const fetchUserInfo = async (): Promise<UserInfo | null> => {
+export const fetchUserInfoServer = async (): Promise<UserInfo | null> => {
   let user: UserInfo | null = null;
   try {
     const cookieStore = cookies();

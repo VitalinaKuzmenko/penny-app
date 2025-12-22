@@ -18,22 +18,20 @@ import Image from 'next/image';
 import logo from '../../../public/penny_logo.svg';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher';
-import { UserInfo } from 'schemas';
+import { useState } from 'react';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface NavbarProps {
   headerText: Record<string, any>;
-  userData: UserInfo | null;
 }
-export const Navbar: React.FC<NavbarProps> = ({ headerText, userData }) => {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null,
-  );
-  const user = userData;
+export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
+  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const pages = [
     headerText.PAGES.HOME,
     headerText.PAGES.UPLOAD_CSV,
     headerText.PAGES.PENNYS_VIEW,
   ];
+  const { user } = useAuth();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);

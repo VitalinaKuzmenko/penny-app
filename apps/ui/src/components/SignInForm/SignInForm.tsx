@@ -23,6 +23,7 @@ import { getNestedDict } from '@/utils/getNestedDict';
 import { loginUser } from '@/api/lib/login';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface SignInFormProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,6 +34,8 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<UiError | null>(null);
   const router = useRouter();
+
+  const { refetchUser } = useAuth();
 
   const {
     register,
@@ -54,9 +57,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   const onSubmit = async (data: LoginInput) => {
     try {
       await loginUser(data);
-
-      router.refresh();
-
+      await refetchUser();
       router.push('/');
     } catch (err: any) {
       if (err.data?.field && err.data?.code) {
@@ -91,6 +92,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
           minWidth: { xs: '100%', sm: 550 },
           maxWidth: { xs: '100%', sm: 550 },
           mx: 'auto',
+          mb: 2,
           p: { xs: 2, sm: 5 },
           borderRadius: 5,
           boxShadow: 10,

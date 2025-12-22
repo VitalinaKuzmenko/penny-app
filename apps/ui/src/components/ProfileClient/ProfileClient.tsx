@@ -2,29 +2,24 @@
 
 import { useState } from 'react';
 import { Button, Card, CardContent, Typography, Box } from '@mui/material';
-import { UserInfo } from 'schemas';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import CustomButton from '../ui/CustomButton/CustomButton';
 import { useRouter } from 'next/navigation';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface ProfileClientProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   profilePageText: Record<string, any>;
-  userData: UserInfo | null;
 }
 
-export default function ProfileClient({
-  profilePageText,
-  userData,
-}: ProfileClientProps) {
+export default function ProfileClient({ profilePageText }: ProfileClientProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<UiError | null>(null);
+  const { user, setUser } = useAuth();
 
   const router = useRouter();
-
-  const user = userData;
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -45,10 +40,11 @@ export default function ProfileClient({
       setLoading(false);
       return;
     }
+
     setLoading(false);
 
-    router.refresh();
     router.push('/');
+    setUser(null);
   };
 
   const handleSignInClick = () => {

@@ -5,6 +5,8 @@ import { ThemeProvider } from '@/providers/ThemeProvider';
 import Header from '@/components/Header/Header';
 import { availableLanguages, LanguageType } from '@/utils/interfaces';
 import { Footer } from '@/components/Footer/Footer';
+import { AuthProvider } from '@/providers/AuthProvider';
+import { fetchUserInfoServer } from '@/requests/fetchUserInfoServer';
 
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ru' }, { lang: 'ua' }];
@@ -16,7 +18,9 @@ export const metadata: Metadata = {
 };
 
 const normalizeLocale = (lang: string): LanguageType => {
-  return availableLanguages.includes(lang as LanguageType) ? (lang as LanguageType) : 'en';
+  return availableLanguages.includes(lang as LanguageType)
+    ? (lang as LanguageType)
+    : 'en';
 };
 
 export default async function RootLayout({
@@ -28,15 +32,18 @@ export default async function RootLayout({
 }>) {
   const { lang: rawLang } = await params;
   const lang = normalizeLocale(rawLang);
+  const user = await fetchUserInfoServer();
 
   return (
     <html lang={lang}>
       <body>
         <AppRouterCacheProvider>
           <ThemeProvider>
-            <Header lang={lang} />
-            <main style={{ flex: 1, padding: '20px' }}>{children}</main>
-            <Footer />
+            <AuthProvider initialUser={user}>
+              <Header lang={lang} />
+              <main style={{ flex: 1, padding: '20px' }}>{children}</main>
+              <Footer />
+            </AuthProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
