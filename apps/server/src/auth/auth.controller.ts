@@ -94,9 +94,9 @@ export class AuthController {
 
     // Set HTTP-only cookie
     res.cookie('access_token', jwt, {
-      httpOnly: true, // Not accessible by JS
-      secure: process.env.NODE_ENV === 'production', // only over HTTPS
-      sameSite: 'lax', // CSRF protection
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 1000 * 60 * 60, // 1 hour
     });
 

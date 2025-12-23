@@ -51,7 +51,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   };
 
   const handleGoogleSignInClick = () => {
-    // TODO: call google sign in API
+    window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/google`;
   };
 
   const onSubmit = async (data: LoginInput) => {
