@@ -90,14 +90,15 @@ export class AuthController {
     @Req() req: AuthenticatedRequest,
     @Res() res: ExpressResponse,
   ) {
-    const jwt = req.user['access_token'];
+    const jwt = req.user.accessToken;
 
     // Set HTTP-only cookie
     res.cookie('access_token', jwt, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 1000 * 60 * 60, // 1 hour
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      path: '/',
     });
 
     // Redirect to frontend page (token is now in cookie, no need in URL)
