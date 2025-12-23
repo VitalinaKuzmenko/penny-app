@@ -19,7 +19,7 @@ import { loginSchema, type LoginInput } from 'schemas';
 import { useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-import { getNestedDict } from '@/utils/getNestedDict';
+import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { loginUser } from '@/api/lib/login';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
@@ -114,8 +114,9 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
             autoComplete="email"
             error={!!errors.email}
             helperText={
-              errors.email &&
-              signInPageText.FORM.SIGN_IN_FORM_VALIDATION.EMAIL.INVALID
+              errors.email && errors.email.message
+                ? getTranslatedError(errors.email.message, signInPageText.FORM)
+                : ''
             }
             {...register('email')}
           />
@@ -126,10 +127,11 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
             autoComplete="current-password"
             error={!!errors.password}
             helperText={
-              errors.password?.message
-                ? signInPageText.FORM.SIGN_IN_FORM_VALIDATION.PASSWORD[
-                    errors.password.message.split('.').pop()!.toUpperCase()
-                  ]
+              errors.password && errors.password.message
+                ? getTranslatedError(
+                    errors.password.message,
+                    signInPageText.FORM,
+                  )
                 : ''
             }
             {...register('password')}

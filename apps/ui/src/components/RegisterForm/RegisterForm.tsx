@@ -22,6 +22,7 @@ import { registerUser } from '@/api/lib/auth';
 import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface RegisterPageProps {
   registerPageText: Record<string, any>;
@@ -31,6 +32,8 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<UiError | null>(null);
+
+  const { refetchUser } = useAuth();
 
   const {
     register,
@@ -45,6 +48,7 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
     try {
       await registerUser(data);
 
+      await refetchUser();
       router.push('/');
     } catch (err: any) {
       if (err.data?.field && err.data?.code) {
