@@ -1,9 +1,5 @@
-import { apiFetch } from './client';
+import { apiFetch } from '../utils/apiFetch';
 import type { LoginInput } from 'schemas';
-
-export interface RegisterResponse {
-  accessToken: string;
-}
 
 export function loginUser(input: LoginInput) {
   return apiFetch<{ success: true }, LoginInput>('/auth/login', {

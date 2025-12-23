@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
-import { loginUser } from '@/api/lib/login';
+import { loginUser } from '@/requests/loginUser';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import { useAuth } from '@/providers/AuthProvider';
