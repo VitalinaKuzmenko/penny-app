@@ -1,13 +1,27 @@
 #!/bin/sh
 
-CHANGED=$(git diff --cached --name-only --relative)
+#!/bin/sh
+set -e
 
-if echo "$CHANGED" | grep -q '^ui/'; then
-  echo "Running UI lint and type-check..."
-  (cd ui && npm run lint && npm run type-check)
+CHANGED_FILES=$(git diff --cached --name-only)
+
+RUN_UI=false
+RUN_SERVER=false
+
+echo "$CHANGED_FILES" | grep -q '^apps/ui/' && RUN_UI=true
+echo "$CHANGED_FILES" | grep -q '^apps/server/' && RUN_SERVER=true
+
+if [ "$RUN_UI" = true ]; then
+  echo "🔍 Running UI lint and type-check..."
+  (cd apps/ui && npm run lint && npm run type-check)
 fi
 
-if echo "$CHANGED" | grep -q '^server/'; then
-  echo "Running Server lint and type-check..."
-  (cd server && npm run lint && npm run type-check)
+if [ "$RUN_SERVER" = true ]; then
+  echo "🔍 Running Server lint and type-check..."
+  (cd apps/server && npm run lint && npm run type-check)
 fi
+
+if [ "$RUN_UI" = false ] && [ "$RUN_SERVER" = false ]; then
+  echo "ℹ️ No UI or Server changes detected. Skipping checks."
+fi
+

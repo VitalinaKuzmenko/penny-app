@@ -1,0 +1,92 @@
+{
+  "HEADER": {
+    "TITLE": "Welcome to Penny App!",
+    "PAGES": {
+      "HOME": "Home",
+      "UPLOAD_CSV": "Upload CSV",
+      "PENNYS_VIEW": "Penny's View",
+      "SIGN_IN": "Sign In"
+    },
+    "TOOLTIP": {
+      "SIGN_IN": "Sign In",
+      "SIGN_IN_USER": "Go to Profile"
+    }
+  },
+  "HOMEPAGE": {},
+  "SIGN_IN_PAGE": {
+    "FORM": {
+      "SIGN_IN_TITLE": "Sign In",
+      "EMAIL_FIELD": "Email",
+      "PASSWORD_FIELD": "Password",
+      "SIGN_IN_BUTTON": "Sign In",
+      "ERRORS": {
+        "GENERAL": {
+          "TITLE": "Something went wrong",
+          "MESSAGE": "Please try again later."
+        },
+        "EMAIL": {
+          "INVALID": "Invalid email"
+        },
+        "PASSWORD": {
+          "REQUIRED": "Password is required",
+          "MIN_LENGTH": "Password must be at least 8 characters"
+        },
+        "AUTH": {
+          "EMAIL_NOT_FOUND": "Sorry, email is not found",
+          "PASSWORD_INVALID": "Sorry, password is invalid"
+        }
+      }
+    },
+    "NEW_USER_TITLE": "New User",
+    "SIGN_UP_BUTTON": "Create Account",
+    "CONTINUE_WITH_GOOGLE_BUTTON": "Continue with Google"
+  },
+  "REGISTER_PAGE": {
+    "FORM": {
+      "CREATE_ACCOUNT_TITLE": "Create your account",
+      "ALREADY_HAVE_ACCOUNT": "Already have an account?",
+      "SIGN_IN_BUTTON": "Sign In",
+      "EMAIL_FIELD": "Email",
+      "PASSWORD_FIELD": "Password",
+      "USERNAME_FIELD": "First Name",
+      "USER_SURNAME_FIELD": "Last Name",
+      "CREATE_ACCOUNT_BUTTON": "Yes, create account!",
+      "ERRORS": {
+        "GENERAL": {
+          "TITLE": "Something went wrong",
+          "MESSAGE": "Please try again later."
+        },
+        "EMAIL": {
+          "INVALID": "Invalid email"
+        },
+        "PASSWORD": {
+          "REQUIRED": "Password is required",
+          "MIN_LENGTH": "Password must be at least 8 characters"
+        },
+        "USERNAME": {
+          "REQUIRED": "First name is required"
+        },
+        "USER_SURNAME": {
+          "REQUIRED": "Last name is required"
+        },
+        "AUTH": {
+          "EMAIL_EXISTS": "This email is already registered"
+        }
+      }
+    }
+  },
+  "PROFILE_PAGE": {
+    "TITLE": "Profile",
+    "NAME": "Name",
+    "EMAIL": "Email",
+    "SIGN_OUT": "Sign out",
+    "NOT_SIGNED_IN": "You are not signed in",
+    "SIGN_IN_BUTTON": "Sign In",
+    "ERRORS": {
+      "SIGN_OUT": {
+        "TITLE": "Failed to sign out",
+        "MESSAGE": "Failed to sign out. Please try again in a minute."
+      }
+    }
+  }
+}
