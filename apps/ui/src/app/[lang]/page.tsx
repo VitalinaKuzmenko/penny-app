@@ -2,6 +2,8 @@ import { Box, Button, Typography } from '@mui/material';
 import { getDictionary } from '@/utils/getDictionary';
 import { LanguageType } from '@/utils/interfaces';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Page({
   params,
 }: {

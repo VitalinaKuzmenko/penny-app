@@ -3,6 +3,8 @@ import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
 import RegisterForm from '@/components/RegisterForm/RegisterForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function RegisterPage({
   params,
 }: {

@@ -3,6 +3,8 @@ import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
 import ProfileClient from '@/components/ProfileClient/ProfileClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage({
   params,
 }: {
