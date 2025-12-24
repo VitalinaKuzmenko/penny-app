@@ -1,17 +1,17 @@
 {
   "name": "penny-monorepo",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
     "lint": "npm run lint:ui && npm run lint:server",
     "lint:ui": "cd apps/ui && eslint 'src/**/*.{ts,tsx,js,jsx}'",
     "lint:server": "cd apps/server && eslint 'src/**/*.ts'",
     "format": "npm run format:ui && npm run format:server",
     "format:ui": "cd apps/ui && prettier --write 'src/**/*.{ts,tsx,js,jsx,json,css,scss,md}'",
-    "format:server": "cd apps/server && prettier --write 'src/**/*.ts'"
+    "format:server": "cd apps/server && prettier --write 'src/**/*.ts'",
+    "build:schemas": "npm run build --workspace=schemas",
+    "build:ui": "npm run build --workspace=penny-app-ui",
+    "build:server": "npm run build --workspace=penny-app-server",
+    "build:all": "npm run build:schemas && npm run build:ui && npm run build:server"
   },
   "devDependencies": {
     "eslint-config-prettier": "^10.1.8",

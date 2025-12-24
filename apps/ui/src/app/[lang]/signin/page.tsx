@@ -3,6 +3,8 @@ import SignInForm from '@/components/SignInForm/SignInForm';
 import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
 
+export const dynamic = 'force-dynamic';
+
 export default async function SignInPage({
   params,
 }: {
