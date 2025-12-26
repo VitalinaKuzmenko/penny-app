@@ -90,10 +90,10 @@ export class AuthController {
     @Req() req: AuthenticatedRequest,
     @Res() res: ExpressResponse,
   ) {
-    const jwt = req.user.accessToken;
+    const accessToken = req.user.accessToken;
 
     // Set HTTP-only cookie
-    res.cookie('access_token', jwt, {
+    res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
