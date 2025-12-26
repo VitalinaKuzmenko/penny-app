@@ -15,10 +15,13 @@ export function getLocale(request: Request) {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const pathnameWithoutLocale = availableLanguages.some((locale) =>
-    pathname.startsWith(`/${locale}/`),
+  const pathnameWithoutLocale = availableLanguages.some(
+    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
   )
-    ? pathname.replace(/^\/[a-zA-Z-]+\//, '/')
+    ? pathname.replace(
+        new RegExp(`^/(${availableLanguages.join('|')})(/|$)`),
+        '/',
+      )
     : pathname;
 
   // 1️⃣ Auth protection
