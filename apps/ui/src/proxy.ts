@@ -15,6 +15,13 @@ export function getLocale(request: Request) {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  console.log('--- MIDDLEWARE START ---');
+  console.log('pathname', pathname);
+  console.log(
+    'cookies:',
+    request.cookies.getAll().map((c) => c.name),
+  );
+
   const pathnameWithoutLocale = availableLanguages.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
   )
@@ -24,11 +31,17 @@ export function proxy(request: NextRequest) {
       )
     : pathname;
 
+  console.log('pathnameWithoutLocale', pathnameWithoutLocale);
+
   // 1️⃣ Auth protection
   if (protectedPaths.some((path) => pathnameWithoutLocale.startsWith(path))) {
     const token = request.cookies.get('access_token')?.value;
 
+    console.log('🔐 Protected path hit:', pathnameWithoutLocale);
+    console.log('🔑 Token exists:', Boolean(token));
+
     if (!token) {
+      console.log('🚫 Redirecting to signin');
       const url = request.nextUrl.clone();
       url.pathname = '/signin';
       return NextResponse.redirect(url);
