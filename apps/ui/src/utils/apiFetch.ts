@@ -1,3 +1,7 @@
+//TODO: review if we want to remove this file
+
+import { cookies } from 'next/headers';
+
 export class ApiError extends Error {
   status: number;
   data?: unknown;
@@ -9,6 +13,10 @@ export class ApiError extends Error {
   }
 }
 
+const getHeaders = async () => ({
+  Cookie: (await cookies()).toString(),
+});
+
 export async function apiFetch<TResponse, TBody = unknown>(
   path: string,
   options?: {
@@ -17,11 +25,12 @@ export async function apiFetch<TResponse, TBody = unknown>(
     headers?: HeadersInit;
   },
 ): Promise<TResponse> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}${path}`, {
+  const res = await fetch(`${process.env.SERVER_URL}${path}`, {
     method: options?.method ?? 'GET',
     headers: {
       'Content-Type': 'application/json',
-      ...options?.headers,
+      ...(await getHeaders()),
+      ...(options?.headers ?? {}),
     },
     credentials: 'include',
     body: options?.body ? JSON.stringify(options.body) : undefined,

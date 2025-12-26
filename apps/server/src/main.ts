@@ -16,9 +16,6 @@ ConfigModule.forRoot({
     GOOGLE_CLIENT_SECRET: Joi.string().required(),
     GOOGLE_CALLBACK_URL: Joi.string().required(),
     UI_APP_URL: Joi.string().required(),
-    NODE_ENV: Joi.string()
-      .valid('development', 'production')
-      .default('development'),
   }),
 });
 async function bootstrap() {
