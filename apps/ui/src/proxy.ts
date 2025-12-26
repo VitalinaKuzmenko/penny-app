@@ -4,7 +4,6 @@ import Negotiator from 'negotiator';
 import { availableLanguages } from './utils/interfaces';
 
 const defaultLocale = 'en';
-const protectedPaths = ['/dashboard', '/profile'];
 
 export function getLocale(request: Request) {
   const headers = Object.fromEntries(request.headers.entries());
@@ -13,57 +12,29 @@ export function getLocale(request: Request) {
 }
 
 export function proxy(request: NextRequest) {
+  // Check if there is any supported locale in the pathname
   const { pathname } = request.nextUrl;
-
-  console.log('--- MIDDLEWARE START ---');
-  console.log('pathname', pathname);
-  console.log(
-    'cookies:',
-    request.cookies.getAll().map((c) => c.name),
-  );
-
-  const pathnameWithoutLocale = availableLanguages.some(
-    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
-  )
-    ? pathname.replace(
-        new RegExp(`^/(${availableLanguages.join('|')})(/|$)`),
-        '/',
-      )
-    : pathname;
-
-  console.log('pathnameWithoutLocale', pathnameWithoutLocale);
-
-  // 1️⃣ Auth protection
-  if (protectedPaths.some((path) => pathnameWithoutLocale.startsWith(path))) {
-    const token = request.cookies.get('access_token')?.value;
-
-    console.log('🔐 Protected path hit:', pathnameWithoutLocale);
-    console.log('🔑 Token exists:', Boolean(token));
-
-    if (!token) {
-      console.log('🚫 Redirecting to signin');
-      const url = request.nextUrl.clone();
-      url.pathname = '/signin';
-      return NextResponse.redirect(url);
-    }
-  }
-
-  // 2️⃣ Locale redirection
   const pathnameHasLocale = availableLanguages.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
-  if (!pathnameHasLocale) {
-    const locale = getLocale(request);
-    const url = request.nextUrl.clone();
-    url.pathname = `/${locale}${pathname}`;
-    return NextResponse.redirect(url);
-  }
+  if (pathnameHasLocale) return;
 
-  // Default: continue
-  return NextResponse.next();
+  // Redirect if there is no locale
+  const locale = getLocale(request);
+
+  request.nextUrl.pathname = `/${locale}${pathname}`;
+
+  // e.g. incoming request is /products
+  // The new URL is now /en-US/products
+  return NextResponse.redirect(request.nextUrl);
 }
 
 export const config = {
-  matcher: ['/((?!_next).*)'], // applies to all paths except _next
+  matcher: [
+    // Skip all internal paths (_next)
+    '/((?!_next).*)',
+    // Optional: only run on root (/) URL
+    // '/'
+  ],
 };
