@@ -8,6 +8,8 @@ import { fetchUserInfoServer } from '@/requests/fetchUserInfoServer';
 
 export const verifySession = cache(async () => {
   const cookieStore = cookies();
+
+  console.log('DAL: cookieStore =', cookieStore); // 🔹 add this
   const accessToken = (await cookieStore).get('access_token')?.value;
 
   console.log('DAL: accessToken =', accessToken); // 🔹 add this

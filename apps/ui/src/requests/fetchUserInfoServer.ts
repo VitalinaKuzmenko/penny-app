@@ -3,6 +3,8 @@ import { UserInfo } from 'schemas';
 
 export const fetchUserInfoServer = async (): Promise<UserInfo | null> => {
   const cookieStore = cookies();
+
+  console.log('fetchUserInfoServer: cookieStore =', cookieStore);
   const accessToken = (await cookieStore).get('access_token')?.value;
 
   console.log('fetchUserInfoServer: accessToken =', accessToken);
