@@ -1,16 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { get } from '@/utils/fetch';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
-  console.log('call here');
-  const cookie = req.headers.get('cookie') || '';
+export async function GET() {
+  try {
+    const res = await get('auth/profile');
 
-  console.log('COOKIES', cookie);
-  const res = await fetch(`${process.env.SERVER_URL}/auth/profile`, {
-    headers: { cookie },
-  });
+    if (!res.ok) {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: res.status },
+      );
+    }
 
-  const data = await res.json();
+    const user = await res.json();
+    return NextResponse.json(user, { status: 200 });
+  } catch (err) {
+    console.error('Profile API error:', err);
 
-  console.log('data', data);
-  return NextResponse.json(data, { status: res.status });
+    return NextResponse.json(
+      { message: 'Internal server error' },
+      { status: 500 },
+    );
+  }
 }

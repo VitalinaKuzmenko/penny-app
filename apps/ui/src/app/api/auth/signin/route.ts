@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+import { setAuthCookies } from '@/utils/setAuthCookie';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -10,21 +10,10 @@ export async function POST(req: NextRequest) {
     credentials: 'include', // optional for backend
   });
 
+  await setAuthCookies(res);
+
   const data = await res.json();
   console.log('data', data);
-
-  const cookiesFromHeader = res.headers.get('set-cookie');
-
-  if (cookiesFromHeader) {
-    const accessToken = cookiesFromHeader.split(';')[0].split('=')[1];
-
-    (await cookies()).set({
-      name: 'access_token',
-      value: accessToken,
-      secure: false,
-      httpOnly: true,
-    });
-  }
 
   return NextResponse.json(data, { status: res.status });
 }
