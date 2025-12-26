@@ -1,9 +1,9 @@
-import { apiFetch } from '../utils/apiFetch';
 import type { LoginInput } from 'schemas';
 
-export function loginUser(input: LoginInput) {
-  return apiFetch<{ success: true }, LoginInput>('/auth/login', {
+export const loginUser = async (input: LoginInput) => {
+  await fetch('/api/auth/signin', {
     method: 'POST',
-    body: input,
+    body: JSON.stringify(input),
+    headers: { 'Content-Type': 'application/json' },
   });
-}
+};
