@@ -1,56 +1,31 @@
 'use server';
 
-import { cookies } from 'next/headers';
+import { get } from '@/utils/fetch';
 import { UserInfo } from 'schemas';
 
 export const fetchUserInfoServer = async (): Promise<UserInfo | null> => {
-  const cookieStore = cookies();
+  try {
+    const res = await get('auth/profile');
 
-  // console.log('fetchUserInfoServer: cookieStore =', cookieStore);
-  const accessToken = (await cookieStore).get('access_token')?.value;
+    // Not authenticated
+    if (res.status === 401) {
+      return null;
+    }
 
-  console.log('fetchUserInfoServer: accessToken =', accessToken);
+    // Other backend errors
+    if (!res.ok) {
+      console.error(
+        'fetchUserInfoServer: failed',
+        res.status,
+        await res.text(),
+      );
+      return null;
+    }
 
-  if (!accessToken) return null;
-
-  const res = await fetch(`${process.env.SERVER_URL}/auth/profile`, {
-    headers: { Cookie: `access_token=${accessToken}` },
-    cache: 'no-store',
-  });
-
-  if (!res.ok) {
-    console.log(
-      'fetchUserInfoServer: failed to fetch profile',
-      await res.text(),
-    );
+    const user = (await res.json()) as UserInfo;
+    return user;
+  } catch (err) {
+    console.error('fetchUserInfoServer: unexpected error', err);
     return null;
   }
-
-  const user = await res.json();
-  console.log('fetchUserInfoServer: user =', user);
-  return user;
 };
-
-// import { UserInfo } from 'schemas';
-
-// export const fetchUserInfoServer = async (): Promise<UserInfo | null> => {
-//   try {
-//     const res = await fetch(
-//       `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/profile`,
-//       {
-//         cache: 'no-store',
-//         // No need to manually attach cookies; Next.js passes them from incoming request
-//       },
-//     );
-
-//     console.log('fetchUserInfoServer: res =1111: ', res);
-
-//     if (!res.ok) return null;
-
-//     const user = await res.json();
-//     return user;
-//   } catch (err) {
-//     console.error('fetchUserInfoServer failed', err);
-//     return null;
-//   }
-// };

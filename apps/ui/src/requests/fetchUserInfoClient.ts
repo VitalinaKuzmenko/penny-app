@@ -2,21 +2,21 @@ import { UserInfo } from 'schemas';
 
 export const fetchUserInfoClient = async (): Promise<UserInfo | null> => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/profile`,
-      {
-        method: 'GET',
-        credentials: 'include', // 🔥 sends HttpOnly cookies automatically
-      },
-    );
+    const res = await fetch('/api/auth/profile', {
+      credentials: 'include',
+    });
 
-    if (!res.ok) {
-      return null;
+    if (res.status === 401) {
+      return null; // not logged in
     }
 
-    return await res.json();
+    if (!res.ok) {
+      throw new Error(`Failed with status ${res.status}`);
+    }
+
+    return (await res.json()) as UserInfo;
   } catch (err) {
-    console.error('Failed to fetch profile', err);
+    console.error('Failed to fetch profile:', err);
     return null;
   }
 };
