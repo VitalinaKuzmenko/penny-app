@@ -14,7 +14,11 @@ export const fetchUserInfoClient = async (): Promise<UserInfo | null> => {
       return null;
     }
 
-    return await res.json();
+    const response = await res.json();
+
+    console.log('response', response);
+
+    return response;
   } catch (err) {
     console.error('Failed to fetch profile', err);
     return null;
