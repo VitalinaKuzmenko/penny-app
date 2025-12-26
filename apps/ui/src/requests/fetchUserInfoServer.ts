@@ -7,6 +7,8 @@ export const fetchUserInfoServer = async (): Promise<UserInfo | null> => {
     const cookieStore = cookies();
     const accessToken = (await cookieStore).get('access_token')?.value;
 
+    console.log('accessToken', accessToken);
+
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/profile`,
       {
