@@ -5,12 +5,18 @@ export const setAuthCookies = async (response: Response) => {
   if (cookiesFromHeader) {
     const accessToken = cookiesFromHeader.split(';')[0].split('=')[1];
 
+    console.log('accessToken', accessToken);
+
+    console.log('node env', process.env.NODE_ENV);
+
     (await cookies()).set({
-      name: 'Authentication',
+      name: 'access_token',
       value: accessToken,
-      secure: true,
       httpOnly: true,
-      expires: 1000 * 60 * 60 * 24, // 1 day
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24,
     });
   }
 };
