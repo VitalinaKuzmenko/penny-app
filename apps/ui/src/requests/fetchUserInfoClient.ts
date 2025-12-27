@@ -15,7 +15,6 @@ export const fetchUserInfoClient = async (): Promise<UserInfo | null> => {
     }
 
     const response = await res.json();
-    console.log('response', response);
 
     return response;
   } catch (err) {

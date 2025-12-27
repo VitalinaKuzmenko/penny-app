@@ -10,6 +10,7 @@ import {
   Stack,
   IconButton,
   InputAdornment,
+  Divider,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
@@ -23,10 +24,17 @@ import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import { useAuth } from '@/providers/AuthProvider';
+import GoogleIcon from '@mui/icons-material/Google';
+import {
+  RegisterFormInput,
+  registerFormSchema,
+} from '@/ui-schemas/registerForm.schema';
 
 interface RegisterPageProps {
   registerPageText: Record<string, any>;
 }
+
+// extend ONLY on the client
 
 export default function RegisterPage({ registerPageText }: RegisterPageProps) {
   const router = useRouter();
@@ -40,13 +48,15 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
     handleSubmit,
     setError: setFormError,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterInput>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<RegisterFormInput>({
+    resolver: zodResolver(registerFormSchema),
   });
 
-  const onSubmit = async (data: RegisterInput) => {
+  const onSubmit = async (data: RegisterFormInput) => {
     try {
-      await registerUser(data);
+      const { confirmPassword, ...payload } = data;
+
+      await registerUser(payload);
 
       await refetchUser();
       router.push('/');
@@ -75,6 +85,10 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
 
   const handleSignInClick = () => {
     router.push('/signin');
+  };
+
+  const handleGoogleSignInClick = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/google`;
   };
 
   return (
@@ -161,6 +175,31 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
           />
 
           <TextField
+            label={registerPageText.FORM.CONFIRM_PASSWORD_FIELD}
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            error={!!errors.confirmPassword}
+            helperText={
+              errors.confirmPassword && errors.confirmPassword.message
+                ? getTranslatedError(
+                    errors.confirmPassword.message,
+                    registerPageText.FORM,
+                  )
+                : ''
+            }
+            {...register('confirmPassword')}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleTogglePassword} edge="end">
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
             label={registerPageText.FORM.USERNAME_FIELD}
             autoComplete="username"
             error={!!errors.userName}
@@ -199,6 +238,21 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
           >
             {registerPageText.FORM.CREATE_ACCOUNT_BUTTON}
           </CustomButton>
+
+          <Box sx={{ my: 4 }}>
+            <Divider sx={{ my: 3, height: 2, bgcolor: 'primary.light' }} />
+          </Box>
+
+          <Box textAlign="center">
+            <CustomButton
+              variantType="other"
+              fullWidth
+              onClick={handleGoogleSignInClick}
+              startIcon={<GoogleIcon />}
+            >
+              {registerPageText.CONTINUE_WITH_GOOGLE_BUTTON}
+            </CustomButton>
+          </Box>
         </Stack>
       </Box>
       <ErrorBanner

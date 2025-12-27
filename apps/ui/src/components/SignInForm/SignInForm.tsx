@@ -24,6 +24,7 @@ import { loginUser } from '@/requests/loginUser';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import { useAuth } from '@/providers/AuthProvider';
+import GoogleIcon from '@mui/icons-material/Google';
 
 interface SignInFormProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -178,6 +179,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
             variantType="other"
             fullWidth
             onClick={handleGoogleSignInClick}
+            startIcon={<GoogleIcon />}
           >
             {signInPageText.CONTINUE_WITH_GOOGLE_BUTTON}
           </CustomButton>
