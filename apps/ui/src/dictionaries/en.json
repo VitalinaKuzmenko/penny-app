@@ -48,6 +48,7 @@
       "SIGN_IN_BUTTON": "Sign In",
       "EMAIL_FIELD": "Email",
       "PASSWORD_FIELD": "Password",
+      "CONFIRM_PASSWORD_FIELD": "Confirm Password",
       "USERNAME_FIELD": "First Name",
       "USER_SURNAME_FIELD": "Last Name",
       "CREATE_ACCOUNT_BUTTON": "Yes, create account!",
@@ -62,6 +63,12 @@
         "PASSWORD": {
           "REQUIRED": "Password is required",
           "MIN_LENGTH": "Password must be at least 8 characters"
+        },
+        "CONFIRM_PASSWORD": {
+          "REQUIRED": "Confirmation password is required"
+        },
+        "PASSWORDS": {
+          "DO_NOT_MATCH": "Passwords do not match"
         },
         "USERNAME": {
           "REQUIRED": "First name is required"

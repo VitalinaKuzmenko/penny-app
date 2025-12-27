@@ -61,8 +61,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'none',
-      domain:
-        process.env.DOMAIN === 'localhost' ? undefined : process.env.DOMAIN,
+      // domain: process.env.DOMAIN,
       maxAge: 1000 * 60 * 60 * 24, // 1 day
       path: '/',
     });

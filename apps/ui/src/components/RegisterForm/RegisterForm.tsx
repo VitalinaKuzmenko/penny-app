@@ -25,10 +25,16 @@ import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import { useAuth } from '@/providers/AuthProvider';
 import GoogleIcon from '@mui/icons-material/Google';
+import {
+  RegisterFormInput,
+  registerFormSchema,
+} from '@/ui-schemas/registerForm.schema';
 
 interface RegisterPageProps {
   registerPageText: Record<string, any>;
 }
+
+// extend ONLY on the client
 
 export default function RegisterPage({ registerPageText }: RegisterPageProps) {
   const router = useRouter();
@@ -42,13 +48,15 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
     handleSubmit,
     setError: setFormError,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterInput>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<RegisterFormInput>({
+    resolver: zodResolver(registerFormSchema),
   });
 
-  const onSubmit = async (data: RegisterInput) => {
+  const onSubmit = async (data: RegisterFormInput) => {
     try {
-      await registerUser(data);
+      const { confirmPassword, ...payload } = data;
+
+      await registerUser(payload);
 
       await refetchUser();
       router.push('/');
@@ -155,6 +163,31 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
                 : ''
             }
             {...register('password')}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleTogglePassword} edge="end">
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            label={registerPageText.FORM.CONFIRM_PASSWORD_FIELD}
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            error={!!errors.confirmPassword}
+            helperText={
+              errors.confirmPassword && errors.confirmPassword.message
+                ? getTranslatedError(
+                    errors.confirmPassword.message,
+                    registerPageText.FORM,
+                  )
+                : ''
+            }
+            {...register('confirmPassword')}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
