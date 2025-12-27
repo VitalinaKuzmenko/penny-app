@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -28,7 +30,14 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
   ],
 
   controllers: [AppController],
-  providers: [AppService, UsersService],
+  providers: [
+    AppService,
+    UsersService,
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe, // 🎯 Global Zod validation
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

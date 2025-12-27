@@ -9,11 +9,12 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
-import { LoginInput, RegisterInput, UserInfo } from 'schemas';
+import { AuthResponseDto, LoginInput, RegisterDto, UserInfo } from 'schemas';
 
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -30,11 +31,26 @@ export interface AuthenticatedRequest extends ExpressRequest {
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiOperation({
+    summary: 'User Registration',
+    description:
+      'Register a new user account with email, password, user name and user surname',
+  })
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Registration successful',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Registration failed',
+  })
   @Post('register')
   async register(
-    @Body() input: RegisterInput,
+    @Body() input: RegisterDto,
     @Res({ passthrough: true }) res: ExpressResponse,
-  ): Promise<{ success: true }> {
+  ): Promise<AuthResponseDto> {
     const { accessToken } = await this.authService.register(input);
 
     res.cookie('access_token', accessToken, {
