@@ -72,7 +72,15 @@ export class AuthController {
 
   @Post('logout')
   logout(@Res({ passthrough: true }) res: ExpressResponse) {
-    res.clearCookie('access_token', { path: '/' });
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
+      domain:
+        process.env.DOMAIN === 'localhost' ? undefined : process.env.DOMAIN,
+      path: '/',
+    });
+
     return { success: true };
   }
 
