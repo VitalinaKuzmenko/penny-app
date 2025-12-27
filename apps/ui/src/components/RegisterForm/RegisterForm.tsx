@@ -18,7 +18,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
-import { registerSchema, type RegisterInput } from 'schemas';
 import { registerUser } from '@/requests/registerUser';
 import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { UiError } from '@/types/interfaces';
