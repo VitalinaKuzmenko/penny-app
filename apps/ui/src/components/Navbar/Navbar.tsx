@@ -33,8 +33,6 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
   ];
   const { user } = useAuth();
 
-  console.log('user', user);
-
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
