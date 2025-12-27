@@ -21,22 +21,6 @@ ConfigModule.forRoot({
   }),
 });
 async function bootstrap() {
-  // 🎯 This is the magic line that makes Zod work with Swagger
-  // cleanupOpenApiDoc();
-
-  // const openApiDoc = SwaggerModule.createDocument(
-  //   app,
-  //   new DocumentBuilder()
-  //     .setTitle('Example API')
-  //     .setDescription('Example API description')
-  //     .setVersion('1.0')
-  //     .build(),
-  // );
-
-  // +SwaggerModule.setup('api', app, cleanupOpenApiDoc(openApiDoc));
-
-  // Create comprehensive OpenAPI documentation
-
   const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
