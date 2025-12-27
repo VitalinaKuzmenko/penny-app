@@ -73,7 +73,8 @@
           "EMAIL_EXISTS": "This email is already registered"
         }
       }
-    }
+    },
+    "CONTINUE_WITH_GOOGLE_BUTTON": "Continue with Google"
   },
   "PROFILE_PAGE": {
     "TITLE": "Profile",

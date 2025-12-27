@@ -10,6 +10,7 @@ import {
   Stack,
   IconButton,
   InputAdornment,
+  Divider,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
@@ -23,6 +24,7 @@ import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import { useAuth } from '@/providers/AuthProvider';
+import GoogleIcon from '@mui/icons-material/Google';
 
 interface RegisterPageProps {
   registerPageText: Record<string, any>;
@@ -75,6 +77,10 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
 
   const handleSignInClick = () => {
     router.push('/signin');
+  };
+
+  const handleGoogleSignInClick = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/google`;
   };
 
   return (
@@ -199,6 +205,21 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
           >
             {registerPageText.FORM.CREATE_ACCOUNT_BUTTON}
           </CustomButton>
+
+          <Box sx={{ my: 4 }}>
+            <Divider sx={{ my: 3, height: 2, bgcolor: 'primary.light' }} />
+          </Box>
+
+          <Box textAlign="center">
+            <CustomButton
+              variantType="other"
+              fullWidth
+              onClick={handleGoogleSignInClick}
+              startIcon={<GoogleIcon />}
+            >
+              {registerPageText.CONTINUE_WITH_GOOGLE_BUTTON}
+            </CustomButton>
+          </Box>
         </Stack>
       </Box>
       <ErrorBanner
