@@ -40,7 +40,7 @@ export class AuthController {
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain:
         process.env.DOMAIN === 'localhost' ? undefined : process.env.DOMAIN,
       maxAge: 1000 * 60 * 60 * 24, // 1 day
@@ -60,7 +60,7 @@ export class AuthController {
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       // domain: process.env.DOMAIN,
       maxAge: 1000 * 60 * 60 * 24, // 1 day
       path: '/',
@@ -74,7 +74,7 @@ export class AuthController {
     res.clearCookie('access_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain:
         process.env.DOMAIN === 'localhost' ? undefined : process.env.DOMAIN,
       path: '/',
@@ -107,7 +107,7 @@ export class AuthController {
     res.cookie('access_token', jwt, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain:
         process.env.DOMAIN === 'localhost' ? undefined : process.env.DOMAIN,
       maxAge: 1000 * 60 * 60 * 24, // 1 day
