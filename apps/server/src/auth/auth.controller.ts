@@ -9,12 +9,17 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
-import { AuthResponseDto, LoginInput, RegisterDto, UserInfo } from 'schemas';
+import { AuthResponseDto, LoginDto, RegisterDto, UserInfoDto } from 'schemas';
 
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -66,11 +71,21 @@ export class AuthController {
     return { success: true };
   }
 
+  @ApiOperation({
+    summary: 'User Login',
+    description: 'Authenticate user with email and password.',
+  })
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Login successful',
+    type: AuthResponseDto,
+  })
   @Post('login')
   async login(
-    @Body() input: LoginInput,
+    @Body() input: LoginDto,
     @Res({ passthrough: true }) res: ExpressResponse,
-  ) {
+  ): Promise<AuthResponseDto> {
     const { accessToken } = await this.authService.login(input);
 
     res.cookie('access_token', accessToken, {
@@ -83,7 +98,7 @@ export class AuthController {
       path: '/',
     });
 
-    return { message: 'Logged in successfully' };
+    return { success: true };
   }
 
   @Post('logout')
@@ -100,9 +115,23 @@ export class AuthController {
     return { success: true };
   }
 
+  @ApiOperation({
+    summary: 'Get User Profile',
+    description: 'Get current authenticated user profile information.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile retrieved successfully',
+    type: UserInfoDto,
+  })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid credentials',
+  })
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getUserProfile(@Request() req): Promise<UserInfo> {
+  getUserProfile(@Request() req): Promise<UserInfoDto> {
     return this.authService.getUserProfile(req.user.userId);
   }
 
