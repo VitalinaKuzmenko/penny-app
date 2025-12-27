@@ -128,7 +128,15 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
                 <Button
                   key={page}
                   onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
+                  sx={{
+                    my: 2,
+                    color: 'white',
+                    display: 'block',
+                    '&:hover': {
+                      color: 'grey.400',
+                    },
+                    transition: 'color 0.3s',
+                  }}
                 >
                   {page}
                 </Button>
