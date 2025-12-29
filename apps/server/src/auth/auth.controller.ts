@@ -19,7 +19,12 @@ import {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
-import { AuthResponseDto, LoginDto, RegisterDto, UserInfoDto } from 'schemas';
+import {
+  AuthResponseDto,
+  LoginDto,
+  RegisterDto,
+  UserInfoDto,
+} from 'schemas-nest';
 
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';

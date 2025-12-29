@@ -8,6 +8,7 @@
     "lint:server": "pnpm --filter penny-app-server lint",
     "format": "pnpm -r format",
     "build:schemas": "pnpm --filter schemas build",
+    "build:schemas-nest": "pnpm --filter schemas-nest build",
     "build:ui": "pnpm --filter penny-app-ui build",
     "build:server": "pnpm --filter penny-app-server build",
     "build:all": "pnpm -r build"
