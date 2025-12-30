@@ -6,13 +6,13 @@ import { availableLanguages } from './utils/interfaces';
 const defaultLocale = 'en';
 const protectedPaths = ['/dashboard', '/profile'];
 
-export function getLocale(request: Request) {
+export const getLocale = (request: Request) => {
   const headers = Object.fromEntries(request.headers.entries());
   const languages = new Negotiator({ headers }).languages();
   return match(languages, availableLanguages, defaultLocale);
-}
+};
 
-export function proxy(request: NextRequest) {
+export const proxy = (request: NextRequest) => {
   const { pathname } = request.nextUrl;
 
   const pathnameWithoutLocale = availableLanguages.some((locale) =>
@@ -46,7 +46,7 @@ export function proxy(request: NextRequest) {
 
   // Default: continue
   return NextResponse.next();
-}
+};
 
 export const config = {
   matcher: ['/((?!_next).*)'], // applies to all paths except _next
