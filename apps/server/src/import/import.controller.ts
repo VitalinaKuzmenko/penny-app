@@ -6,8 +6,13 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
-import { CsvRowDto } from 'schemas-nest';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
+import { CsvRowDto, CsvUploadDto } from 'schemas-nest';
 
 import { ImportService } from './import.service';
 
@@ -18,6 +23,10 @@ export class ImportController {
   @Post('csv')
   @ApiOperation({ summary: 'Upload CSV and parse transactions' })
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'CSV file',
+    type: CsvUploadDto,
+  })
   @ApiOkResponse({
     type: CsvRowDto,
     isArray: true,
@@ -25,15 +34,17 @@ export class ImportController {
   @UseInterceptors(FileInterceptor('file'))
   uploadCsv(@UploadedFile() file: Express.Multer.File): CsvRowDto[] {
     if (!file) {
-      throw new BadRequestException('File is required');
+      throw new BadRequestException({
+        code: 'import.file_required',
+      });
     }
 
     if (!file.mimetype.includes('csv')) {
-      throw new BadRequestException('Only CSV files are allowed');
+      throw new BadRequestException({
+        code: 'import.file_not_csv',
+      });
     }
 
-    const rows = this.importService.parseCsv(file.buffer);
-
-    return rows;
+    return this.importService.parseCsv(file.buffer);
   }
 }

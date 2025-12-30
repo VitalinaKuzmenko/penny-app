@@ -2,7 +2,7 @@
 import { z } from 'zod';
 
 export const CsvRowSchema = z.object({
-  date: z.date(),
+  date: z.string(),
   description: z.string().trim().min(1),
   amount: z.number(),
 });

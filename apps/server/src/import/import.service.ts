@@ -18,47 +18,58 @@ export class ImportService {
         trim: true,
       });
     } catch {
-      throw new BadRequestException('Invalid CSV file');
+      throw new BadRequestException({
+        code: 'import.csv_invalid',
+      });
     }
 
     if (!records.length) {
-      throw new BadRequestException('CSV file is empty');
+      throw new BadRequestException({
+        code: 'import.csv_empty',
+      });
     }
 
-    // Validate column names
     const requiredColumns = ['date', 'description', 'amount'];
     const actualColumns = Object.keys(records[0]);
 
     for (const col of requiredColumns) {
       if (!actualColumns.includes(col)) {
-        throw new BadRequestException(`Missing required column: ${col}`);
+        throw new BadRequestException({
+          code: 'import.csv_missing_column',
+          meta: { column: col },
+        });
       }
     }
 
-    // Normalize + validate rows
     return records.map((row, index) => {
+      const rowNumber = index + 2;
+
       const date = parseDate(row.date);
       if (!date) {
-        throw new BadRequestException(
-          `Invalid date format at row ${index + 2}`,
-        );
+        throw new BadRequestException({
+          code: 'import.invalid_date',
+          meta: { row: rowNumber },
+        });
       }
 
       const amount = Number(row.amount);
       if (Number.isNaN(amount)) {
-        throw new BadRequestException(`Invalid amount at row ${index + 2}`);
+        throw new BadRequestException({
+          code: 'import.invalid_amount',
+          meta: { row: rowNumber },
+        });
       }
 
       const result = CsvRowSchema.safeParse({
-        date,
+        date: date,
         description: row.description,
         amount,
       });
 
       if (!result.success) {
         throw new BadRequestException({
-          row: index + 2,
-          errors: result.error.flatten(),
+          code: 'import.row_validation_failed',
+          meta: { row: rowNumber },
         });
       }
 

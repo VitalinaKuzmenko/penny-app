@@ -6,6 +6,7 @@ import { ZodValidationPipe } from 'nestjs-zod';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { ImportModule } from './import/import.module';
 import { AccountModule } from './modules/account/account.module';
 import { CategoryModule } from './modules/category/category.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
@@ -27,6 +28,7 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
     AuthModule,
     UsersModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    ImportModule,
   ],
 
   controllers: [AppController],
