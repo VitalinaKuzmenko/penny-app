@@ -2,17 +2,24 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { parse } from 'csv-parse/sync';
 import { CsvRowSchema } from 'schemas';
-import { CsvRowDto } from 'schemas-nest';
+import { ImportCsvResponseDto } from 'schemas-nest';
 
+import { PrismaService } from '../prisma/prisma.service';
 import { WinstonLogger } from '../utils/logger/logger';
 import { parseDate } from '../utils/parse-date';
 
 @Injectable()
 export class ImportService {
-  constructor(private readonly logger: WinstonLogger) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger: WinstonLogger,
+  ) {}
 
-  parseCsv(buffer: Buffer): CsvRowDto[] {
-    this.logger.info('Starting CSV parsing');
+  async importCsv(
+    userId: string,
+    buffer: Buffer,
+  ): Promise<ImportCsvResponseDto> {
+    this.logger.info('Starting CSV import');
 
     let records: any[];
 
@@ -22,19 +29,15 @@ export class ImportService {
         skip_empty_lines: true,
         trim: true,
       });
-      this.logger.debug(
-        `CSV parsed successfully, ${records.length} rows found`,
-      );
+      this.logger.debug('CSV parsed', { rows: records.length });
     } catch (err) {
-      const errorMessage = (err as Error).message;
-      this.logger.error('CSV parsing failed', errorMessage);
+      this.logger.error('CSV parsing failed', err as Error);
       throw new BadRequestException({
         code: 'import.csv_invalid',
       });
     }
 
     if (!records.length) {
-      this.logger.warn('CSV file is empty');
       throw new BadRequestException({
         code: 'import.csv_empty',
       });
@@ -42,11 +45,9 @@ export class ImportService {
 
     const requiredColumns = ['date', 'description', 'amount'];
     const actualColumns = Object.keys(records[0]);
-    this.logger.debug('Checking required CSV columns', { actualColumns });
 
     for (const col of requiredColumns) {
       if (!actualColumns.includes(col)) {
-        this.logger.warn(`Missing required column: ${col}`);
         throw new BadRequestException({
           code: 'import.csv_missing_column',
           meta: { column: col },
@@ -54,60 +55,66 @@ export class ImportService {
       }
     }
 
-    const parsedRows: CsvRowDto[] = [];
+    const rowsToInsert = records.map((row, index) => {
+      const rowNumber = index + 2;
 
-    records.forEach((row, index) => {
-      const rowNumber = index + 2; // CSV header is row 1
-
-      this.logger.debug(`Parsing row ${rowNumber}`, { row });
-
-      // Parse date
       const date = parseDate(row.date);
       if (!date) {
-        this.logger.warn(`Invalid date at row ${rowNumber}`, {
-          value: row.date,
-        });
         throw new BadRequestException({
           code: 'import.invalid_date',
           meta: { row: rowNumber },
         });
       }
 
-      // Parse amount
       const amount = Number(row.amount);
       if (Number.isNaN(amount)) {
-        this.logger.warn(`Invalid amount at row ${rowNumber}`, {
-          value: row.amount,
-        });
         throw new BadRequestException({
           code: 'import.invalid_amount',
           meta: { row: rowNumber },
         });
       }
 
-      // Validate full row with Zod
       const result = CsvRowSchema.safeParse({
-        date: date,
+        date,
         description: row.description,
         amount,
       });
 
       if (!result.success) {
-        this.logger.warn(`Row validation failed at row ${rowNumber}`, {
-          errors: result.error.flatten(),
-        });
         throw new BadRequestException({
           code: 'import.row_validation_failed',
           meta: { row: rowNumber },
         });
       }
 
-      parsedRows.push(result.data);
+      return result.data;
     });
 
-    this.logger.info('CSV parsing completed successfully', {
-      totalRows: parsedRows.length,
+    this.logger.info('CSV validation passed', {
+      rows: rowsToInsert.length,
     });
-    return parsedRows;
+
+    // ✅ Create import + rows in ONE transaction
+    const importEntity = await this.prisma.transactionImport.create({
+      data: {
+        // userId should come from auth later
+        userId,
+        rows: {
+          createMany: {
+            data: rowsToInsert.map((row) => ({
+              date: row.date,
+              description: row.description,
+              amount: row.amount,
+            })),
+          },
+        },
+      },
+    });
+
+    this.logger.info('CSV import created', {
+      importId: importEntity.id,
+    });
+
+    return { importId: importEntity.id };
   }
 }

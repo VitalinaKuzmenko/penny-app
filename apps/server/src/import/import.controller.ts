@@ -4,6 +4,7 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -12,7 +13,7 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
-import { CsvRowDto, CsvUploadDto } from 'schemas-nest';
+import { CsvUploadDto, ImportCsvResponseDto } from 'schemas-nest';
 
 import { ImportService } from './import.service';
 
@@ -21,18 +22,20 @@ export class ImportController {
   constructor(private readonly importService: ImportService) {}
 
   @Post('csv')
-  @ApiOperation({ summary: 'Upload CSV and parse transactions' })
+  @ApiOperation({ summary: 'Upload CSV and create import draft' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'CSV file',
     type: CsvUploadDto,
   })
   @ApiOkResponse({
-    type: CsvRowDto,
-    isArray: true,
+    type: ImportCsvResponseDto,
   })
   @UseInterceptors(FileInterceptor('file'))
-  uploadCsv(@UploadedFile() file: Express.Multer.File): CsvRowDto[] {
+  async uploadCsv(
+    @Req() req,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<ImportCsvResponseDto> {
     if (!file) {
       throw new BadRequestException({
         code: 'import.file_required',
@@ -44,7 +47,7 @@ export class ImportController {
         code: 'import.file_not_csv',
       });
     }
-
-    return this.importService.parseCsv(file.buffer);
+    const userId = req.user.userId;
+    return this.importService.importCsv(userId, file.buffer);
   }
 }
