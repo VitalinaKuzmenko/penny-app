@@ -2,7 +2,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { parse } from 'csv-parse/sync';
 import { CsvRowSchema } from 'schemas';
-import { ImportCsvResponseDto } from 'schemas-nest';
+import { CsvRowDto, ImportCsvResponseDto } from 'schemas-nest';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { WinstonLogger } from '../utils/logger/logger';
@@ -48,6 +48,7 @@ export class ImportService {
 
     for (const col of requiredColumns) {
       if (!actualColumns.includes(col)) {
+        this.logger.warn('Missing column', { column: col });
         throw new BadRequestException({
           code: 'import.csv_missing_column',
           meta: { column: col },
@@ -60,6 +61,7 @@ export class ImportService {
 
       const date = parseDate(row.date);
       if (!date) {
+        this.logger.warn('Invalid date', { row });
         throw new BadRequestException({
           code: 'import.invalid_date',
           meta: { row: rowNumber },
@@ -68,6 +70,7 @@ export class ImportService {
 
       const amount = Number(row.amount);
       if (Number.isNaN(amount)) {
+        this.logger.warn('Invalid amount', { row });
         throw new BadRequestException({
           code: 'import.invalid_amount',
           meta: { row: rowNumber },
@@ -81,6 +84,7 @@ export class ImportService {
       });
 
       if (!result.success) {
+        this.logger.warn('CSV row validation failed', result.error);
         throw new BadRequestException({
           code: 'import.row_validation_failed',
           meta: { row: rowNumber },
@@ -97,12 +101,11 @@ export class ImportService {
     // ✅ Create import + rows in ONE transaction
     const importEntity = await this.prisma.transactionImport.create({
       data: {
-        // userId should come from auth later
         userId,
         rows: {
           createMany: {
             data: rowsToInsert.map((row) => ({
-              date: row.date,
+              date: new Date(row.date),
               description: row.description,
               amount: row.amount,
             })),
@@ -116,5 +119,39 @@ export class ImportService {
     });
 
     return { importId: importEntity.id };
+  }
+
+  async getImportRows(
+    userId: string,
+    importId: string,
+  ): Promise<CsvRowDto[] | null> {
+    this.logger.info('Getting import rows', { importId, userId });
+    const importEntity = await this.prisma.transactionImport.findFirst({
+      where: {
+        id: importId,
+        userId,
+      },
+      include: {
+        rows: {
+          orderBy: { date: 'asc' },
+        },
+      },
+    });
+
+    if (!importEntity) {
+      this.logger.info('Import not found', { importId, userId });
+      return null;
+    }
+
+    this.logger.info('Import found', {
+      importId: importEntity.id,
+      rows: importEntity.rows.length,
+    });
+
+    return importEntity.rows.map((row) => ({
+      date: row.date.toString(),
+      description: row.description,
+      amount: Number(row.amount),
+    }));
   }
 }

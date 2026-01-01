@@ -117,7 +117,7 @@ model TransactionImportRow {
 model TransactionImport {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")
-  createdAt DateTime @default(now()) @map("created_id")
+  createdAt DateTime @default(now()) @map("created_at")
 
   rows      TransactionImportRow[]
 }
