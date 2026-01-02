@@ -10,6 +10,7 @@ import {
   NotFoundException,
   UnauthorizedException,
   UseGuards,
+  Body,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -19,15 +20,25 @@ import {
   ApiOperation,
   ApiParam,
 } from '@nestjs/swagger';
-import { CsvRowDto, CsvUploadDto, ImportCsvResponseDto } from 'schemas-nest';
+import {
+  ConfirmImportDto,
+  ConfirmImportResponseDto,
+  CsvRowDto,
+  CsvUploadDto,
+  ImportCsvResponseDto,
+} from 'schemas-nest';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { WinstonLogger } from '../utils/logger/logger';
 
 import { ImportService } from './import.service';
 
 @Controller('import')
 export class ImportController {
-  constructor(private readonly importService: ImportService) {}
+  constructor(
+    private readonly importService: ImportService,
+    private readonly logger: WinstonLogger,
+  ) {}
 
   @Post('csv')
   @UseGuards(JwtAuthGuard)
@@ -46,12 +57,16 @@ export class ImportController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ImportCsvResponseDto> {
     if (!file) {
+      this.logger.warn('uploadCsv failed: file not found');
       throw new BadRequestException({
         code: 'import.file_required',
       });
     }
 
     if (!file.mimetype.includes('csv')) {
+      this.logger.warn('uploadCsv failed: file not CSV', {
+        mimetype: file.mimetype,
+      });
       throw new BadRequestException({
         code: 'import.file_not_csv',
       });
@@ -59,6 +74,7 @@ export class ImportController {
     const userId = req.user.userId;
 
     if (!userId) {
+      this.logger.warn('uploadCsv failed: user not found', { userId });
       throw new UnauthorizedException({
         code: 'auth.unauthorized',
       });
@@ -79,6 +95,7 @@ export class ImportController {
     const userId = req.user.userId;
 
     if (!userId) {
+      this.logger.warn('getImportRows failed: user not found', { userId });
       throw new UnauthorizedException({
         code: 'auth.unauthorized',
       });
@@ -93,5 +110,29 @@ export class ImportController {
     }
 
     return rows;
+  }
+
+  @Post(':importId/confirm')
+  @ApiOperation({ summary: 'Confirm imported CSV rows' })
+  @ApiBody({ type: ConfirmImportDto })
+  @ApiOkResponse({ type: ConfirmImportResponseDto })
+  @UseGuards(JwtAuthGuard)
+  async confirmImport(
+    @Param('importId') importId: string,
+    @Body() dto: ConfirmImportDto,
+    @Req() req,
+  ) {
+    const userId = req.user.userId;
+
+    if (!userId) {
+      this.logger.warn('getImportRows failed: user not found', { userId });
+      throw new UnauthorizedException({
+        code: 'auth.unauthorized',
+      });
+    }
+
+    await this.importService.confirmImport(userId, importId, dto);
+
+    return { success: true };
   }
 }

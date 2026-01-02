@@ -1,9 +1,14 @@
 // src/import/import.service.ts
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { parse } from 'csv-parse/sync';
-import { CsvRowSchema } from 'schemas';
+import { ConfirmImportInput, CsvRowSchema } from 'schemas';
 import { CsvRowDto, ImportCsvResponseDto } from 'schemas-nest';
 
+import { ImportStatus } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { WinstonLogger } from '../utils/logger/logger';
 import { parseDate } from '../utils/parse-date';
@@ -149,9 +154,84 @@ export class ImportService {
     });
 
     return importEntity.rows.map((row) => ({
-      date: row.date.toString(),
+      date: parseDate(row.date.toString()),
       description: row.description,
       amount: Number(row.amount),
     }));
+  }
+
+  async confirmImport(
+    userId: string,
+    importId: string,
+    dto: ConfirmImportInput,
+  ): Promise<void> {
+    this.logger.info('Confirming import', { userId, importId });
+
+    const importEntity = await this.prisma.transactionImport.findFirst({
+      where: {
+        id: importId,
+        userId,
+      },
+      include: {
+        rows: true,
+      },
+    });
+
+    if (!importEntity) {
+      this.logger.warn('Import not found', { importId, userId });
+      throw new NotFoundException({
+        code: 'import.not_found',
+      });
+    }
+
+    if (importEntity.status === 'CONFIRMED') {
+      this.logger.warn('Import already confirmed', { importId, userId });
+      throw new BadRequestException({
+        code: 'import.already_confirmed',
+      });
+    }
+
+    const rowInputMap = new Map(dto.rows.map((row) => [row.id, row]));
+
+    await this.prisma.$transaction(async (tx) => {
+      // 1️⃣ Create real transactions
+      await tx.transaction.createMany({
+        data: importEntity.rows.map((row) => {
+          const input = rowInputMap.get(row.id);
+
+          if (!input) {
+            this.logger.warn('Missing input for row', { rowId: row.id });
+            throw new BadRequestException({
+              code: 'import.row_missing_input',
+              meta: { rowId: row.id },
+            });
+          }
+
+          return {
+            userId,
+            date: row.date,
+            description: row.description,
+            amount: row.amount,
+            currency: dto.currency,
+            accountId: dto.accountId,
+            categoryId: input.categoryId ?? null,
+            type: input.type,
+          };
+        }),
+      });
+
+      // 2️⃣ Mark import as confirmed
+      await tx.transactionImport.update({
+        where: { id: importId },
+        data: {
+          status: ImportStatus.CONFIRMED,
+        },
+      });
+    });
+
+    this.logger.info('Import confirmed successfully', {
+      importId,
+      userId,
+    });
   }
 }

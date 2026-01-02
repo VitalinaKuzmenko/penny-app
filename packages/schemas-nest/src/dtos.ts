@@ -5,6 +5,8 @@ import {
   registerSchema,
   UserInfoSchema,
   ImportCsvResponseSchema,
+  ConfirmImportResponseSchema,
+  ConfirmImportSchema,
 } from 'schemas';
 import { createZodDto } from 'nestjs-zod';
 
@@ -18,9 +20,14 @@ export class UserInfoDto extends createZodDto(UserInfoSchema) {}
 export class AuthResponseDto extends createZodDto(authResponseSchema) {}
 
 // IMPORT
-//TODO: check if needs to be removed
 export class CsvRowDto extends createZodDto(CsvRowSchema) {}
 
 export class ImportCsvResponseDto extends createZodDto(
   ImportCsvResponseSchema,
+) {}
+
+export class ConfirmImportDto extends createZodDto(ConfirmImportSchema) {}
+
+export class ConfirmImportResponseDto extends createZodDto(
+  ConfirmImportResponseSchema,
 ) {}
