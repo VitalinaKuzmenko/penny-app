@@ -7,6 +7,11 @@ import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import UploadFileContainer from './UploadFileContainer';
 import UploadCsvTrustBar from './UploadCsvTrustBar';
 import UploadCsvFormatOverview from './UploadCsvFormatOverview';
+import { UiError } from '@/types/interfaces';
+import { useRouter } from 'next/navigation';
+import { uploadCsvFile } from '@/requests/importCsv';
+import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
+import { mapUploadCsvErrorToUiError } from '@/utils/mapUploadCsvErrorToUiError';
 
 interface UploadCsvSectionProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,6 +22,31 @@ export default function UploadCsvSection({
   uploadCsvPageText,
 }: UploadCsvSectionProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<UiError | null>(null);
+
+  const router = useRouter();
+
+  const handleImport = async () => {
+    if (!selectedFile) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { importId } = await uploadCsvFile(selectedFile);
+
+      console.log('importId', importId);
+      // 👉 Redirect to next step
+      // router.push(`/transactions/import/${importId}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error(err);
+      setError(mapUploadCsvErrorToUiError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFileUpload = (file: File) => setSelectedFile(file);
 
@@ -53,6 +83,8 @@ export default function UploadCsvSection({
         fileContainerText={uploadCsvPageText.UPLOAD_FILE}
       />
 
+      <ErrorBanner error={error} colorMode="light" />
+
       <Box sx={{ textAlign: 'right' }}>
         <Tooltip
           title={
@@ -65,6 +97,8 @@ export default function UploadCsvSection({
             variantType="primary"
             buttonSize="medium"
             disabledStyling={!selectedFile}
+            loading={loading}
+            onClick={handleImport}
           >
             {uploadCsvPageText.IMPORT_BUTTON.LABEL}
           </CustomButton>
