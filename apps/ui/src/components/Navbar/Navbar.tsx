@@ -47,7 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
+        <Toolbar sx={{ pr: { xs: 0, md: 3 } }} disableGutters>
           <Typography
             variant="h6"
             noWrap
