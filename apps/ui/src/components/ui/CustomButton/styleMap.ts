@@ -16,14 +16,6 @@ export const styleMap: Record<
       bgcolor: 'primary.light',
       boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
     },
-    '&.Mui-disabled': {
-      bgcolor: 'grey.300',
-      color: 'grey.500',
-      border: '2px solid',
-      borderColor: 'grey.400',
-      boxShadow: 'none',
-      opacity: 0.7,
-    },
   },
   secondary: {
     border: '2px solid',
@@ -38,13 +30,6 @@ export const styleMap: Record<
       color: 'primary.contrastText',
       borderColor: 'primary.dark',
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    },
-    '&.Mui-disabled': {
-      color: 'grey.500',
-      boxShadow: 'none',
-      border: '2px solid',
-      borderColor: 'grey.400',
-      opacity: 0.7,
     },
   },
   secondary_transparent: {
@@ -61,13 +46,6 @@ export const styleMap: Record<
       borderColor: 'secondary.dark',
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     },
-    '&.Mui-disabled': {
-      color: 'grey.500',
-      boxShadow: 'none',
-      border: '2px solid',
-      borderColor: 'grey.400',
-      opacity: 0.7,
-    },
   },
   secondary_full: {
     border: '2px solid',
@@ -82,13 +60,6 @@ export const styleMap: Record<
       bgcolor: 'secondary.main',
       borderColor: 'secondary.dark',
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    },
-    '&.Mui-disabled': {
-      bgcolor: 'grey.200',
-      borderColor: 'grey.300',
-      color: 'grey.400',
-      boxShadow: 'none',
-      opacity: 0.7,
     },
   },
 };

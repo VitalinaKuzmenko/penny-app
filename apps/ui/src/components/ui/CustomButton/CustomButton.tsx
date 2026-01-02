@@ -12,6 +12,7 @@ interface CustomButtonProps extends ButtonProps {
     | 'secondary_transparent'
     | 'secondary_full';
   buttonSize?: 'small' | 'medium' | 'big-medium' | 'large';
+  disabledStyling?: boolean;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -21,14 +22,37 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   buttonSize = 'medium',
   fullWidth = false,
   sx,
-  disabled,
+  disabledStyling = false,
   ...rest
 }) => {
   // Merge the variant + size + user-provided sx
-  const mergedSx = {
+  const baseSx = {
     ...(styleMap[variantType] || {}),
     ...(sizeMap[buttonSize] || {}),
     ...(sx || {}),
+  };
+
+  // Custom "disabled look" styles
+  const disabledSx =
+    disabledStyling || loading
+      ? {
+          bgcolor: 'grey.300',
+          border: '2px solid',
+          borderColor: 'grey.400',
+          color: 'grey.500',
+          opacity: 0.7,
+          boxShadow: 'none',
+          cursor: 'not-allowed',
+          '&:hover': {
+            bgcolor: 'grey.300', // prevent hover change
+            boxShadow: 'none',
+          },
+        }
+      : {};
+
+  const mergedSx = {
+    ...baseSx,
+    ...disabledSx,
   };
 
   return (
@@ -36,7 +60,6 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       {...rest}
       // size={size}
       fullWidth={fullWidth}
-      disabled={disabled || loading}
       endIcon={
         loading ? <CircularProgress size={20} color="inherit" /> : undefined
       }

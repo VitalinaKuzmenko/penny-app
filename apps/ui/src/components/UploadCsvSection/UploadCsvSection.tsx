@@ -16,12 +16,14 @@ import {
   Paper,
   Divider,
   Button,
+  Tooltip,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import DescriptionIcon from '@mui/icons-material/Description';
 import CustomButton from '../ui/CustomButton/CustomButton';
 import UploadFileContainer from '../UploadFileContainer/UploadFileContainer';
 import { useState } from 'react';
+import UploadCsvTrustBar from '../UploadCsvTrustBar/UploadCsvTrustBar';
 
 interface UploadCsvSectionProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,7 +86,6 @@ export default function UploadCsvSection({
           backgroundColor: 'background.paper',
           border: '1px solid',
           borderColor: 'grey.200',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.06)',
         }}
       >
         <CardContent sx={{ p: { xs: 3, md: 4 } }}>
@@ -234,7 +235,7 @@ export default function UploadCsvSection({
                 }}
               >
                 <CustomButton
-                  variantType="secondary_full"
+                  variantType="secondary"
                   buttonSize="medium"
                   startIcon={<DownloadIcon />}
                   onClick={downloadCsvTemplate}
@@ -256,19 +257,29 @@ export default function UploadCsvSection({
         </CardContent>
       </Card>
 
+      <UploadCsvTrustBar />
+
       <UploadFileContainer
         selectedFile={selectedFile}
         onFileUpload={handleFileUpload}
       />
 
       <Box sx={{ textAlign: 'right' }}>
-        <CustomButton
-          variantType="primary"
-          buttonSize="medium"
-          disabled={!selectedFile}
+        <Tooltip
+          title={
+            !selectedFile
+              ? 'Upload CSV file to submit transactions'
+              : 'Proceed editing transactions'
+          }
         >
-          Import transactions
-        </CustomButton>
+          <CustomButton
+            variantType="primary"
+            buttonSize="medium"
+            disabledStyling={!selectedFile}
+          >
+            Import transactions
+          </CustomButton>
+        </Tooltip>
       </Box>
     </Container>
   );
