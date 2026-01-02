@@ -28,6 +28,7 @@ interface UploadCsvSectionProps {
 export default function UploadCsvSection({
   uploadCsvPageText,
 }: UploadCsvSectionProps) {
+  const columnNames = ['Date', 'Description', 'Amount'];
   return (
     <Container maxWidth="xl" disableGutters>
       {/* Header / Hero */}
@@ -106,13 +107,12 @@ export default function UploadCsvSection({
 
               <Stack
                 direction="row"
-                // spacing={1.5}
                 flexWrap="wrap"
                 sx={{
                   rowGap: 1,
                 }}
               >
-                {['Date', 'Description', 'Amount'].map((col) => (
+                {columnNames.map((col) => (
                   <Chip
                     key={col}
                     label={col}
@@ -127,7 +127,6 @@ export default function UploadCsvSection({
                       background: (theme) =>
                         `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
                       color: 'primary.contrastText',
-
                       boxShadow: '0 6px 14px rgba(4, 22, 70, 0.25)',
                     }}
                   />
@@ -145,28 +144,42 @@ export default function UploadCsvSection({
                   sx={{
                     borderRadius: 3,
                     border: '1px solid',
-                    borderColor: 'grey.200',
+                    borderColor: 'primary.light',
                     overflowX: 'auto',
                   }}
                 >
                   <Table>
                     <TableHead>
-                      <TableRow sx={{ backgroundColor: 'grey.50' }}>
-                        <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>
-                          Description
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 600 }} align="right">
-                          Amount
-                        </TableCell>
+                      <TableRow
+                        sx={{
+                          background: (theme) =>
+                            `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                        }}
+                      >
+                        {columnNames.map((col, index) => (
+                          <TableCell
+                            align={
+                              index === columnNames.length - 1
+                                ? 'right'
+                                : 'left'
+                            }
+                            key={col + index}
+                            sx={{
+                              fontWeight: 600,
+                              color: 'primary.contrastText',
+                            }}
+                          >
+                            {col}
+                          </TableCell>
+                        ))}
                       </TableRow>
                     </TableHead>
 
                     <TableBody>
                       {[
-                        ['2025-01-01', 'Groceries', '-45.90'],
-                        ['2025-01-03', 'Salary', '2500.00'],
-                        ['2025-01-05', 'Coffee', '-3.50'],
+                        ['01/01/2025', 'Groceries', '-45.90'],
+                        ['03/01/2025', 'Salary', '2500.00'],
+                        ['05/01/2025', 'Coffee', '-3.50'],
                       ].map((row, index) => (
                         <TableRow
                           key={index}
