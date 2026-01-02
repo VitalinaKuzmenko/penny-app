@@ -15,10 +15,13 @@ import {
   TableRow,
   Paper,
   Divider,
+  Button,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import DescriptionIcon from '@mui/icons-material/Description';
 import CustomButton from '../ui/CustomButton/CustomButton';
+import UploadFileContainer from '../UploadFileContainer/UploadFileContainer';
+import { useState } from 'react';
 
 interface UploadCsvSectionProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,6 +32,7 @@ export default function UploadCsvSection({
   uploadCsvPageText,
 }: UploadCsvSectionProps) {
   const columnNames = ['date', 'description', 'amount'];
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const downloadCsvTemplate = () => {
     const link = document.createElement('a');
@@ -42,6 +46,10 @@ export default function UploadCsvSection({
     setTimeout(() => {
       document.body.removeChild(link);
     }, 0);
+  };
+
+  const handleFileUpload = (file: File) => {
+    setSelectedFile(file);
   };
 
   return (
@@ -227,7 +235,7 @@ export default function UploadCsvSection({
               >
                 <CustomButton
                   variantType="secondary_full"
-                  buttonSize="big-medium"
+                  buttonSize="medium"
                   startIcon={<DownloadIcon />}
                   onClick={downloadCsvTemplate}
                 >
@@ -247,6 +255,21 @@ export default function UploadCsvSection({
           </Stack>
         </CardContent>
       </Card>
+
+      <UploadFileContainer
+        selectedFile={selectedFile}
+        onFileUpload={handleFileUpload}
+      />
+
+      <Box sx={{ textAlign: 'right' }}>
+        <CustomButton
+          variantType="primary"
+          buttonSize="medium"
+          disabled={!selectedFile}
+        >
+          Import transactions
+        </CustomButton>
+      </Box>
     </Container>
   );
 }
