@@ -69,7 +69,7 @@ export default function ProfileClientSection({
         </Typography>
         <CustomButton
           variantType="secondary"
-          size="small"
+          buttonSize="small"
           onClick={handleSignInClick}
         >
           {profilePageText.SIGN_IN_BUTTON}

@@ -124,7 +124,7 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
           </Typography>
           <CustomButton
             variantType="secondary"
-            size="small"
+            buttonSize="small"
             onClick={handleSignInClick}
           >
             {registerPageText.FORM.SIGN_IN_BUTTON}
@@ -244,8 +244,9 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
 
           <Box textAlign="center">
             <CustomButton
-              variantType="other"
+              variantType="secondary_transparent"
               fullWidth
+              buttonSize="big-medium"
               onClick={handleGoogleSignInClick}
               startIcon={<GoogleIcon />}
             >
