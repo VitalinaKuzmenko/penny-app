@@ -49,5 +49,7 @@ export const proxy = (request: NextRequest) => {
 };
 
 export const config = {
-  matcher: ['/((?!_next).*)'], // applies to all paths except _next
+  matcher: [
+    '/((?!_next|favicon.ico|.*\\.(?:csv|png|jpg|jpeg|svg|webp|ico)).*)',
+  ],
 };

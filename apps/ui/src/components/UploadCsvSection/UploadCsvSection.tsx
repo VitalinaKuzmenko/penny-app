@@ -28,7 +28,22 @@ interface UploadCsvSectionProps {
 export default function UploadCsvSection({
   uploadCsvPageText,
 }: UploadCsvSectionProps) {
-  const columnNames = ['Date', 'Description', 'Amount'];
+  const columnNames = ['date', 'description', 'amount'];
+
+  const downloadCsvTemplate = () => {
+    const link = document.createElement('a');
+    link.href = '/penny_template.csv';
+    link.download = 'penny_template.csv';
+
+    document.body.appendChild(link);
+    link.click();
+
+    // Safe cleanup
+    setTimeout(() => {
+      document.body.removeChild(link);
+    }, 0);
+  };
+
   return (
     <Container maxWidth="xl" disableGutters>
       {/* Header / Hero */}
@@ -119,7 +134,6 @@ export default function UploadCsvSection({
                     sx={{
                       fontWeight: 700,
                       letterSpacing: '0.04em',
-                      textTransform: 'uppercase',
                       borderRadius: 3,
                       px: 1.75,
                       py: 0.75,
@@ -215,6 +229,7 @@ export default function UploadCsvSection({
                   variantType="secondary_full"
                   buttonSize="big-medium"
                   startIcon={<DownloadIcon />}
+                  onClick={downloadCsvTemplate}
                 >
                   Download template
                 </CustomButton>
