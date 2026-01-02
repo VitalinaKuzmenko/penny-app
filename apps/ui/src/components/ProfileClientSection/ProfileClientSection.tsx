@@ -14,7 +14,9 @@ interface ProfileClientProps {
   profilePageText: Record<string, any>;
 }
 
-export default function ProfileClient({ profilePageText }: ProfileClientProps) {
+export default function ProfileClientSection({
+  profilePageText,
+}: ProfileClientProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<UiError | null>(null);
   const { user, setUser } = useAuth();

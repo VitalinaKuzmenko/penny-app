@@ -1,7 +1,7 @@
 import { Container } from '@mui/material';
 import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
-import ProfileClient from '@/components/ProfileClient/ProfileClient';
+import ProfileClient from '@/components/ProfileClientSection/ProfileClientSection';
 
 export const dynamic = 'force-dynamic';
 

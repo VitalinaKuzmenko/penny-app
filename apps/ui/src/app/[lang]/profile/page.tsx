@@ -1,7 +1,7 @@
 import { Container } from '@mui/material';
 import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
-import ProfileClient from '@/components/ProfileClient/ProfileClient';
+import ProfileClientSection from '@/components/ProfileClientSection/ProfileClientSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +16,7 @@ export default async function ProfilePage({
 
   return (
     <Container maxWidth="sm">
-      <ProfileClient profilePageText={profilePageText} />
+      <ProfileClientSection profilePageText={profilePageText} />
     </Container>
   );
 }

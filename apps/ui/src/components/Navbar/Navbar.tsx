@@ -96,9 +96,9 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
                 onClose={handleCloseNavMenu}
                 sx={{ display: { xs: 'block', md: 'none' } }}
               >
-                {pages.map((page) => (
+                {pages.map((page, index) => (
                   <MenuItem
-                    key={page}
+                    key={page.NAME + index}
                     onClick={() => handleCloseNavMenu(page.URL)}
                   >
                     <Typography sx={{ textAlign: 'center' }}>
@@ -132,9 +132,9 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
           {/* desktop pages */}
           {user ? (
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
+              {pages.map((page, index) => (
                 <Button
-                  key={page}
+                  key={page.NAME + index}
                   onClick={() => handleCloseNavMenu(page.URL)}
                   sx={{
                     my: 2,
