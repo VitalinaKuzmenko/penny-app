@@ -62,39 +62,14 @@ export class UsersService {
 
   async createOAuthUser(dto: CreateOAuthUserDto) {
     this.logger.info('Creating OAuth user', { dto });
-
-    return this.prisma.user.create({
-      data: {
-        provider: dto.provider,
-        providerId: dto.providerId,
-        userEmail: dto.email,
-        userName: dto.userName,
-        userSurname: dto.userSurname,
-      },
-    });
-  }
-
-  async createOAuthUser2({
-    provider,
-    providerId,
-    email,
-    userName,
-    userSurname,
-  }: {
-    provider: string;
-    providerId: string;
-    email: string;
-    userName?: string;
-    userSurname?: string;
-  }) {
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
-          provider,
-          providerId,
-          userEmail: email,
-          userName,
-          userSurname,
+          provider: dto.provider,
+          providerId: dto.providerId,
+          userEmail: dto.email,
+          userName: dto.userName,
+          userSurname: dto.userSurname,
         },
       });
 
