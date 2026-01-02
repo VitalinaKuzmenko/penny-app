@@ -2,7 +2,7 @@ import { Container } from '@mui/material';
 import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
 
-import UploadCsvSection from '@/components/UploadCsvSection/UploadCsvSection';
+import UploadCsvSection from '../upload-csv/components/UploadCsvSection';
 
 export const dynamic = 'force-dynamic';
 

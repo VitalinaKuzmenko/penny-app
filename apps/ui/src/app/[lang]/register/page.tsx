@@ -1,7 +1,7 @@
 import { Container, Box } from '@mui/material';
 import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
-import RegisterForm from '@/components/RegisterForm/RegisterForm';
+import RegisterForm from '@/app/[lang]/register/components/RegisterForm';
 
 export const dynamic = 'force-dynamic';
 

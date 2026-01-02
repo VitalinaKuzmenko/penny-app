@@ -15,15 +15,14 @@ import {
   TableRow,
   Paper,
   Divider,
-  Button,
   Tooltip,
 } from '@mui/material';
+import { useState } from 'react';
 import DownloadIcon from '@mui/icons-material/Download';
 import DescriptionIcon from '@mui/icons-material/Description';
-import CustomButton from '../ui/CustomButton/CustomButton';
-import UploadFileContainer from '../UploadFileContainer/UploadFileContainer';
-import { useState } from 'react';
-import UploadCsvTrustBar from '../UploadCsvTrustBar/UploadCsvTrustBar';
+import CustomButton from '@/components/ui/CustomButton/CustomButton';
+import UploadFileContainer from './UploadFileContainer';
+import UploadCsvTrustBar from './UploadCsvTrustBar';
 
 interface UploadCsvSectionProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

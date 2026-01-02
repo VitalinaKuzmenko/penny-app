@@ -22,7 +22,7 @@ import { useRouter } from 'next/navigation';
 import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { loginUser } from '@/requests/loginUser';
 import { UiError } from '@/types/interfaces';
-import ErrorBanner from '../ErrorBanner/ErrorBanner';
+import ErrorBanner from '../../../../components/ErrorBanner/ErrorBanner';
 import { useAuth } from '@/providers/AuthProvider';
 import GoogleIcon from '@mui/icons-material/Google';
 

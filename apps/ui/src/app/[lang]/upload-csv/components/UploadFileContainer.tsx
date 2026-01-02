@@ -2,8 +2,7 @@
 
 import { Paper, Typography, Button, Stack, Box } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import { useRef, useState } from 'react';
-import CustomButton from '../ui/CustomButton/CustomButton';
+import { useRef } from 'react';
 
 interface UploadFileContainerProps {
   selectedFile: File | null;
