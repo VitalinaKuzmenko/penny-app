@@ -1,8 +1,8 @@
 import {
-  authResponseSchema,
+  AuthResponseSchema,
   CsvImportResponseSchema,
-  loginSchema,
-  registerSchema,
+  LoginSchema,
+  RegisterSchema,
   UserInfoSchema,
   ImportCsvResponseSchema,
   ConfirmImportResponseSchema,
@@ -11,13 +11,13 @@ import {
 import { createZodDto } from 'nestjs-zod';
 
 // AUTH
-export class RegisterDto extends createZodDto(registerSchema) {}
+export class RegisterDto extends createZodDto(RegisterSchema) {}
 
-export class LoginDto extends createZodDto(loginSchema) {}
+export class LoginDto extends createZodDto(LoginSchema) {}
 
 export class UserInfoDto extends createZodDto(UserInfoSchema) {}
 
-export class AuthResponseDto extends createZodDto(authResponseSchema) {}
+export class AuthResponseDto extends createZodDto(AuthResponseSchema) {}
 
 // IMPORT
 export class CsvImportResponseDTO extends createZodDto(

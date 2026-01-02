@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const registerSchema = z.object({
+export const RegisterSchema = z.object({
   email: z.string().email({
     message: 'errors.email.invalid',
   }),
@@ -14,4 +14,4 @@ export const registerSchema = z.object({
   userSurname: z.string().nonempty({ message: 'errors.user_surname.required' }),
 });
 
-export type RegisterInput = z.infer<typeof registerSchema>;
+export type RegisterInput = z.infer<typeof RegisterSchema>;
