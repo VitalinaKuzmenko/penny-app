@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
-import { loginSchema, type LoginInput } from 'schemas';
+import { LoginSchema, type LoginInput } from 'schemas';
 import { useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
@@ -44,7 +44,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
     setError: setFormError,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(LoginSchema),
   });
 
   const handleSignUpClick = () => {
