@@ -4,7 +4,7 @@ import Negotiator from 'negotiator';
 import { availableLanguages } from './utils/interfaces';
 
 const defaultLocale = 'en';
-const protectedPaths = ['/dashboard', '/profile'];
+const protectedPaths = ['/profile', '/upload-csv', '/pennys-view'];
 
 export const getLocale = (request: Request) => {
   const headers = Object.fromEntries(request.headers.entries());
