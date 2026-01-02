@@ -42,7 +42,7 @@ export default function UploadCsvSection({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error(err);
-      setError(mapUploadCsvErrorToUiError(err));
+      setError(mapUploadCsvErrorToUiError(err, uploadCsvPageText));
     } finally {
       setLoading(false);
     }

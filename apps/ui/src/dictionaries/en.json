@@ -112,6 +112,7 @@
   "UPLOAD_CSV_PAGE": {
     "TITLE": "Upload CSV",
     "SUBTITLE": "Import your transactions into Penny in seconds using a clean, structured CSV file downloaded from your bank account.",
+
     "CSV_FORMAT_OVERVIEW": {
       "TITLE": "CSV Format Overview",
       "REQUIRED_COLUMNS": "Required columns:",
@@ -124,21 +125,67 @@
       "DOWNLOAD_BUTTON": "Download template",
       "DOWNLOAD_TEXT": "Use this if you want a ready-to-go file with the correct format."
     },
+
     "TRUST_BAR": [
       "We'll check for missing columns automatically",
       "You'll be able to edit entries after upload",
       "Only you can see your uploaded data"
     ],
+
     "UPLOAD_FILE": {
       "DRAG_DROP": "Drag and drop your CSV file here",
       "OR": "or",
       "CHOOSE_FILE": "Choose a file",
       "INFO": "CSV only · Max file size 5 MB"
     },
+
     "IMPORT_BUTTON": {
       "LABEL": "Import transactions",
       "TOOLTIP_NO_FILE": "Upload CSV file to submit transactions",
       "TOOLTIP_WITH_FILE": "Proceed editing transactions"
+    },
+
+    "ERRORS": {
+      "FILE_REQUIRED": {
+        "TITLE": "File required",
+        "MESSAGE": "Please upload a CSV file before importing."
+      },
+      "FILE_NOT_CSV": {
+        "TITLE": "Invalid file format",
+        "MESSAGE": "Only CSV files are supported."
+      },
+      "CSV_INVALID": {
+        "TITLE": "Invalid CSV file",
+        "MESSAGE": "We could not read this file. Please make sure it is a valid CSV exported from your bank."
+      },
+      "CSV_EMPTY": {
+        "TITLE": "Empty file",
+        "MESSAGE": "The uploaded CSV file does not contain any transactions."
+      },
+      "CSV_MISSING_COLUMN": {
+        "TITLE": "Missing column",
+        "MESSAGE": "The required column \"{column}\" is missing from your CSV file."
+      },
+      "INVALID_DATE": {
+        "TITLE": "Invalid date format",
+        "MESSAGE": "Row {row} contains an invalid date. Please check the date format."
+      },
+      "INVALID_AMOUNT": {
+        "TITLE": "Invalid amount",
+        "MESSAGE": "Row {row} contains an invalid amount."
+      },
+      "ROW_VALIDATION_FAILED": {
+        "TITLE": "Invalid row data",
+        "MESSAGE": "Row {row} contains invalid or missing values."
+      },
+      "UNAUTHORIZED": {
+        "TITLE": "Session expired",
+        "MESSAGE": "Please sign in again to continue."
+      },
+      "UNKNOWN": {
+        "TITLE": "Upload failed",
+        "MESSAGE": "Something went wrong while uploading your file. Please try again."
+      }
     }
   }
 }
