@@ -23,7 +23,7 @@ import {
 import {
   ConfirmImportDto,
   ConfirmImportResponseDto,
-  CsvRowDto,
+  CsvImportResponseDTO,
   CsvUploadDto,
   ImportCsvResponseDto,
 } from 'schemas-nest';
@@ -87,11 +87,11 @@ export class ImportController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get all rows for an import' })
   @ApiParam({ name: 'importId', type: 'string' })
-  @ApiOkResponse({ type: CsvRowDto, isArray: true })
+  @ApiOkResponse({ type: CsvImportResponseDTO, isArray: true })
   async getImportRows(
     @Param('importId') importId: string,
     @Req() req,
-  ): Promise<CsvRowDto[]> {
+  ): Promise<CsvImportResponseDTO[]> {
     const userId = req.user.userId;
 
     if (!userId) {

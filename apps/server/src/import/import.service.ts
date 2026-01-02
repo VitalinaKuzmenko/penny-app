@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { parse } from 'csv-parse/sync';
 import { ConfirmImportInput, CsvRowSchema } from 'schemas';
-import { CsvRowDto, ImportCsvResponseDto } from 'schemas-nest';
+import { CsvImportResponseDTO, ImportCsvResponseDto } from 'schemas-nest';
 
 import { ImportStatus } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -129,7 +129,7 @@ export class ImportService {
   async getImportRows(
     userId: string,
     importId: string,
-  ): Promise<CsvRowDto[] | null> {
+  ): Promise<CsvImportResponseDTO[] | null> {
     this.logger.info('Getting import rows', { importId, userId });
     const importEntity = await this.prisma.transactionImport.findFirst({
       where: {
@@ -154,6 +154,7 @@ export class ImportService {
     });
 
     return importEntity.rows.map((row) => ({
+      id: row.id,
       date: parseDate(row.date.toString()),
       description: row.description,
       amount: Number(row.amount),

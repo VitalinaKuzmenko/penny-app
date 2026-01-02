@@ -1,6 +1,6 @@
 import {
   authResponseSchema,
-  CsvRowSchema,
+  CsvImportResponseSchema,
   loginSchema,
   registerSchema,
   UserInfoSchema,
@@ -20,7 +20,9 @@ export class UserInfoDto extends createZodDto(UserInfoSchema) {}
 export class AuthResponseDto extends createZodDto(authResponseSchema) {}
 
 // IMPORT
-export class CsvRowDto extends createZodDto(CsvRowSchema) {}
+export class CsvImportResponseDTO extends createZodDto(
+  CsvImportResponseSchema,
+) {}
 
 export class ImportCsvResponseDto extends createZodDto(
   ImportCsvResponseSchema,
