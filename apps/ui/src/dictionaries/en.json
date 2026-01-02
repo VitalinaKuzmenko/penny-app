@@ -110,6 +110,35 @@
     }
   },
   "UPLOAD_CSV_PAGE": {
-    "TITLE": "Upload CSV"
+    "TITLE": "Upload CSV",
+    "SUBTITLE": "Import your transactions into Penny in seconds using a clean, structured CSV file downloaded from your bank account.",
+    "CSV_FORMAT_OVERVIEW": {
+      "TITLE": "CSV Format Overview",
+      "REQUIRED_COLUMNS": "Required columns:",
+      "COLUMNS": ["date", "description", "amount"],
+      "EXAMPLE_TABLE": [
+        ["01/01/2025", "Groceries", "-45.90"],
+        ["03/01/2025", "Salary", "2500.00"],
+        ["05/01/2025", "Coffee", "-3.50"]
+      ],
+      "DOWNLOAD_BUTTON": "Download template",
+      "DOWNLOAD_TEXT": "Use this if you want a ready-to-go file with the correct format."
+    },
+    "TRUST_BAR": [
+      "We'll check for missing columns automatically",
+      "You'll be able to edit entries after upload",
+      "Only you can see your uploaded data"
+    ],
+    "UPLOAD_FILE": {
+      "DRAG_DROP": "Drag and drop your CSV file here",
+      "OR": "or",
+      "CHOOSE_FILE": "Choose a file",
+      "INFO": "CSV only · Max file size 5 MB"
+    },
+    "IMPORT_BUTTON": {
+      "LABEL": "Import transactions",
+      "TOOLTIP_NO_FILE": "Upload CSV file to submit transactions",
+      "TOOLTIP_WITH_FILE": "Proceed editing transactions"
+    }
   }
 }

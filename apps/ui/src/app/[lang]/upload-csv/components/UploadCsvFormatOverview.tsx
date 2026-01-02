@@ -18,8 +18,16 @@ import {
 import DownloadIcon from '@mui/icons-material/Download';
 import DescriptionIcon from '@mui/icons-material/Description';
 
-const UploadCsvFormatOverview = () => {
-  const columnNames = ['date', 'description', 'amount'];
+interface UploadCsvFormatOverviewProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formatOverviewText: Record<string, any>;
+}
+
+const UploadCsvFormatOverview = ({
+  formatOverviewText,
+}: UploadCsvFormatOverviewProps) => {
+  const columnNames: string[] = formatOverviewText.COLUMNS;
+  const rows: string[][] = formatOverviewText.EXAMPLE_TABLE;
 
   const downloadCsvTemplate = () => {
     const link = document.createElement('a');
@@ -64,7 +72,7 @@ const UploadCsvFormatOverview = () => {
               <DescriptionIcon />
             </Box>
             <Typography variant="h6" fontWeight={700}>
-              CSV Format Overview
+              {formatOverviewText.TITLE}
             </Typography>
           </Stack>
 
@@ -83,16 +91,9 @@ const UploadCsvFormatOverview = () => {
               gutterBottom
               sx={{ m: 0 }}
             >
-              Required columns:
+              {formatOverviewText.REQUIRED_COLUMNS}
             </Typography>
-
-            <Stack
-              direction="row"
-              flexWrap="wrap"
-              sx={{
-                rowGap: 1,
-              }}
-            >
+            <Stack direction="row" flexWrap="wrap" sx={{ rowGap: 1 }}>
               {columnNames.map((col) => (
                 <Chip
                   key={col}
@@ -116,8 +117,8 @@ const UploadCsvFormatOverview = () => {
 
           <Divider sx={{ my: 6, height: 2, bgcolor: 'primary.light' }} />
 
+          {/* Table + Download */}
           <Stack direction={{ xs: 'column', md: 'row' }} alignItems="stretch">
-            {/* Table Preview */}
             <Box flex={1}>
               <Paper
                 elevation={0}
@@ -154,11 +155,7 @@ const UploadCsvFormatOverview = () => {
                   </TableHead>
 
                   <TableBody>
-                    {[
-                      ['01/01/2025', 'Groceries', '-45.90'],
-                      ['03/01/2025', 'Salary', '2500.00'],
-                      ['05/01/2025', 'Coffee', '-3.50'],
-                    ].map((row, index) => (
+                    {rows.map((row, index) => (
                       <TableRow
                         key={index}
                         sx={{
@@ -190,20 +187,17 @@ const UploadCsvFormatOverview = () => {
               }}
             >
               <CustomButton
-                variantType="secondary"
-                buttonSize="medium"
-                startIcon={<DownloadIcon />}
                 onClick={downloadCsvTemplate}
+                startIcon={<DownloadIcon />}
               >
-                Download template
+                {formatOverviewText.DOWNLOAD_BUTTON}
               </CustomButton>
-
               <Typography
                 variant="body1"
                 color="text.secondary"
                 sx={{ textAlign: 'center' }}
               >
-                Use this if you want a ready-to-go file with the correct format.
+                {formatOverviewText.DOWNLOAD_TEXT}
               </Typography>
             </Box>
           </Stack>

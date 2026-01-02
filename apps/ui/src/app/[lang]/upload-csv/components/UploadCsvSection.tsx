@@ -18,13 +18,11 @@ export default function UploadCsvSection({
 }: UploadCsvSectionProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleFileUpload = (file: File) => {
-    setSelectedFile(file);
-  };
+  const handleFileUpload = (file: File) => setSelectedFile(file);
 
   return (
     <Container maxWidth="xl" disableGutters>
-      {/* Header / Hero */}
+      {/* Hero */}
       <Box
         sx={{
           mb: 4,
@@ -37,30 +35,30 @@ export default function UploadCsvSection({
       >
         <Stack spacing={1}>
           <Typography variant="h4" fontWeight={800}>
-            Upload CSV
+            {uploadCsvPageText.TITLE}
           </Typography>
           <Typography variant="body1" sx={{ opacity: 0.9, maxWidth: 600 }}>
-            Import your transactions into Penny in seconds using a clean,
-            structured CSV file downloaded from you bank account.
+            {uploadCsvPageText.SUBTITLE}
           </Typography>
         </Stack>
       </Box>
 
-      <UploadCsvFormatOverview />
-
-      <UploadCsvTrustBar />
-
+      <UploadCsvFormatOverview
+        formatOverviewText={uploadCsvPageText.CSV_FORMAT_OVERVIEW}
+      />
+      <UploadCsvTrustBar trustBarTextItems={uploadCsvPageText.TRUST_BAR} />
       <UploadFileContainer
         selectedFile={selectedFile}
         onFileUpload={handleFileUpload}
+        fileContainerText={uploadCsvPageText.UPLOAD_FILE}
       />
 
       <Box sx={{ textAlign: 'right' }}>
         <Tooltip
           title={
             !selectedFile
-              ? 'Upload CSV file to submit transactions'
-              : 'Proceed editing transactions'
+              ? uploadCsvPageText.IMPORT_BUTTON.TOOLTIP_NO_FILE
+              : uploadCsvPageText.IMPORT_BUTTON.TOOLTIP_WITH_FILE
           }
         >
           <CustomButton
@@ -68,7 +66,7 @@ export default function UploadCsvSection({
             buttonSize="medium"
             disabledStyling={!selectedFile}
           >
-            Import transactions
+            {uploadCsvPageText.IMPORT_BUTTON.LABEL}
           </CustomButton>
         </Tooltip>
       </Box>

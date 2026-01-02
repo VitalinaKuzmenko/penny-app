@@ -5,11 +5,14 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useRef } from 'react';
 
 interface UploadFileContainerProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fileContainerText: Record<string, any>;
   selectedFile: File | null;
   onFileUpload: (file: File) => void;
 }
 
 const UploadFileContainer = ({
+  fileContainerText,
   selectedFile,
   onFileUpload,
 }: UploadFileContainerProps) => {
@@ -46,12 +49,10 @@ const UploadFileContainer = ({
       <Stack spacing={2} alignItems="center">
         <UploadFileIcon color="primary" sx={{ fontSize: 40 }} />
 
-        <Typography fontWeight={600}>
-          Drag and drop your CSV file here
-        </Typography>
+        <Typography fontWeight={600}>{fileContainerText.DRAG_DROP}</Typography>
 
         <Typography variant="body2" color="text.secondary">
-          or
+          {fileContainerText.OR}
         </Typography>
 
         <Button
@@ -64,7 +65,7 @@ const UploadFileContainer = ({
             px: 3,
           }}
         >
-          Choose a file
+          {fileContainerText.CHOOSE_FILE}
         </Button>
 
         {selectedFile && (
@@ -88,7 +89,7 @@ const UploadFileContainer = ({
         )}
 
         <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-          CSV only · Max file size 5 MB
+          {fileContainerText.INFO}
         </Typography>
       </Stack>
 

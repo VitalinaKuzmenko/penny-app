@@ -1,23 +1,15 @@
 import { Box, Stack, Typography } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import EditIcon from '@mui/icons-material/Edit';
-import LockIcon from '@mui/icons-material/Lock';
 
-const UploadCsvTrustBar = () => {
-  const items = [
-    {
-      icon: <CheckCircleIcon color="primary" />,
-      text: "We'll check for missing columns automatically",
-    },
-    {
-      icon: <EditIcon color="primary" />,
-      text: "You'll be able to edit entries after upload",
-    },
-    {
-      icon: <LockIcon color="primary" />,
-      text: 'Only you can see your uploaded data',
-    },
-  ];
+interface UploadCsvTrustBarProps {
+  trustBarTextItems: string[];
+}
+
+const UploadCsvTrustBar = ({ trustBarTextItems }: UploadCsvTrustBarProps) => {
+  const items = trustBarTextItems.map((item) => ({
+    icon: <CheckCircleIcon color="primary" />,
+    text: item,
+  }));
 
   return (
     <Box
