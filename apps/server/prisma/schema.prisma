@@ -17,6 +17,11 @@ enum Currency {
   PLN
 }
 
+enum ImportStatus {
+  PENDING
+  CONFIRMED
+}
+
 generator client {
   provider = "prisma-client"
   previewFeatures = ["relationJoins"]
@@ -118,8 +123,11 @@ model TransactionImport {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
+  status    ImportStatus @default(PENDING)
 
   rows      TransactionImportRow[]
 }
+
+
 
 
