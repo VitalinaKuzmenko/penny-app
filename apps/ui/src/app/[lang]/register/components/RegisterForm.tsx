@@ -18,10 +18,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
+import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { registerUser } from '@/requests/registerUser';
 import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { UiError } from '@/types/interfaces';
-import ErrorBanner from '../../../../components/ErrorBanner/ErrorBanner';
 import { useAuth } from '@/providers/AuthProvider';
 import GoogleIcon from '@mui/icons-material/Google';
 import {

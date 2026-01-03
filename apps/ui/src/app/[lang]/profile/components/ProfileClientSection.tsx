@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { Button, Card, CardContent, Typography, Box } from '@mui/material';
 import Spinner from '@/components/ui/Spinner/Spinner';
-import CustomButton from '../../../../components/ui/CustomButton/CustomButton';
+import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { useRouter } from 'next/navigation';
 import { UiError } from '@/types/interfaces';
-import ErrorBanner from '../../../../components/ErrorBanner/ErrorBanner';
+import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { useAuth } from '@/providers/AuthProvider';
 
 interface ProfileClientProps {
