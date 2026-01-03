@@ -17,6 +17,7 @@ import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
 import { LoggerModule } from './utils/logger/logger.module';
 import { TraceMiddleware } from './utils/logger/trace.middleware';
+import { CurrenciesModule } from './currencies/currencies.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
     ConfigModule.forRoot({ isGlobal: true }),
     ImportModule,
     AccountsModule,
+    CurrenciesModule,
   ],
 
   controllers: [AppController],

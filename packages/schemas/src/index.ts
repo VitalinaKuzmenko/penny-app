@@ -15,3 +15,6 @@ export * from './transactions/confirm-import.schema';
 // ACCOUNTS
 export * from './accounts/account.schema';
 export * from './accounts/create-account.schema';
+
+// CURRENCY
+export * from './currency/getCurrenciesResponse.schema';

@@ -9,6 +9,7 @@ import {
   ConfirmImportSchema,
   AccountSchema,
   CreateAccountSchema,
+  GetCurrenciesResponseSchema,
 } from 'schemas';
 import { createZodDto } from 'nestjs-zod';
 
@@ -39,3 +40,8 @@ export class ConfirmImportResponseDto extends createZodDto(
 // ACCOUNTS
 export class AccountDto extends createZodDto(AccountSchema) {}
 export class CreateAccountDto extends createZodDto(CreateAccountSchema) {}
+
+// CURRENCY
+export class GetCurrenciesResponseDto extends createZodDto(
+  GetCurrenciesResponseSchema,
+) {}
