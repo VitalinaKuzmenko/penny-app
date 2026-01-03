@@ -4,7 +4,7 @@ import Negotiator from 'negotiator';
 import { availableLanguages } from './utils/interfaces';
 
 const defaultLocale = 'en';
-const protectedPaths = ['/dashboard', '/profile'];
+const protectedPaths = ['/profile', '/upload-csv', '/pennys-view'];
 
 export const getLocale = (request: Request) => {
   const headers = Object.fromEntries(request.headers.entries());
@@ -49,5 +49,7 @@ export const proxy = (request: NextRequest) => {
 };
 
 export const config = {
-  matcher: ['/((?!_next).*)'], // applies to all paths except _next
+  matcher: [
+    '/((?!_next|favicon.ico|.*\\.(?:csv|png|jpg|jpeg|svg|webp|ico)).*)',
+  ],
 };

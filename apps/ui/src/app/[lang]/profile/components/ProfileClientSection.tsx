@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { Button, Card, CardContent, Typography, Box } from '@mui/material';
 import Spinner from '@/components/ui/Spinner/Spinner';
-import CustomButton from '../ui/CustomButton/CustomButton';
+import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { useRouter } from 'next/navigation';
 import { UiError } from '@/types/interfaces';
-import ErrorBanner from '../ErrorBanner/ErrorBanner';
+import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { useAuth } from '@/providers/AuthProvider';
 
 interface ProfileClientProps {
@@ -14,7 +14,9 @@ interface ProfileClientProps {
   profilePageText: Record<string, any>;
 }
 
-export default function ProfileClient({ profilePageText }: ProfileClientProps) {
+export default function ProfileClientSection({
+  profilePageText,
+}: ProfileClientProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<UiError | null>(null);
   const { user, setUser } = useAuth();
@@ -67,7 +69,7 @@ export default function ProfileClient({ profilePageText }: ProfileClientProps) {
         </Typography>
         <CustomButton
           variantType="secondary"
-          size="small"
+          buttonSize="small"
           onClick={handleSignInClick}
         >
           {profilePageText.SIGN_IN_BUTTON}

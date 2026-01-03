@@ -1,7 +1,7 @@
 import { SxProps, Theme } from '@mui/material';
 
 export const styleMap: Record<
-  'primary' | 'secondary' | 'other',
+  'primary' | 'secondary' | 'secondary_transparent' | 'secondary_full',
   SxProps<Theme>
 > = {
   primary: {
@@ -32,7 +32,7 @@ export const styleMap: Record<
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     },
   },
-  other: {
+  secondary_transparent: {
     border: '2px solid',
     borderColor: 'secondary.main',
     color: 'secondary.main',
@@ -47,10 +47,29 @@ export const styleMap: Record<
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     },
   },
+  secondary_full: {
+    border: '2px solid',
+    borderColor: 'secondary.main',
+    color: 'secondary.contrastText',
+    bgcolor: 'secondary.light',
+    fontWeight: 600,
+    borderRadius: 2,
+    textTransform: 'none',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      bgcolor: 'secondary.main',
+      borderColor: 'secondary.dark',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    },
+  },
 };
 
-export const sizeMap: Record<'small' | 'medium' | 'large', SxProps<Theme>> = {
+export const sizeMap: Record<
+  'small' | 'medium' | 'big-medium' | 'large',
+  SxProps<Theme>
+> = {
   small: { fontSize: '0.75rem', py: 0.5, px: 1.5 },
   medium: { fontSize: '1rem', py: 1, px: 2 },
+  'big-medium': { fontSize: '1.25rem', py: 1.25, px: 3 },
   large: { fontSize: '1.5rem', py: 1.5, px: 3 },
 };

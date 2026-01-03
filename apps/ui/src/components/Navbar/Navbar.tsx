@@ -20,6 +20,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher';
 import { useState } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
+import { useRouter } from 'next/navigation';
 
 interface NavbarProps {
   headerText: Record<string, any>;
@@ -32,19 +33,21 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
     headerText.PAGES.PENNYS_VIEW,
   ];
   const { user } = useAuth();
+  const router = useRouter();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
+  const handleCloseNavMenu = (url: string) => {
     setAnchorElNav(null);
+    router.push(url);
   };
 
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
+        <Toolbar sx={{ pr: { xs: 0, md: 3 } }} disableGutters>
           <Typography
             variant="h6"
             noWrap
@@ -93,9 +96,14 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
                 onClose={handleCloseNavMenu}
                 sx={{ display: { xs: 'block', md: 'none' } }}
               >
-                {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+                {pages.map((page, index) => (
+                  <MenuItem
+                    key={page.NAME + index}
+                    onClick={() => handleCloseNavMenu(page.URL)}
+                  >
+                    <Typography sx={{ textAlign: 'center' }}>
+                      {page.NAME}
+                    </Typography>
                   </MenuItem>
                 ))}
               </Menu>
@@ -124,10 +132,10 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
           {/* desktop pages */}
           {user ? (
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
+              {pages.map((page, index) => (
                 <Button
-                  key={page}
-                  onClick={handleCloseNavMenu}
+                  key={page.NAME + index}
+                  onClick={() => handleCloseNavMenu(page.URL)}
                   sx={{
                     my: 2,
                     color: 'white',
@@ -138,7 +146,7 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
                     transition: 'color 0.3s',
                   }}
                 >
-                  {page}
+                  {page.NAME}
                 </Button>
               ))}
             </Box>
@@ -174,7 +182,7 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
                 >
                   <AccountCircle />
                   <Typography sx={{ ml: 1 }}>
-                    {user ? user.userName : headerText.PAGES.SIGN_IN}
+                    {user ? user.userName : headerText.PAGES.SIGN_IN.NAME}
                   </Typography>
                 </IconButton>
               </Box>

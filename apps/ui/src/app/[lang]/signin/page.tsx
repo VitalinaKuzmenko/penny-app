@@ -1,5 +1,5 @@
 import { Container, Box } from '@mui/material';
-import SignInForm from '@/components/SignInForm/SignInForm';
+import SignInForm from './components/SignInForm';
 import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
 

@@ -11,20 +11,22 @@ import {
   InputAdornment,
   IconButton,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import GoogleIcon from '@mui/icons-material/Google';
+
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
+import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { LoginSchema, type LoginInput } from 'schemas';
-import { useState } from 'react';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useRouter } from 'next/navigation';
+
 import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { loginUser } from '@/requests/loginUser';
 import { UiError } from '@/types/interfaces';
-import ErrorBanner from '../ErrorBanner/ErrorBanner';
-import { useAuth } from '@/providers/AuthProvider';
-import GoogleIcon from '@mui/icons-material/Google';
 
 interface SignInFormProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -176,7 +178,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
 
         <Box textAlign="center">
           <CustomButton
-            variantType="other"
+            variantType="secondary_transparent"
             fullWidth
             onClick={handleGoogleSignInClick}
             startIcon={<GoogleIcon />}

@@ -1,22 +1,23 @@
 import { Container } from '@mui/material';
 import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
-import ProfileClientSection from './components/ProfileClientSection';
+
+import UploadCsvSection from '../upload-csv/components/UploadCsvSection';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProfilePage({
+export default async function UploadCsvPage({
   params,
 }: {
   params: Promise<{ lang: LanguageType }>;
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
-  const profilePageText = dict.PROFILE_PAGE;
+  const uploadCsvPageText = dict.UPLOAD_CSV_PAGE;
 
   return (
-    <Container maxWidth="sm">
-      <ProfileClientSection profilePageText={profilePageText} />
+    <Container maxWidth="xl">
+      <UploadCsvSection uploadCsvPageText={uploadCsvPageText} />
     </Container>
   );
 }

@@ -35,7 +35,7 @@ const ErrorBanner: FC<ErrorBannerProps> = ({
               size="small"
               onClick={handleClose}
             >
-              <CloseIcon fontSize="inherit" />
+              {onClose && <CloseIcon fontSize="inherit" />}
             </IconButton>
           }
           sx={{ mb: 2 }}
