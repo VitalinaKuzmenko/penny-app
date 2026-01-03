@@ -11,3 +11,6 @@ export * from './transactions/csv-row.schema.';
 export * from './transactions/import-csv-response.schema';
 export * from './transactions/confirm-import-response.schema';
 export * from './transactions/confirm-import.schema';
+
+// ACCOUNTS
+export * from './accounts/account.schema';
