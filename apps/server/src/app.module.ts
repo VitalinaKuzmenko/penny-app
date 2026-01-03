@@ -7,6 +7,8 @@ import { AccountsModule } from './accounts/accounts.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CategoriesModule } from './categories/categories.module';
+import { CurrenciesModule } from './currencies/currencies.module';
 import { ImportModule } from './import/import.module';
 import { AccountModule } from './modules/account/account.module';
 import { CategoryModule } from './modules/category/category.module';
@@ -17,7 +19,6 @@ import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
 import { LoggerModule } from './utils/logger/logger.module';
 import { TraceMiddleware } from './utils/logger/trace.middleware';
-import { CurrenciesModule } from './currencies/currencies.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CurrenciesModule } from './currencies/currencies.module';
     ImportModule,
     AccountsModule,
     CurrenciesModule,
+    CategoriesModule,
   ],
 
   controllers: [AppController],

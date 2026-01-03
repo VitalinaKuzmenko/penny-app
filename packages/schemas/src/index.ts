@@ -18,3 +18,7 @@ export * from './accounts/create-account.schema';
 
 // CURRENCY
 export * from './currency/getCurrenciesResponse.schema';
+
+// CATEGORY
+export * from './category/category.schema';
+export * from './category/getCategoriesResponse.schema';
