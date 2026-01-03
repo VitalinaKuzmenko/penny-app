@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
 
+import { AccountsModule } from './accounts/accounts.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -16,7 +17,6 @@ import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
 import { LoggerModule } from './utils/logger/logger.module';
 import { TraceMiddleware } from './utils/logger/trace.middleware';
-import { AccountsModule } from './accounts/accounts.module';
 
 @Module({
   imports: [

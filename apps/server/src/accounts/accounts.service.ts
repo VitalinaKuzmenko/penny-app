@@ -18,4 +18,17 @@ export class AccountsService {
       },
     });
   }
+
+  async createAccount(userId: string, name: string) {
+    return this.prisma.account.create({
+      data: {
+        userId,
+        name,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+  }
 }
