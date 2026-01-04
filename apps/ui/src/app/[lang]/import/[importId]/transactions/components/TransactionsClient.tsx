@@ -19,8 +19,13 @@ import { UiError } from '@/types/interfaces';
 
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
+import { ConfirmImportSchema, ConfirmImportInput } from 'schemas';
+import { saveTransactions } from '@/requests/saveTransactions';
+import { ApiError } from '@/utils/clientApiFetch';
+import { mapConfirmImportErrorToUiError } from '@/utils/mapConfirmImportErrorToUiError';
 
 interface TransactionsClientProps {
+  importId: string;
   rows: CsvImportResponse[];
   accounts: Account[];
   categories: Category[];
@@ -31,6 +36,7 @@ interface TransactionsClientProps {
 export type Currency = z.infer<typeof CurrencySchema>;
 
 export default function TransactionsClient({
+  importId,
   rows,
   accounts,
   categories,
@@ -43,6 +49,9 @@ export default function TransactionsClient({
   const [rowCategories, setRowCategories] = useState<Record<string, string>>(
     {},
   );
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [apiError, setApiError] = useState<UiError | null>(null);
+
   const router = useRouter();
   // const [areButtonsEnabled, setAreButtonsEnabled] = useState<boolean>(false);
   const areButtonsEnabled = useMemo(() => {
@@ -58,8 +67,43 @@ export default function TransactionsClient({
     router.push('/');
   };
 
-  const handleTransactionSave = () => {
-    console.log('handleTransactionSave');
+  const handleTransactionSave = async () => {
+    if (!accountId || !currency) return;
+    setIsSaving(true);
+    setApiError(null); // clear previous error
+
+    try {
+      const payloadRows: ConfirmImportInput['rows'] = rows.map((row) => ({
+        id: row.id,
+        categoryId: rowCategories[row.id],
+      }));
+
+      const payload: ConfirmImportInput = {
+        accountId,
+        currency,
+        rows: payloadRows,
+      };
+
+      ConfirmImportSchema.parse(payload);
+
+      console.log('payload', payload);
+
+      // Call API
+      const response = await saveTransactions(importId, payload);
+
+      console.log('response', response);
+
+      // Navigate away on success
+      router.push('/');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error('Confirm import failed:', error);
+
+      // const uiError = mapConfirmImportErrorToUiError(error, errorsDict);
+      // setApiError(uiError);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   //display alert fo user before leaving
@@ -146,16 +190,21 @@ export default function TransactionsClient({
           }))
         }
       />
+      <Box sx={{ mt: 3 }}>{apiError && <ErrorBanner error={apiError} />}</Box>
 
       {/* Footer */}
-      <Stack direction="row" justifyContent="space-between" mt={4}>
-        <CustomButton variantType="text" onClick={goToHomePage}>
+      <Stack direction="row" justifyContent="space-between" mt={3}>
+        <CustomButton
+          variantType="text"
+          onClick={goToHomePage}
+          disabledStyling={isSaving}
+        >
           Cancel
         </CustomButton>
 
         <CustomButton
           variantType="primary"
-          disabledStyling={!areButtonsEnabled}
+          disabledStyling={!areButtonsEnabled || isSaving}
           onClick={handleTransactionSave}
         >
           Save & continue

@@ -71,6 +71,7 @@ export default async function TransactionsPage({
 
   return (
     <TransactionsClient
+      importId={importId}
       rows={rows}
       accounts={accounts}
       categories={categories}
