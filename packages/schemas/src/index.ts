@@ -21,4 +21,3 @@ export * from './currency/getCurrenciesResponse.schema';
 
 // CATEGORY
 export * from './category/category.schema';
-export * from './category/getCategoriesResponse.schema';

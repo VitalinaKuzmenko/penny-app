@@ -1,69 +1,76 @@
 'use client';
 
-import { Button, ButtonProps, CircularProgress } from '@mui/material';
 import React from 'react';
-import { styleMap, sizeMap } from './styleMap';
+import { Button, ButtonProps, CircularProgress } from '@mui/material';
 
 interface CustomButtonProps extends ButtonProps {
   loading?: boolean;
-  variantType?:
-    | 'primary'
-    | 'secondary'
-    | 'secondary_transparent'
-    | 'secondary_full';
-  buttonSize?: 'small' | 'medium' | 'big-medium' | 'large';
+  variantType?: 'primary' | 'secondary' | 'text' | 'contained' | 'outlined';
   disabledStyling?: boolean;
 }
+
+const variantMap: Record<
+  NonNullable<CustomButtonProps['variantType']>,
+  Pick<ButtonProps, 'variant' | 'color'>
+> = {
+  primary: {
+    variant: 'contained',
+    color: 'primary',
+  },
+  secondary: {
+    variant: 'outlined',
+    color: 'primary',
+  },
+  text: {
+    variant: 'text',
+    color: 'primary',
+  },
+  contained: {
+    variant: 'contained',
+    color: 'secondary',
+  },
+  outlined: {
+    variant: 'outlined',
+    color: 'secondary',
+  },
+};
 
 const CustomButton: React.FC<CustomButtonProps> = ({
   children,
   loading = false,
-  variantType = 'primary',
-  buttonSize = 'medium',
-  fullWidth = false,
-  sx,
+  disabled,
   disabledStyling = false,
+  variantType = 'primary',
+  sx,
   ...rest
 }) => {
-  // Merge the variant + size + user-provided sx
-  const baseSx = {
-    ...(styleMap[variantType] || {}),
-    ...(sizeMap[buttonSize] || {}),
-    ...(sx || {}),
-  };
+  const muiVariantProps = variantMap[variantType];
 
-  // Custom "disabled look" styles
   const disabledSx =
     disabledStyling || loading
       ? {
-          bgcolor: 'grey.300',
-          border: '2px solid',
-          borderColor: 'grey.400',
-          color: 'grey.500',
-          opacity: 0.7,
-          boxShadow: 'none',
-          cursor: 'not-allowed',
-          '&:hover': {
-            bgcolor: 'grey.300', // prevent hover change
-            boxShadow: 'none',
+          '&.Mui-disabled': {
+            bgcolor: 'grey.300',
+            borderColor: 'grey.400',
+            color: 'grey.500',
+            opacity: 0.7,
+            cursor: 'not-allowed',
           },
         }
-      : {};
-
-  const mergedSx = {
-    ...baseSx,
-    ...disabledSx,
-  };
+      : undefined;
 
   return (
     <Button
+      {...muiVariantProps}
       {...rest}
-      // size={size}
-      fullWidth={fullWidth}
+      disabled={disabled || loading}
+      sx={{
+        ...disabledSx,
+        ...sx, // allow local overrides if needed
+      }}
       endIcon={
-        loading ? <CircularProgress size={20} color="inherit" /> : undefined
+        loading ? <CircularProgress size={18} color="inherit" /> : undefined
       }
-      sx={mergedSx}
     >
       {children}
     </Button>

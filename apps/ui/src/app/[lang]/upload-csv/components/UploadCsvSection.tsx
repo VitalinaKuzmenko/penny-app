@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Container, Stack, Typography, Tooltip } from '@mui/material';
+import { Box, Container, Typography, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
@@ -36,9 +36,7 @@ export default function UploadCsvSection({
 
       const { importId } = await uploadCsvFile(selectedFile);
 
-      console.log('importId', importId);
-      // 👉 Redirect to next step
-      // router.push(`/transactions/import/${importId}`);
+      router.push(`/import/${importId}/transactions`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error(err);
@@ -53,24 +51,14 @@ export default function UploadCsvSection({
   return (
     <Container maxWidth="xl" disableGutters>
       {/* Hero */}
-      <Box
-        sx={{
-          mb: 4,
-          p: { xs: 3, md: 4 },
-          borderRadius: 4,
-          background: (theme) =>
-            `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
-          color: 'primary.contrastText',
-        }}
-      >
-        <Stack spacing={1}>
-          <Typography variant="h4" fontWeight={800}>
-            {uploadCsvPageText.TITLE}
-          </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.9, maxWidth: 600 }}>
-            {uploadCsvPageText.SUBTITLE}
-          </Typography>
-        </Stack>
+      <Box sx={{ p: { xs: 3, md: 3 } }}>
+        <Typography variant="h4" fontWeight={600} gutterBottom>
+          {uploadCsvPageText.TITLE}
+        </Typography>
+
+        <Typography color="text.secondary" mb={3}>
+          {uploadCsvPageText.SUBTITLE}
+        </Typography>
       </Box>
 
       <UploadCsvFormatOverview
@@ -95,7 +83,6 @@ export default function UploadCsvSection({
         >
           <CustomButton
             variantType="primary"
-            buttonSize="medium"
             disabledStyling={!selectedFile}
             loading={loading}
             onClick={handleImport}

@@ -1,15 +1,7 @@
-export class ApiError extends Error {
-  status: number;
-  data?: unknown;
+import { cookies } from 'next/headers';
+import { ApiError } from './clientApiFetch';
 
-  constructor(message: string, status: number, data?: unknown) {
-    super(message);
-    this.status = status;
-    this.data = data;
-  }
-}
-
-export async function apiFetch<TResponse, TBody = unknown>(
+export async function serverApiFetch<TResponse, TBody = unknown>(
   path: string,
   options?: {
     method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -17,13 +9,15 @@ export async function apiFetch<TResponse, TBody = unknown>(
     headers?: HeadersInit;
   },
 ): Promise<TResponse> {
+  const cookieStore = cookies();
+  const accessToken = (await cookieStore).get('access_token')?.value;
+
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}${path}`, {
     method: options?.method ?? 'GET',
     headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
+      Cookie: `access_token=${accessToken}`,
     },
-    credentials: 'include',
+
     body: options?.body ? JSON.stringify(options.body) : undefined,
   });
 

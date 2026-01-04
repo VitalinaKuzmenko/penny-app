@@ -6,7 +6,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GetCategoriesResponseDto } from 'schemas-nest';
+import { CategoryDto } from 'schemas-nest';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -20,8 +20,8 @@ export class CategoriesController {
 
   @Get()
   @ApiOperation({ summary: 'Get all categories for current user' })
-  @ApiOkResponse({ type: GetCategoriesResponseDto })
-  async getCategories(@Req() req): Promise<GetCategoriesResponseDto> {
+  @ApiOkResponse({ type: CategoryDto, isArray: true })
+  async getCategories(@Req() req): Promise<CategoryDto[]> {
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -32,6 +32,6 @@ export class CategoriesController {
 
     const categories = await this.categoriesService.getUserCategories(userId);
 
-    return { categories };
+    return categories;
   }
 }

@@ -183,10 +183,12 @@ const UploadCsvFormatOverview = ({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: 2,
               }}
             >
               <CustomButton
+                variantType="secondary"
                 onClick={downloadCsvTemplate}
                 startIcon={<DownloadIcon />}
               >
