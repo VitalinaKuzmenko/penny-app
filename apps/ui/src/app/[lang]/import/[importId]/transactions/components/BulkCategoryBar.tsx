@@ -26,8 +26,6 @@ export default function BulkCategoryBar({
 }: BulkCategoryBarProps) {
   const [bulkCategory, setBulkCategory] = useState<string>('');
 
-  console.log('categories', categories);
-
   const handleChange = (event: SelectChangeEvent) =>
     setBulkCategory(event.target.value);
 

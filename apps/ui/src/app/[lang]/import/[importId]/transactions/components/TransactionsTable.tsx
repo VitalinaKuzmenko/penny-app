@@ -9,7 +9,7 @@ interface TransactionsTableProps {
   rows: CsvImportResponse[];
   categories: Category[];
   selectedRows: string[];
-  onSelectRows: (ids: string[]) => void;
+  onSelectRows: React.Dispatch<React.SetStateAction<string[]>>;
   rowCategories: Record<string, string>;
   onChangeCategory: (rowId: string, categoryId: string) => void;
 }
@@ -22,7 +22,7 @@ export default function TransactionsTable({
   rowCategories,
   onChangeCategory,
 }: TransactionsTableProps) {
-  const columns = React.useMemo<GridColDef[]>(
+  const columns = React.useMemo<GridColDef<CsvImportResponse>[]>(
     () => [
       {
         field: 'date',
@@ -51,6 +51,11 @@ export default function TransactionsTable({
         width: 300,
         sortable: false,
         filterable: true,
+        valueGetter: (value, row) => {
+          const rowId = row.id;
+          const categoryId = rowCategories[rowId];
+          return categories.find((c) => c.id === categoryId)?.name ?? '';
+        },
         renderCell: (params) => (
           <FormControl
             size="small"
@@ -97,9 +102,11 @@ export default function TransactionsTable({
           onSelectRows(Array.from(newSelection.ids).map(String))
         }
         filterMode="client"
-        // pagination={false}
         hideFooter={true}
         sx={{
+          '.MuiDataGrid-columnHeaderTitle': {
+            fontWeight: 'bold',
+          },
           // Remove cell focus highlight
           '.MuiDataGrid-cell:focus, .MuiDataGrid-columnHeader:focus': {
             outline: 'none',

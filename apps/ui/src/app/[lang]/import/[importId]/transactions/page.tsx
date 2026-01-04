@@ -27,8 +27,6 @@ export default async function TransactionsPage({
     getCurrencies(),
   ]);
 
-  console.log('results', results);
-
   let rows: CsvImportResponse[] = [];
   let accounts: Account[] = [];
   let categories: Category[] = [];
@@ -71,15 +69,13 @@ export default async function TransactionsPage({
     }
   });
 
-  const serverError = errors.length > 0 ? errors[0] : null;
-
   return (
     <TransactionsClient
       rows={rows}
       accounts={accounts}
       categories={categories}
       currencies={currencies}
-      serverError={serverError}
+      serverErrors={errors}
     />
   );
 }

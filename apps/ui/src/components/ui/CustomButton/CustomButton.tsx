@@ -49,15 +49,19 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   const disabledSx =
     disabledStyling || loading
       ? {
-          '&.Mui-disabled': {
-            bgcolor: 'grey.300',
-            borderColor: 'grey.400',
-            color: 'grey.500',
-            opacity: 0.7,
-            cursor: 'not-allowed',
+          bgcolor: 'grey.300',
+          border: '2px solid',
+          borderColor: 'grey.400',
+          color: 'grey.500',
+          opacity: 0.7,
+          boxShadow: 'none',
+          cursor: 'not-allowed',
+          '&:hover': {
+            bgcolor: 'grey.300', // prevent hover change
+            boxShadow: 'none',
           },
         }
-      : undefined;
+      : {};
 
   return (
     <Button
