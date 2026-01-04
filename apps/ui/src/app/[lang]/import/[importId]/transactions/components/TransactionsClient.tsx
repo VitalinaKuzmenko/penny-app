@@ -87,6 +87,7 @@ export default function TransactionsClient({
             selectedRows.forEach((id) => (next[id] = categoryId));
             return next;
           });
+          setSelectedRows([]);
         }}
       />
 

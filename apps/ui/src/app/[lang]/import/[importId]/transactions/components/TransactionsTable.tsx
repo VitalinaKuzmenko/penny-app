@@ -1,18 +1,8 @@
 'use client';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Checkbox,
-  Select,
-  MenuItem,
-  FormControl,
-} from '@mui/material';
+import * as React from 'react';
+import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid';
+import { Paper, FormControl, Select, MenuItem } from '@mui/material';
 import { CsvImportResponse, Category } from 'schemas';
 
 interface TransactionsTableProps {
@@ -32,64 +22,97 @@ export default function TransactionsTable({
   rowCategories,
   onChangeCategory,
 }: TransactionsTableProps) {
-  const allSelected = rows.length > 0 && selectedRows.length === rows.length;
-
-  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onSelectRows(event.target.checked ? rows.map((r) => r.id) : []);
-  };
-
-  const handleSelectRow = (id: string) => {
-    onSelectRows(
-      selectedRows.includes(id)
-        ? selectedRows.filter((rid) => rid !== id)
-        : [...selectedRows, id],
-    );
-  };
+  const columns = React.useMemo<GridColDef[]>(
+    () => [
+      {
+        field: 'date',
+        headerName: 'Date',
+        minWidth: 150,
+        flex: 1,
+        filterable: true,
+      },
+      {
+        field: 'description',
+        headerName: 'Description',
+        minWidth: 150,
+        flex: 2,
+        filterable: true,
+      },
+      {
+        field: 'amount',
+        headerName: 'Amount',
+        minWidth: 100,
+        flex: 1,
+        filterable: true,
+      },
+      {
+        field: 'category',
+        headerName: 'Category',
+        width: 300,
+        sortable: false,
+        filterable: true,
+        renderCell: (params) => (
+          <FormControl
+            size="small"
+            fullWidth
+            sx={{
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center', // vertically center
+            }}
+          >
+            <Select
+              value={rowCategories[params.row.id] ?? ''}
+              onChange={(e) => onChangeCategory(params.row.id, e.target.value)}
+              sx={{
+                width: '100%',
+              }}
+            >
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        ),
+      },
+    ],
+    [categories, onChangeCategory, rowCategories],
+  );
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell padding="checkbox">
-              <Checkbox checked={allSelected} onChange={handleSelectAll} />
-            </TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Amount</TableCell>
-            <TableCell>Category</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.id} hover>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={selectedRows.includes(row.id)}
-                  onChange={() => handleSelectRow(row.id)}
-                />
-              </TableCell>
-              <TableCell>{row.date}</TableCell>
-              <TableCell>{row.description}</TableCell>
-              <TableCell>{row.amount}</TableCell>
-              <TableCell sx={{ width: 300, minWidth: 300, maxWidth: 300 }}>
-                <FormControl size="small" fullWidth>
-                  <Select
-                    value={rowCategories[row.id] ?? ''}
-                    onChange={(e) => onChangeCategory(row.id, e.target.value)}
-                  >
-                    {categories.map((cat) => (
-                      <MenuItem key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Paper sx={{ height: 600, width: '100%', borderRadius: 4 }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        getRowId={(row) => row.id}
+        checkboxSelection
+        disableRowSelectionOnClick
+        rowSelectionModel={{
+          type: 'include',
+          ids: new Set<GridRowId>(selectedRows),
+        }}
+        onRowSelectionModelChange={(newSelection) =>
+          onSelectRows(Array.from(newSelection.ids).map(String))
+        }
+        filterMode="client"
+        // pagination={false}
+        hideFooter={true}
+        sx={{
+          // Remove cell focus highlight
+          '.MuiDataGrid-cell:focus, .MuiDataGrid-columnHeader:focus': {
+            outline: 'none',
+          },
+          // Remove row selection highlight
+          '.MuiDataGrid-row.Mui-selected': {
+            backgroundColor: 'transparent',
+          },
+          '.MuiDataGrid-cell:focus-within': {
+            outline: 'none',
+          },
+        }}
+      />
+    </Paper>
   );
 }

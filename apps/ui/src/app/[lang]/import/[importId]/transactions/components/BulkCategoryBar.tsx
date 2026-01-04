@@ -32,7 +32,10 @@ export default function BulkCategoryBar({
     setBulkCategory(event.target.value);
 
   const handleApply = () => {
-    if (bulkCategory) onApply(bulkCategory);
+    if (bulkCategory) {
+      onApply(bulkCategory);
+      setBulkCategory('');
+    }
   };
 
   if (!selectedRows.length) return null;
