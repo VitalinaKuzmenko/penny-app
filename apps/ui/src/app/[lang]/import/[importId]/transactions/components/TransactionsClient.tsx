@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Button, Typography, Stack, Container } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TransactionsTable from './TransactionsTable';
 import BulkCategoryBar from './BulkCategoryBar';
 import {
@@ -40,6 +40,20 @@ export default function TransactionsClient({
   const [rowCategories, setRowCategories] = useState<Record<string, string>>(
     {},
   );
+
+  //display alert fo user before leaving
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = ''; // Required for Chrome
+      return ''; // Required for some other browsers
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   return (
     <Container sx={{ p: { xs: 1, md: 3 } }} maxWidth="xl" disableGutters>
@@ -87,6 +101,7 @@ export default function TransactionsClient({
             selectedRows.forEach((id) => (next[id] = categoryId));
             return next;
           });
+
           setSelectedRows([]);
         }}
       />
