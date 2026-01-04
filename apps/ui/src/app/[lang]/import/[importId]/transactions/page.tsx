@@ -11,6 +11,7 @@ import {
 } from 'schemas';
 import { LanguageType } from '@/utils/interfaces';
 import { UiError } from '@/types/interfaces';
+import { getDictionary } from '@/utils/getDictionary';
 
 export default async function TransactionsPage({
   params,
@@ -18,6 +19,9 @@ export default async function TransactionsPage({
   params: Promise<{ importId: string; lang: LanguageType }>;
 }) {
   const { importId, lang } = await params;
+  const dict = await getDictionary(lang);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const transactionsPageText: Record<string, any> = dict.TRANSACTIONS_PAGE;
 
   // fetch all in parallel, but settle promises individually
   const results = await Promise.allSettled([
@@ -71,6 +75,7 @@ export default async function TransactionsPage({
 
   return (
     <TransactionsClient
+      transactionsPageText={transactionsPageText}
       importId={importId}
       rows={rows}
       accounts={accounts}

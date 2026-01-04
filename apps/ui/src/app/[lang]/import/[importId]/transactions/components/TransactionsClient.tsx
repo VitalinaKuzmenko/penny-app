@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Box, Typography, Stack, Container } from '@mui/material';
@@ -21,10 +22,10 @@ import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { ConfirmImportSchema, ConfirmImportInput } from 'schemas';
 import { saveTransactions } from '@/requests/saveTransactions';
-import { ApiError } from '@/utils/clientApiFetch';
 import { mapConfirmImportErrorToUiError } from '@/utils/mapConfirmImportErrorToUiError';
 
 interface TransactionsClientProps {
+  transactionsPageText: Record<string, any>;
   importId: string;
   rows: CsvImportResponse[];
   accounts: Account[];
@@ -36,6 +37,7 @@ interface TransactionsClientProps {
 export type Currency = z.infer<typeof CurrencySchema>;
 
 export default function TransactionsClient({
+  transactionsPageText,
   importId,
   rows,
   accounts,
@@ -86,21 +88,19 @@ export default function TransactionsClient({
 
       ConfirmImportSchema.parse(payload);
 
-      console.log('payload', payload);
+      await saveTransactions(importId, payload);
 
-      // Call API
-      const response = await saveTransactions(importId, payload);
-
-      console.log('response', response);
-
-      // Navigate away on success
       router.push('/');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error('Confirm import failed:', error);
+      console.error('Confirm import failed:', error.data);
 
-      // const uiError = mapConfirmImportErrorToUiError(error, errorsDict);
-      // setApiError(uiError);
+      const uiError = mapConfirmImportErrorToUiError(
+        error.data,
+        transactionsPageText.ERRORS,
+      );
+
+      console.log('uiError', uiError);
+      setApiError(uiError);
     } finally {
       setIsSaving(false);
     }
@@ -125,10 +125,10 @@ export default function TransactionsClient({
       {/* Title */}
       <Box>
         <Typography variant="h4" fontWeight={600} gutterBottom>
-          Check your transactions
+          {transactionsPageText.TRANSACTIONS_PAGE}
         </Typography>
         <Typography color="text.secondary" mb={3}>
-          Make sure everything looks correct before saving.
+          {transactionsPageText.SUBTITLE}
         </Typography>
       </Box>
 
@@ -148,6 +148,7 @@ export default function TransactionsClient({
       >
         {/* Currency select */}
         <CurrencySelect
+          pageText={transactionsPageText.CURRENCY_SELECT}
           currencies={currencies}
           value={currency}
           onChange={setCurrency}
@@ -155,6 +156,7 @@ export default function TransactionsClient({
 
         {/* Account select + create */}
         <AccountSelect
+          pageText={transactionsPageText.ACCOUNT_SELECT}
           accounts={accounts}
           value={accountId}
           onChange={setAccountId}
@@ -163,6 +165,7 @@ export default function TransactionsClient({
 
       {/* Bulk category */}
       <BulkCategoryBar
+        pageText={transactionsPageText.BULK_CATEGORY_BAR}
         categories={categories}
         selectedRows={selectedRows}
         onApply={(categoryId: string) => {
@@ -178,6 +181,7 @@ export default function TransactionsClient({
 
       {/* Table */}
       <TransactionsTable
+        pageText={transactionsPageText.TABLE}
         rows={rows}
         categories={categories}
         selectedRows={selectedRows}
@@ -190,7 +194,11 @@ export default function TransactionsClient({
           }))
         }
       />
-      <Box sx={{ mt: 3 }}>{apiError && <ErrorBanner error={apiError} />}</Box>
+      {apiError && (
+        <Box sx={{ mt: 3 }}>
+          <ErrorBanner error={apiError} />
+        </Box>
+      )}
 
       {/* Footer */}
       <Stack direction="row" justifyContent="space-between" mt={3}>
@@ -199,7 +207,7 @@ export default function TransactionsClient({
           onClick={goToHomePage}
           disabledStyling={isSaving}
         >
-          Cancel
+          {transactionsPageText.FOOTER.BACK_TO_HOME_PAGE}
         </CustomButton>
 
         <CustomButton
@@ -207,7 +215,7 @@ export default function TransactionsClient({
           disabledStyling={!areButtonsEnabled || isSaving}
           onClick={handleTransactionSave}
         >
-          Save & continue
+          {transactionsPageText.FOOTER.SAVE_BUTTON}
         </CustomButton>
       </Stack>
     </Container>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
@@ -14,12 +15,14 @@ import { useState } from 'react';
 import { Category } from 'schemas';
 
 interface BulkCategoryBarProps {
+  pageText: Record<string, any>;
   categories: Category[];
   selectedRows: string[];
   onApply: (categoryId: string) => void;
 }
 
 export default function BulkCategoryBar({
+  pageText,
   categories,
   selectedRows,
   onApply,
@@ -40,10 +43,12 @@ export default function BulkCategoryBar({
 
   return (
     <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} mb={2}>
-      <Typography sx={{ flex: 1 }}>{selectedRows.length} selected</Typography>
+      <Typography sx={{ flex: 1 }}>
+        {selectedRows.length} {pageText.LABEL}
+      </Typography>
 
       <FormControl size="small" sx={{ flex: 2 }}>
-        <InputLabel>Category</InputLabel>
+        <InputLabel>{pageText.CATEGORY_LABEL}</InputLabel>
         <Select value={bulkCategory} label="Category" onChange={handleChange}>
           {categories.map((cat) => (
             <MenuItem
@@ -66,7 +71,7 @@ export default function BulkCategoryBar({
         variantType="secondary"
         onClick={handleApply}
       >
-        Apply
+        {pageText.APPLY_BUTTON}
       </CustomButton>
     </Stack>
   );

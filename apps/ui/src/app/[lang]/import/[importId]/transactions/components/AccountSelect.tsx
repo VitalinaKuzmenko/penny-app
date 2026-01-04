@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
@@ -13,12 +14,14 @@ import {
 import { Account } from 'schemas';
 
 interface AccountSelectProps {
+  pageText: Record<string, any>;
   accounts: Account[];
   value: string | null;
   onChange: (val: string) => void;
 }
 
 export default function AccountSelect({
+  pageText,
   accounts,
   value,
   onChange,
@@ -35,17 +38,13 @@ export default function AccountSelect({
   return (
     <Stack direction="row" spacing={2} flex={2}>
       <Tooltip
-        title={
-          hasAccounts
-            ? ''
-            : 'You have no accounts. You need to create an account first.'
-        }
+        title={hasAccounts ? '' : `${pageText.TOOLTIP_NO_ACCOUNTS}`}
         placement="top"
       >
         {/* Tooltip requires a non-disabled wrapper */}
         <span style={{ width: '100%' }}>
           <FormControl fullWidth disabled={!hasAccounts}>
-            <InputLabel>Account</InputLabel>
+            <InputLabel>{pageText.LABEL}</InputLabel>
             <Select value={value ?? ''} label="Account" onChange={handleChange}>
               {hasAccounts &&
                 accounts.map((acc) => (
@@ -65,10 +64,10 @@ export default function AccountSelect({
           </FormControl>
         </span>
       </Tooltip>
-      {/* TODO: explain what is an account */}
-      <Tooltip title="Explanation what is account">
+
+      <Tooltip title={pageText.CREATE_TOOLTIP}>
         <CustomButton variantType="secondary" onClick={handleCreateNew}>
-          Create new account
+          {pageText.CREATE_BUTTON}
         </CustomButton>
       </Tooltip>
     </Stack>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import * as React from 'react';
@@ -6,6 +7,7 @@ import { Paper, FormControl, Select, MenuItem } from '@mui/material';
 import { CsvImportResponse, Category } from 'schemas';
 
 interface TransactionsTableProps {
+  pageText: Record<string, any>;
   rows: CsvImportResponse[];
   categories: Category[];
   selectedRows: string[];
@@ -15,6 +17,7 @@ interface TransactionsTableProps {
 }
 
 export default function TransactionsTable({
+  pageText,
   rows,
   categories,
   selectedRows,
@@ -26,28 +29,28 @@ export default function TransactionsTable({
     () => [
       {
         field: 'date',
-        headerName: 'Date',
+        headerName: `${pageText.DATE}`,
         minWidth: 150,
         flex: 1,
         filterable: true,
       },
       {
         field: 'description',
-        headerName: 'Description',
+        headerName: `${pageText.DESCRIPTION}`,
         minWidth: 150,
         flex: 2,
         filterable: true,
       },
       {
         field: 'amount',
-        headerName: 'Amount',
+        headerName: `${pageText.AMOUNT}`,
         minWidth: 100,
         flex: 1,
         filterable: true,
       },
       {
         field: 'category',
-        headerName: 'Category',
+        headerName: `${pageText.CATEGORY}`,
         width: 300,
         sortable: false,
         filterable: true,

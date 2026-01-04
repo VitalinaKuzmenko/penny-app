@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import {
@@ -11,12 +12,14 @@ import { GetCurrenciesResponse } from 'schemas';
 import { Currency } from './TransactionsClient';
 
 interface CurrencySelectProps {
+  pageText: Record<string, any>;
   currencies: GetCurrenciesResponse;
   value: Currency | null;
   onChange: (val: Currency) => void;
 }
 
 export default function CurrencySelect({
+  pageText,
   currencies,
   value,
   onChange,
@@ -26,10 +29,10 @@ export default function CurrencySelect({
 
   return (
     <FormControl fullWidth sx={{ flex: 1 }}>
-      <InputLabel id="currency-label">Currency</InputLabel>
+      <InputLabel id="currency-label">{pageText.LABEL}</InputLabel>
       <Select value={value ?? ''} label="Currency" onChange={handleChange}>
         <MenuItem value="" disabled>
-          Select currency
+          {pageText.PLACEHOLDER}
         </MenuItem>
 
         {currencies.currencies.map((cur) => (

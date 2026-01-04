@@ -187,5 +187,64 @@
         "MESSAGE": "Something went wrong while uploading your file. Please try again."
       }
     }
+  },
+  "TRANSACTIONS_PAGE": {
+    "TITLE": "Check your transactions",
+    "SUBTITLE": "Make sure everything looks correct before saving.",
+
+    "CURRENCY_SELECT": {
+      "LABEL": "Currency",
+      "PLACEHOLDER": "Select currency"
+    },
+
+    "ACCOUNT_SELECT": {
+      "LABEL": "Account",
+      "TOOLTIP_NO_ACCOUNTS": "You have no accounts. You need to create an account first.",
+      "CREATE_BUTTON": "Create new account",
+      "CREATE_TOOLTIP": "Account is your bank account/card. It's a way to group transactions."
+    },
+
+    "BULK_CATEGORY_BAR": {
+      "LABEL": "selected",
+      "APPLY_BUTTON": "Apply",
+      "CATEGORY_LABEL": "Category"
+    },
+
+    "TABLE": {
+      "COLUMNS": {
+        "DATE": "Date",
+        "DESCRIPTION": "Description",
+        "AMOUNT": "Amount",
+        "CATEGORY": "Category"
+      }
+    },
+
+    "FOOTER": {
+      "BACK_TO_HOME_PAGE": "Back to home",
+      "SAVE_BUTTON": "Save & continue"
+    },
+
+    "ERRORS": {
+      "IMPORT_NOT_FOUND": {
+        "TITLE": "Import not found",
+        "MESSAGE": "The requested import could not be found. Please refresh the page or try again."
+      },
+      "IMPORT_ALREADY_CONFIRMED": {
+        "TITLE": "Already confirmed",
+        "MESSAGE": "This import has already been confirmed."
+      },
+      "IMPORT_ROW_MISSING_INPUT": {
+        "TITLE": "Missing category",
+        "MESSAGE": "Row {row} is missing a category. Please assign a category before confirming."
+      },
+      "UNAUTHORIZED": {
+        "TITLE": "Session expired",
+        "MESSAGE": "Please sign in again to continue."
+      },
+      "UNKNOWN": {
+        "TITLE": "Save failed",
+        "MESSAGE": "Something went wrong while saving your transactions. Please try again."
+      }
+    }
   }
 }

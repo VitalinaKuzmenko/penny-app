@@ -30,7 +30,11 @@ export async function clientApiFetch<TResponse, TBody = unknown>(
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
-    throw new ApiError(data?.message ?? 'Request failed', res.status, data);
+    if (data.code) {
+      throw new ApiError('Request failed', res.status, data);
+    } else {
+      throw new ApiError(data?.message ?? 'Request failed', res.status, data);
+    }
   }
 
   return data as TResponse;
