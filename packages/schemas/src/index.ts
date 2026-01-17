@@ -21,3 +21,7 @@ export * from './currency/getCurrenciesResponse.schema';
 
 // CATEGORY
 export * from './category/category.schema';
+
+// CHARTS
+export * from './charts/get-income-expense-input.schema';
+export * from './charts/get-income-expense-response.schema';

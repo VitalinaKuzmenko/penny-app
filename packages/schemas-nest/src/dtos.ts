@@ -11,6 +11,8 @@ import {
   CreateAccountSchema,
   GetCurrenciesResponseSchema,
   CategorySchema,
+  GetIncomeExpenseInputSchema,
+  GetIncomeExpenseResponseSchema,
 } from 'schemas';
 import { createZodDto } from 'nestjs-zod';
 
@@ -49,3 +51,12 @@ export class GetCurrenciesResponseDto extends createZodDto(
 
 // CATEGORY
 export class CategoryDto extends createZodDto(CategorySchema) {}
+
+// CHARTS
+export class GetIncomeExpenseInputDto extends createZodDto(
+  GetIncomeExpenseInputSchema,
+) {}
+
+export class GetIncomeExpenseResponseDto extends createZodDto(
+  GetIncomeExpenseResponseSchema,
+) {}
