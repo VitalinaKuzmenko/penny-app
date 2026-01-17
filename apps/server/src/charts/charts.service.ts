@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { MonthlyCategoryResponseSchema } from 'schemas';
-import { MonthlyCategoryQueryDto } from 'schemas-nest';
+import {
+  CategoryBreakdownResponseSchema,
+  MonthlyCategoryResponseSchema,
+} from 'schemas';
+import {
+  CategoryBreakdownQueryDto,
+  MonthlyCategoryQueryDto,
+} from 'schemas-nest';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -128,5 +134,55 @@ export class ChartsService {
     };
 
     return MonthlyCategoryResponseSchema.parse(result);
+  }
+
+  async getCategoryBreakdown(
+    userId: string,
+    { startDate, endDate, accountIds, type }: CategoryBreakdownQueryDto,
+  ) {
+    const gte = startDate ? new Date(startDate) : undefined;
+    const lte = endDate ? new Date(endDate) : undefined;
+
+    const rows = await this.prisma.transaction.groupBy({
+      by: ['categoryId'],
+      where: {
+        userId,
+        type,
+        ...(gte && { date: { gte } }),
+        ...(lte && { date: { lte } }),
+        ...(accountIds && { accountId: { in: accountIds } }),
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    const categoryIds = rows.map((r) => r.categoryId);
+
+    const categories = await this.prisma.category.findMany({
+      where: { id: { in: categoryIds } },
+      select: { id: true, name: true },
+    });
+
+    const total = rows.reduce((sum, r) => sum + Number(r._sum.amount ?? 0), 0);
+
+    const result = {
+      total,
+      categories: rows.map((r) => {
+        const category = categories.find((c) => c.id === r.categoryId);
+
+        const amount = Number(r._sum.amount ?? 0);
+
+        return {
+          categoryId: r.categoryId,
+          categoryName: category?.name ?? 'Unknown',
+          amount,
+          percentage:
+            total === 0 ? 0 : Number(((amount / total) * 100).toFixed(2)),
+        };
+      }),
+    };
+
+    return CategoryBreakdownResponseSchema.parse(result);
   }
 }

@@ -15,6 +15,8 @@ import {
   GetIncomeExpenseResponseSchema,
   MonthlyCategoryQuerySchema,
   MonthlyCategoryResponseSchema,
+  CategoryBreakdownQuerySchema,
+  CategoryBreakdownResponseSchema,
 } from 'schemas';
 import { createZodDto } from 'nestjs-zod';
 
@@ -68,4 +70,11 @@ export class MonthlyCategoryQueryDto extends createZodDto(
 
 export class MonthlyCategoryResponseDto extends createZodDto(
   MonthlyCategoryResponseSchema,
+) {}
+
+export class CategoryBreakdownQueryDto extends createZodDto(
+  CategoryBreakdownQuerySchema,
+) {}
+export class CategoryBreakdownResponseDto extends createZodDto(
+  CategoryBreakdownResponseSchema,
 ) {}

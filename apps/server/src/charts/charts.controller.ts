@@ -1,10 +1,8 @@
 import { Controller, Get, Query, Req, UseGuards, Logger } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
-  GetIncomeExpenseQuerySchema,
-  MonthlyCategoryQuerySchema,
-} from 'schemas';
-import {
+  CategoryBreakdownQueryDto,
+  CategoryBreakdownResponseDto,
   GetIncomeExpenseQueryDto,
   GetIncomeExpenseResponseDto,
   MonthlyCategoryQueryDto,
@@ -32,9 +30,7 @@ export class ChartsController {
   ): Promise<GetIncomeExpenseResponseDto> {
     const userId = req.user?.userId;
 
-    const parsed = GetIncomeExpenseQuerySchema.parse(dto);
-
-    return this.chartsService.getIncomeExpenseByYear(userId, parsed);
+    return this.chartsService.getIncomeExpenseByYear(userId, dto);
   }
 
   @Get('monthly-category')
@@ -46,8 +42,21 @@ export class ChartsController {
   async getMonthlyCategory(@Query() dto: MonthlyCategoryQueryDto, @Req() req) {
     const userId = req.user.userId;
 
-    const parsed = MonthlyCategoryQuerySchema.parse(dto);
+    return this.chartsService.getMonthlyCategoryChart(userId, dto);
+  }
 
-    return this.chartsService.getMonthlyCategoryChart(userId, parsed);
+  @Get('category-breakdown')
+  @ApiOperation({
+    summary: 'Share by category or account',
+  })
+  @ApiOkResponse({ type: CategoryBreakdownResponseDto })
+  @UseGuards(JwtAuthGuard)
+  async getCategoryBreakdown(
+    @Query() dto: CategoryBreakdownQueryDto,
+    @Req() req,
+  ) {
+    const userId = req.user.userId;
+
+    return this.chartsService.getCategoryBreakdown(userId, dto);
   }
 }
