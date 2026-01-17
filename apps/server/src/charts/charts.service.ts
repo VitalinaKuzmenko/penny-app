@@ -5,6 +5,7 @@ import {
 } from 'schemas';
 import {
   CategoryBreakdownQueryDto,
+  IncomeExpenseStackedQueryDto,
   MonthlyCategoryQueryDto,
 } from 'schemas-nest';
 
@@ -184,5 +185,44 @@ export class ChartsService {
     };
 
     return CategoryBreakdownResponseSchema.parse(result);
+  }
+
+  async getIncomeExpenseStacked(
+    userId: string,
+    query: IncomeExpenseStackedQueryDto,
+  ) {
+    const { startDate, endDate, accountIds, categoryIds, type } = query;
+
+    // convert dates to Date objects if needed
+    const gte = startDate ? new Date(startDate) : undefined;
+    const lte = endDate ? new Date(endDate) : undefined;
+
+    const rows = await this.prisma.transaction.groupBy({
+      by: ['type', 'date'],
+      where: {
+        userId,
+        ...(type && { type }),
+        ...(accountIds && { accountId: { in: accountIds } }),
+        ...(categoryIds && { categoryId: { in: categoryIds } }),
+        ...(gte && { date: { gte } }),
+        ...(lte && { date: { lte } }),
+      },
+      _sum: { amount: true },
+    });
+
+    // aggregate by month/year
+    const grouped: Record<string, { INCOME: number; EXPENSE: number }> = {};
+
+    rows.forEach((r) => {
+      const key = `${r.date.getFullYear()}-${r.date.getMonth() + 1}`; // e.g., "2026-01"
+      if (!grouped[key]) grouped[key] = { INCOME: 0, EXPENSE: 0 };
+      grouped[key][r.type] = Number(r._sum.amount ?? 0);
+    });
+
+    return Object.entries(grouped).map(([month, data]) => ({
+      month,
+      income: data.INCOME,
+      expense: data.EXPENSE,
+    }));
   }
 }

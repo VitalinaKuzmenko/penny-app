@@ -29,3 +29,5 @@ export * from './charts/monthly-category.query';
 export * from './charts/monthly-category.response';
 export * from './charts/category-breakdown.query';
 export * from './charts/category-breakdown.response';
+export * from './charts/income-expense-stacked.query';
+export * from './charts/income-expense-stacked.response';

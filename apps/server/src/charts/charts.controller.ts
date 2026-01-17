@@ -5,6 +5,8 @@ import {
   CategoryBreakdownResponseDto,
   GetIncomeExpenseQueryDto,
   GetIncomeExpenseResponseDto,
+  IncomeExpenseStackedQueryDto,
+  IncomeExpenseStackedResponseDto,
   MonthlyCategoryQueryDto,
   MonthlyCategoryResponseDto,
 } from 'schemas-nest';
@@ -58,5 +60,18 @@ export class ChartsController {
     const userId = req.user.userId;
 
     return this.chartsService.getCategoryBreakdown(userId, dto);
+  }
+
+  @Get('income-expense-stacked')
+  @ApiOperation({ summary: 'Income vs Expense stacked by month/year' })
+  @ApiOkResponse({ type: [IncomeExpenseStackedResponseDto] })
+  @UseGuards(JwtAuthGuard)
+  async getIncomeExpenseStacked(
+    @Query() dto: IncomeExpenseStackedQueryDto,
+    @Req() req,
+  ) {
+    const userId = req.user.userId;
+
+    return this.chartsService.getIncomeExpenseStacked(userId, dto);
   }
 }
