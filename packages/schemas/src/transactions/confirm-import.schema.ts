@@ -4,7 +4,6 @@ import { CurrencySchema, TransactionTypeSchema } from '../types';
 export const ConfirmImportRowSchema = z.object({
   id: z.string().uuid(),
   categoryId: z.string().uuid().optional(),
-  type: TransactionTypeSchema,
 });
 
 export const ConfirmImportSchema = z.object({

@@ -3,9 +3,12 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
 
+import { AccountsModule } from './accounts/accounts.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CategoriesModule } from './categories/categories.module';
+import { CurrenciesModule } from './currencies/currencies.module';
 import { ImportModule } from './import/import.module';
 import { AccountModule } from './modules/account/account.module';
 import { CategoryModule } from './modules/category/category.module';
@@ -29,6 +32,9 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
     UsersModule,
     ConfigModule.forRoot({ isGlobal: true }),
     ImportModule,
+    AccountsModule,
+    CurrenciesModule,
+    CategoriesModule,
   ],
 
   controllers: [AppController],

@@ -122,11 +122,7 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
           <Typography variant="body2" align="center">
             {registerPageText.FORM.ALREADY_HAVE_ACCOUNT}
           </Typography>
-          <CustomButton
-            variantType="secondary"
-            buttonSize="small"
-            onClick={handleSignInClick}
-          >
+          <CustomButton variantType="secondary" onClick={handleSignInClick}>
             {registerPageText.FORM.SIGN_IN_BUTTON}
           </CustomButton>
         </Stack>
@@ -244,9 +240,8 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
 
           <Box textAlign="center">
             <CustomButton
-              variantType="secondary_transparent"
+              variantType="outlined"
               fullWidth
-              buttonSize="big-medium"
               onClick={handleGoogleSignInClick}
               startIcon={<GoogleIcon />}
             >

@@ -8,7 +8,10 @@ import { parse } from 'csv-parse/sync';
 import { ConfirmImportInput, CsvRowSchema } from 'schemas';
 import { CsvImportResponseDTO, ImportCsvResponseDto } from 'schemas-nest';
 
-import { ImportStatus } from '../prisma/generated/prisma/client';
+import {
+  ImportStatus,
+  TransactionType,
+} from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { WinstonLogger } from '../utils/logger/logger';
 import { parseDate } from '../utils/parse-date';
@@ -216,7 +219,10 @@ export class ImportService {
             currency: dto.currency,
             accountId: dto.accountId,
             categoryId: input.categoryId ?? null,
-            type: input.type,
+            type:
+              Number(row.amount) > 0
+                ? TransactionType.INCOME
+                : TransactionType.EXPENSE,
           };
         }),
       });

@@ -178,7 +178,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
 
         <Box textAlign="center">
           <CustomButton
-            variantType="secondary_transparent"
+            variantType="outlined"
             fullWidth
             onClick={handleGoogleSignInClick}
             startIcon={<GoogleIcon />}

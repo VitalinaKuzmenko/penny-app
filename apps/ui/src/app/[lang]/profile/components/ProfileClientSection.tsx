@@ -67,11 +67,7 @@ export default function ProfileClientSection({
         <Typography align="center" mt={5}>
           {profilePageText.NOT_SIGNED_IN}
         </Typography>
-        <CustomButton
-          variantType="secondary"
-          buttonSize="small"
-          onClick={handleSignInClick}
-        >
+        <CustomButton variantType="secondary" onClick={handleSignInClick}>
           {profilePageText.SIGN_IN_BUTTON}
         </CustomButton>
       </Box>

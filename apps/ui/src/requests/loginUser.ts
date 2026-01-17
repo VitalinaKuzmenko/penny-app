@@ -1,8 +1,8 @@
-import { apiFetch } from '../utils/apiFetch';
+import { clientApiFetch } from '@/utils/clientApiFetch';
 import type { LoginInput } from 'schemas';
 
 export const loginUser = (input: LoginInput) => {
-  return apiFetch<{ success: true }, LoginInput>('/auth/login', {
+  return clientApiFetch<{ success: true }, LoginInput>('/auth/login', {
     method: 'POST',
     body: input,
   });

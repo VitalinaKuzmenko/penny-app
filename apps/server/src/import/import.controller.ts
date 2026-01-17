@@ -104,6 +104,7 @@ export class ImportController {
     const rows = await this.importService.getImportRows(userId, importId);
 
     if (!rows) {
+      this.logger.warn('getImportRows failed: import not found', { importId });
       throw new NotFoundException({
         code: 'import.not_found',
       });
