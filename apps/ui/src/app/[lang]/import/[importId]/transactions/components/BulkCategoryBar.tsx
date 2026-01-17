@@ -42,7 +42,12 @@ export default function BulkCategoryBar({
   if (!selectedRows.length) return null;
 
   return (
-    <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} mb={2}>
+    <Stack
+      direction={{ xs: 'column', md: 'row' }}
+      spacing={2}
+      mb={2}
+      alignItems="center"
+    >
       <Typography sx={{ flex: 1 }}>
         {selectedRows.length} {pageText.LABEL}
       </Typography>
@@ -67,7 +72,7 @@ export default function BulkCategoryBar({
       </FormControl>
 
       <CustomButton
-        sx={{ flex: 3 }}
+        sx={{ flex: 3, width: '220px', maxWidth: '220px', minWidth: '220px' }}
         variantType="secondary"
         onClick={handleApply}
       >

@@ -134,7 +134,7 @@ export default function TransactionsClient({
       {/* Title */}
       <Box>
         <Typography variant="h4" fontWeight={600} gutterBottom>
-          {transactionsPageText.TRANSACTIONS_PAGE}
+          {transactionsPageText.TITLE}
         </Typography>
         <Typography color="text.secondary" mb={3}>
           {transactionsPageText.SUBTITLE}

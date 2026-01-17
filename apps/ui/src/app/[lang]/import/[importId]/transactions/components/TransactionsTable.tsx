@@ -29,28 +29,28 @@ export default function TransactionsTable({
     () => [
       {
         field: 'date',
-        headerName: `${pageText.DATE}`,
+        headerName: `${pageText.COLUMNS.DATE}`,
         minWidth: 150,
         flex: 1,
         filterable: true,
       },
       {
         field: 'description',
-        headerName: `${pageText.DESCRIPTION}`,
+        headerName: `${pageText.COLUMNS.DESCRIPTION}`,
         minWidth: 150,
         flex: 2,
         filterable: true,
       },
       {
         field: 'amount',
-        headerName: `${pageText.AMOUNT}`,
+        headerName: `${pageText.COLUMNS.AMOUNT}`,
         minWidth: 100,
         flex: 1,
         filterable: true,
       },
       {
         field: 'category',
-        headerName: `${pageText.CATEGORY}`,
+        headerName: `${pageText.COLUMNS.CATEGORY}`,
         width: 300,
         sortable: false,
         filterable: true,

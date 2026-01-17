@@ -67,7 +67,11 @@ export default function AccountSelect({
       </Tooltip>
 
       <Tooltip title={pageText.CREATE_TOOLTIP}>
-        <CustomButton variantType="secondary" onClick={handleCreateNew}>
+        <CustomButton
+          variantType="secondary"
+          onClick={handleCreateNew}
+          sx={{ width: '220px', maxWidth: '220px', minWidth: '220px' }}
+        >
           {pageText.CREATE_BUTTON}
         </CustomButton>
       </Tooltip>
