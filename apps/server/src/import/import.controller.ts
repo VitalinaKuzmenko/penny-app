@@ -8,7 +8,6 @@ import {
   Get,
   Param,
   NotFoundException,
-  UnauthorizedException,
   UseGuards,
   Body,
 } from '@nestjs/common';
@@ -73,13 +72,6 @@ export class ImportController {
     }
     const userId = req.user.userId;
 
-    if (!userId) {
-      this.logger.warn('uploadCsv failed: user not found', { userId });
-      throw new UnauthorizedException({
-        code: 'auth.unauthorized',
-      });
-    }
-
     return this.importService.importCsv(userId, file.buffer);
   }
 
@@ -93,13 +85,6 @@ export class ImportController {
     @Req() req,
   ): Promise<CsvImportResponseDTO[]> {
     const userId = req.user.userId;
-
-    if (!userId) {
-      this.logger.warn('getImportRows failed: user not found', { userId });
-      throw new UnauthorizedException({
-        code: 'auth.unauthorized',
-      });
-    }
 
     const rows = await this.importService.getImportRows(userId, importId);
 
@@ -124,13 +109,6 @@ export class ImportController {
     @Req() req,
   ) {
     const userId = req.user.userId;
-
-    if (!userId) {
-      this.logger.warn('getImportRows failed: user not found', { userId });
-      throw new UnauthorizedException({
-        code: 'auth.unauthorized',
-      });
-    }
 
     await this.importService.confirmImport(userId, importId, dto);
 

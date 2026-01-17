@@ -3,7 +3,6 @@ import {
   Get,
   Req,
   UseGuards,
-  UnauthorizedException,
   Post,
   Body,
   BadRequestException,
@@ -27,12 +26,6 @@ export class AccountsController {
   async getAccounts(@Req() req): Promise<AccountDto[]> {
     const userId = req.user?.userId;
 
-    if (!userId) {
-      throw new UnauthorizedException({
-        code: 'auth.unauthorized',
-      });
-    }
-
     return this.accountsService.getUserAccounts(userId);
   }
 
@@ -46,12 +39,6 @@ export class AccountsController {
     @Body() dto: CreateAccountDto,
   ): Promise<AccountDto> {
     const userId = req.user?.userId;
-
-    if (!userId) {
-      throw new UnauthorizedException({
-        code: 'auth.unauthorized',
-      });
-    }
 
     try {
       return await this.accountsService.createAccount(userId, dto.name);
