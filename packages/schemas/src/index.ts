@@ -25,3 +25,5 @@ export * from './category/category.schema';
 // CHARTS
 export * from './charts/get-income-expense.query';
 export * from './charts/get-income-expense.response';
+export * from './charts/monthly-category.query';
+export * from './charts/monthly-category.response';

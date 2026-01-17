@@ -1,9 +1,14 @@
 import { Controller, Get, Query, Req, UseGuards, Logger } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GetIncomeExpenseQuerySchema } from 'schemas';
+import {
+  GetIncomeExpenseQuerySchema,
+  MonthlyCategoryQuerySchema,
+} from 'schemas';
 import {
   GetIncomeExpenseQueryDto,
   GetIncomeExpenseResponseDto,
+  MonthlyCategoryQueryDto,
+  MonthlyCategoryResponseDto,
 } from 'schemas-nest';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -30,5 +35,19 @@ export class ChartsController {
     const parsed = GetIncomeExpenseQuerySchema.parse(dto);
 
     return this.chartsService.getIncomeExpenseByYear(userId, parsed);
+  }
+
+  @Get('monthly-category')
+  @ApiOperation({
+    summary: 'Get monthly spending per category for a selected year',
+  })
+  @ApiOkResponse({ type: MonthlyCategoryResponseDto })
+  @UseGuards(JwtAuthGuard)
+  async getMonthlyCategory(@Query() dto: MonthlyCategoryQueryDto, @Req() req) {
+    const userId = req.user.userId;
+
+    const parsed = MonthlyCategoryQuerySchema.parse(dto);
+
+    return this.chartsService.getMonthlyCategoryChart(userId, parsed);
   }
 }
