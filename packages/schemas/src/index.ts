@@ -23,5 +23,5 @@ export * from './currency/getCurrenciesResponse.schema';
 export * from './category/category.schema';
 
 // CHARTS
-export * from './charts/get-income-expense-input.schema';
-export * from './charts/get-income-expense-response.schema';
+export * from './charts/get-income-expense.query';
+export * from './charts/get-income-expense.response';

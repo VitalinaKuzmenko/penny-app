@@ -1,8 +1,8 @@
 import { Controller, Get, Query, Req, UseGuards, Logger } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GetIncomeExpenseInputSchema } from 'schemas';
+import { GetIncomeExpenseQuerySchema } from 'schemas';
 import {
-  GetIncomeExpenseInputDto,
+  GetIncomeExpenseQueryDto,
   GetIncomeExpenseResponseDto,
 } from 'schemas-nest';
 
@@ -22,12 +22,12 @@ export class ChartsController {
   @ApiOkResponse({ type: GetIncomeExpenseResponseDto })
   @UseGuards(JwtAuthGuard)
   async getIncomeExpense(
-    @Query() dto: GetIncomeExpenseInputDto,
+    @Query() dto: GetIncomeExpenseQueryDto,
     @Req() req,
   ): Promise<GetIncomeExpenseResponseDto> {
     const userId = req.user?.userId;
 
-    const parsed = GetIncomeExpenseInputSchema.parse(dto);
+    const parsed = GetIncomeExpenseQuerySchema.parse(dto);
 
     return this.chartsService.getIncomeExpenseByYear(userId, parsed);
   }

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const GetIncomeExpenseInputSchema = z.object({
+export const GetIncomeExpenseQuerySchema = z.object({
   year: z.coerce.number().int().min(2000),
 
   accountIds: z
@@ -13,4 +13,4 @@ export const GetIncomeExpenseInputSchema = z.object({
     }),
 });
 
-export type GetIncomeExpenseInput = z.infer<typeof GetIncomeExpenseInputSchema>;
+export type GetIncomeExpenseQuery = z.infer<typeof GetIncomeExpenseQuerySchema>;
