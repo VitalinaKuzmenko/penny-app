@@ -23,6 +23,8 @@ import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { ConfirmImportSchema, ConfirmImportInput } from 'schemas';
 import { saveTransactions } from '@/requests/saveTransactions';
 import { mapConfirmImportErrorToUiError } from '@/utils/mapConfirmImportErrorToUiError';
+import CreateAccountModal from './CreateAccountModal';
+import { getAccounts } from '@/requests/getAccounts';
 
 interface TransactionsClientProps {
   transactionsPageText: Record<string, any>;
@@ -53,6 +55,8 @@ export default function TransactionsClient({
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [apiError, setApiError] = useState<UiError | null>(null);
+  const [accountsState, setAccountsState] = useState<Account[]>(accounts);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const router = useRouter();
   // const [areButtonsEnabled, setAreButtonsEnabled] = useState<boolean>(false);
@@ -64,6 +68,12 @@ export default function TransactionsClient({
       accountId && currency && rows.length === assignedCategoriesCount,
     );
   }, [accountId, currency, rowCategories, rows.length]);
+
+  const refetchAccounts = async () => {
+    const freshAccounts = await getAccounts();
+
+    setAccountsState(freshAccounts);
+  };
 
   const goToHomePage = () => {
     router.push('/');
@@ -99,7 +109,6 @@ export default function TransactionsClient({
         transactionsPageText.ERRORS,
       );
 
-      console.log('uiError', uiError);
       setApiError(uiError);
     } finally {
       setIsSaving(false);
@@ -157,9 +166,10 @@ export default function TransactionsClient({
         {/* Account select + create */}
         <AccountSelect
           pageText={transactionsPageText.ACCOUNT_SELECT}
-          accounts={accounts}
+          accounts={accountsState}
           value={accountId}
           onChange={setAccountId}
+          onCreate={() => setIsCreateModalOpen(true)}
         />
       </Stack>
 
@@ -218,6 +228,14 @@ export default function TransactionsClient({
           {transactionsPageText.FOOTER.SAVE_BUTTON}
         </CustomButton>
       </Stack>
+
+      {/* Pop up for create account */}
+      <CreateAccountModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreated={refetchAccounts}
+        pageText={transactionsPageText.CREATE_ACCOUNT_MODAL}
+      />
     </Container>
   );
 }

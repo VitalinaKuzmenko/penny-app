@@ -18,6 +18,7 @@ interface AccountSelectProps {
   accounts: Account[];
   value: string | null;
   onChange: (val: string) => void;
+  onCreate: () => void;
 }
 
 export default function AccountSelect({
@@ -25,14 +26,14 @@ export default function AccountSelect({
   accounts,
   value,
   onChange,
+  onCreate,
 }: AccountSelectProps) {
   const hasAccounts = accounts.length > 0;
   const handleChange = (event: SelectChangeEvent) =>
     onChange(event.target.value);
 
   const handleCreateNew = () => {
-    // TODO: open modal or navigate to create account page
-    alert('Create new account clicked');
+    onCreate();
   };
 
   return (

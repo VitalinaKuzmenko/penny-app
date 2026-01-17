@@ -191,25 +191,21 @@
   "TRANSACTIONS_PAGE": {
     "TITLE": "Check your transactions",
     "SUBTITLE": "Make sure everything looks correct before saving.",
-
     "CURRENCY_SELECT": {
       "LABEL": "Currency",
       "PLACEHOLDER": "Select currency"
     },
-
     "ACCOUNT_SELECT": {
       "LABEL": "Account",
       "TOOLTIP_NO_ACCOUNTS": "You have no accounts. You need to create an account first.",
       "CREATE_BUTTON": "Create new account",
       "CREATE_TOOLTIP": "Account is your bank account/card. It's a way to group transactions."
     },
-
     "BULK_CATEGORY_BAR": {
       "LABEL": "selected",
       "APPLY_BUTTON": "Apply",
       "CATEGORY_LABEL": "Category"
     },
-
     "TABLE": {
       "COLUMNS": {
         "DATE": "Date",
@@ -218,12 +214,10 @@
         "CATEGORY": "Category"
       }
     },
-
     "FOOTER": {
       "BACK_TO_HOME_PAGE": "Back to home",
       "SAVE_BUTTON": "Save & continue"
     },
-
     "ERRORS": {
       "IMPORT_NOT_FOUND": {
         "TITLE": "Import not found",
@@ -245,6 +239,14 @@
         "TITLE": "Save failed",
         "MESSAGE": "Something went wrong while saving your transactions. Please try again."
       }
+    },
+    "CREATE_ACCOUNT_MODAL": {
+      "TITLE": "Create account",
+      "NAME_LABEL": "Account name",
+      "CREATE": "Create",
+      "CANCEL": "Cancel",
+      "ERROR_ALREADY_EXISTS": "Account with this name already exists",
+      "ERROR_GENERIC": "Failed to create account"
     }
   }
 }
