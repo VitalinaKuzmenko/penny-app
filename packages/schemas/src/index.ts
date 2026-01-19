@@ -21,3 +21,15 @@ export * from './currency/getCurrenciesResponse.schema';
 
 // CATEGORY
 export * from './category/category.schema';
+
+// CHARTS
+export * from './charts/get-income-expense.query';
+export * from './charts/get-income-expense.response';
+export * from './charts/monthly-category.query';
+export * from './charts/monthly-category.response';
+export * from './charts/category-breakdown.query';
+export * from './charts/category-breakdown.response';
+export * from './charts/income-expense-stacked.query';
+export * from './charts/income-expense-stacked.response';
+export * from './charts/income-expense-ratio.query';
+export * from './charts/income-expense-ratio.response';

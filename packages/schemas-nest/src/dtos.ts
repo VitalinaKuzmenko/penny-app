@@ -11,6 +11,16 @@ import {
   CreateAccountSchema,
   GetCurrenciesResponseSchema,
   CategorySchema,
+  GetIncomeExpenseQuerySchema,
+  GetIncomeExpenseResponseSchema,
+  MonthlyCategoryQuerySchema,
+  MonthlyCategoryResponseSchema,
+  CategoryBreakdownQuerySchema,
+  CategoryBreakdownResponseSchema,
+  IncomeExpenseStackedQuerySchema,
+  IncomeExpenseStackedResponseSchema,
+  IncomeExpenseRatioQuerySchema,
+  IncomeExpenseRatioResponseSchema,
 } from 'schemas';
 import { createZodDto } from 'nestjs-zod';
 
@@ -49,3 +59,38 @@ export class GetCurrenciesResponseDto extends createZodDto(
 
 // CATEGORY
 export class CategoryDto extends createZodDto(CategorySchema) {}
+
+// CHARTS
+export class GetIncomeExpenseQueryDto extends createZodDto(
+  GetIncomeExpenseQuerySchema,
+) {}
+
+export class GetIncomeExpenseResponseDto extends createZodDto(
+  GetIncomeExpenseResponseSchema,
+) {}
+export class MonthlyCategoryQueryDto extends createZodDto(
+  MonthlyCategoryQuerySchema,
+) {}
+
+export class MonthlyCategoryResponseDto extends createZodDto(
+  MonthlyCategoryResponseSchema,
+) {}
+
+export class CategoryBreakdownQueryDto extends createZodDto(
+  CategoryBreakdownQuerySchema,
+) {}
+export class CategoryBreakdownResponseDto extends createZodDto(
+  CategoryBreakdownResponseSchema,
+) {}
+export class IncomeExpenseStackedQueryDto extends createZodDto(
+  IncomeExpenseStackedQuerySchema,
+) {}
+export class IncomeExpenseStackedResponseDto extends createZodDto(
+  IncomeExpenseStackedResponseSchema,
+) {}
+export class IncomeExpenseRatioQueryDto extends createZodDto(
+  IncomeExpenseRatioQuerySchema,
+) {}
+export class IncomeExpenseRatioResponseDto extends createZodDto(
+  IncomeExpenseRatioResponseSchema,
+) {}

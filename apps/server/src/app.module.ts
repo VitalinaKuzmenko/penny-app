@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ChartsModule } from './charts/charts.module';
 import { CurrenciesModule } from './currencies/currencies.module';
 import { ImportModule } from './import/import.module';
 import { AccountModule } from './modules/account/account.module';
@@ -35,6 +36,7 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
     AccountsModule,
     CurrenciesModule,
     CategoriesModule,
+    ChartsModule,
   ],
 
   controllers: [AppController],
