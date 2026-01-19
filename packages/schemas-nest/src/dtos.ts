@@ -19,6 +19,8 @@ import {
   CategoryBreakdownResponseSchema,
   IncomeExpenseStackedQuerySchema,
   IncomeExpenseStackedResponseSchema,
+  IncomeExpenseRatioQuerySchema,
+  IncomeExpenseRatioResponseSchema,
 } from 'schemas';
 import { createZodDto } from 'nestjs-zod';
 
@@ -85,4 +87,10 @@ export class IncomeExpenseStackedQueryDto extends createZodDto(
 ) {}
 export class IncomeExpenseStackedResponseDto extends createZodDto(
   IncomeExpenseStackedResponseSchema,
+) {}
+export class IncomeExpenseRatioQueryDto extends createZodDto(
+  IncomeExpenseRatioQuerySchema,
+) {}
+export class IncomeExpenseRatioResponseDto extends createZodDto(
+  IncomeExpenseRatioResponseSchema,
 ) {}

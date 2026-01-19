@@ -31,3 +31,5 @@ export * from './charts/category-breakdown.query';
 export * from './charts/category-breakdown.response';
 export * from './charts/income-expense-stacked.query';
 export * from './charts/income-expense-stacked.response';
+export * from './charts/income-expense-ratio.query';
+export * from './charts/income-expense-ratio.response';

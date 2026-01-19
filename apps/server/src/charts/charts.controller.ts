@@ -5,6 +5,8 @@ import {
   CategoryBreakdownResponseDto,
   GetIncomeExpenseQueryDto,
   GetIncomeExpenseResponseDto,
+  IncomeExpenseRatioQueryDto,
+  IncomeExpenseRatioResponseDto,
   IncomeExpenseStackedQueryDto,
   IncomeExpenseStackedResponseDto,
   MonthlyCategoryQueryDto,
@@ -73,5 +75,16 @@ export class ChartsController {
     const userId = req.user.userId;
 
     return this.chartsService.getIncomeExpenseStacked(userId, dto);
+  }
+
+  @Get('income-expense-ratio')
+  @ApiOperation({ summary: 'Income vs expense ratio (gauge)' })
+  @ApiOkResponse({ type: IncomeExpenseRatioResponseDto })
+  @UseGuards(JwtAuthGuard)
+  async getIncomeExpenseRatio(
+    @Query() dto: IncomeExpenseRatioQueryDto,
+    @Req() req,
+  ) {
+    return this.chartsService.getIncomeExpenseRatio(req.user.userId, dto);
   }
 }

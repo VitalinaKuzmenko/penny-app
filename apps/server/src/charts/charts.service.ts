@@ -5,6 +5,7 @@ import {
 } from 'schemas';
 import {
   CategoryBreakdownQueryDto,
+  IncomeExpenseRatioQueryDto,
   IncomeExpenseStackedQueryDto,
   MonthlyCategoryQueryDto,
 } from 'schemas-nest';
@@ -224,5 +225,41 @@ export class ChartsService {
       income: data.INCOME,
       expense: data.EXPENSE,
     }));
+  }
+
+  async getIncomeExpenseRatio(
+    userId: string,
+    { from, to }: IncomeExpenseRatioQueryDto,
+  ) {
+    const gte = from ? new Date(from) : undefined;
+    const lte = to ? new Date(to) : undefined;
+
+    const rows = await this.prisma.transaction.groupBy({
+      by: ['type'],
+      where: {
+        userId,
+        ...(gte && { date: { gte } }),
+        ...(lte && { date: { lte } }),
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    const income = Number(
+      rows.find((r) => r.type === 'INCOME')?._sum.amount ?? 0,
+    );
+
+    const expense = Number(
+      rows.find((r) => r.type === 'EXPENSE')?._sum.amount ?? 0,
+    );
+    const ratio =
+      income === 0 ? 0 : Number(((expense / income) * 100).toFixed(2));
+
+    return {
+      income,
+      expense,
+      ratio,
+    };
   }
 }
