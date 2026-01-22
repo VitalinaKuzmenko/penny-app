@@ -7,4 +7,5 @@ export const DEFAULT_CATEGORIES = [
   { name: 'Clothes, cosmetics', icon: 'checkroom', color: '#E91E63' },
   { name: 'Drugs', icon: 'medical_services', color: '#009688' },
   { name: 'Others', icon: 'category', color: '#607D8B' },
+  { name: 'Internal Transfer', icon: 'swap_horiz', color: '#9E9E9E' },
 ];

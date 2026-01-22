@@ -12,6 +12,16 @@ import {
 
 import { PrismaService } from '../prisma/prisma.service';
 
+const EXCLUDED_CATEGORY_NAME = 'Internal Transfer';
+
+const excludeInternalTransfers = {
+  category: {
+    name: {
+      not: EXCLUDED_CATEGORY_NAME,
+    },
+  },
+};
+
 @Injectable()
 export class ChartsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -37,6 +47,7 @@ export class ChartsService {
           gte: start,
           lt: end,
         },
+        ...excludeInternalTransfers,
         ...(accountIds && {
           accountId: { in: accountIds },
         }),
@@ -73,6 +84,7 @@ export class ChartsService {
           gte: start,
           lt: end,
         },
+        ...excludeInternalTransfers,
         ...(accountIds && {
           accountId: { in: accountIds },
         }),
@@ -150,6 +162,7 @@ export class ChartsService {
       where: {
         userId,
         type,
+        ...excludeInternalTransfers,
         ...(gte && { date: { gte } }),
         ...(lte && { date: { lte } }),
         ...(accountIds && { accountId: { in: accountIds } }),
@@ -202,6 +215,7 @@ export class ChartsService {
       by: ['type', 'date'],
       where: {
         userId,
+        ...excludeInternalTransfers,
         ...(type && { type }),
         ...(accountIds && { accountId: { in: accountIds } }),
         ...(categoryIds && { categoryId: { in: categoryIds } }),
@@ -238,6 +252,7 @@ export class ChartsService {
       by: ['type'],
       where: {
         userId,
+        ...excludeInternalTransfers,
         ...(gte && { date: { gte } }),
         ...(lte && { date: { lte } }),
       },
