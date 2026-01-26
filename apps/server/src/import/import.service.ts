@@ -1,4 +1,7 @@
 // src/import/import.service.ts
+import fs from 'fs';
+import path from 'path';
+
 import {
   Injectable,
   BadRequestException,
@@ -240,5 +243,81 @@ export class ImportService {
       importId,
       userId,
     });
+  }
+
+  //for data migration from excel to DB
+  /**
+   * Custom CSV import directly into Transaction table
+   * Uses default CSV file 'cleaned_transactions.csv' in the same folder
+   */
+  async importCsvDirect(userId: string) {
+    this.logger.info('Importing CSV', { userId });
+    const filePath = path.resolve(__dirname, 'cleaned_transactions.csv');
+
+    if (!fs.existsSync(filePath)) {
+      this.logger.warn('CSV file not found');
+      throw new BadRequestException({ code: 'import.file_not_found' });
+    }
+
+    const buffer = fs.readFileSync(filePath);
+
+    let records: any[];
+    try {
+      records = parse(buffer, {
+        columns: true,
+        skip_empty_lines: true,
+        trim: true,
+      });
+    } catch (err: any) {
+      this.logger.error('Error parsing CSV:', err, err.message);
+      throw new BadRequestException({ code: 'import.csv_invalid' });
+    }
+
+    if (!records.length) {
+      this.logger.warn('CSV is empty');
+      throw new BadRequestException({ code: 'import.csv_empty' });
+    }
+
+    // Validate required columns
+    const requiredColumns = [
+      'date',
+      'description',
+      'amount',
+      'currency',
+      'type',
+      'userId',
+      'categoryId',
+      'accountId',
+    ];
+    const missing = requiredColumns.filter(
+      (col) => !Object.keys(records[0]).includes(col),
+    );
+    if (missing.length) {
+      this.logger.warn('Missing required columns:', missing);
+      throw new BadRequestException({
+        code: 'import.missing_columns',
+        meta: { missing },
+      });
+    }
+
+    // Prepare transactions
+    const transactions = records.map((row) => ({
+      userId,
+      date: new Date(row.date),
+      description: row.description?.trim() || 'No description',
+      amount: parseFloat(row.amount),
+      currency: row.currency,
+      type: row.type,
+      categoryId: row.categoryId,
+      accountId: row.accountId,
+    }));
+
+    // Insert into DB
+    await this.prisma.transaction.createMany({
+      data: transactions,
+      skipDuplicates: true,
+    });
+
+    return { imported: transactions.length };
   }
 }
