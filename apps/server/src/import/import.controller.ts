@@ -114,4 +114,19 @@ export class ImportController {
 
     return { success: true };
   }
+
+  /**
+   * GET /import/direct-import
+   * for data migration from excel to DB
+   */
+  @ApiOperation({ summary: 'Direct Import' })
+  @Get('direct-import')
+  @UseGuards(JwtAuthGuard)
+  async directImport(@Req() req) {
+    const userId = req.user.userId;
+
+    const result = await this.importService.importCsvDirect(userId);
+
+    return result; // { imported: 10 }
+  }
 }
