@@ -2,8 +2,21 @@
 
 import { Typography, Box } from '@mui/material';
 import DashboardFilters from './DashboardFilters';
+import { Account, Category } from 'schemas';
+import { UiError } from '@/types/interfaces';
+import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 
-const MainDashboard = () => {
+interface MainDashboardProps {
+  accounts: Account[];
+  categories: Category[];
+  serverErrors: UiError[] | null;
+}
+
+const MainDashboard = ({
+  accounts,
+  categories,
+  serverErrors,
+}: MainDashboardProps) => {
   return (
     <div>
       {/* Hero */}
@@ -13,7 +26,14 @@ const MainDashboard = () => {
         </Typography>
       </Box>
 
-      <DashboardFilters />
+      {/* Error display */}
+      {serverErrors &&
+        serverErrors.length > 0 &&
+        serverErrors.map((error) => (
+          <ErrorBanner key={error.message} error={error} />
+        ))}
+
+      <DashboardFilters accounts={accounts} categories={categories} />
     </div>
   );
 };

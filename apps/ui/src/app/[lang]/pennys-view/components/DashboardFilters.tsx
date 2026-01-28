@@ -7,10 +7,17 @@ import {
   TransactionTypeFilter,
 } from '@/providers/FilterContext';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import CategoryMultiSelect from './CategoryMultiSelect';
+import { Account, Category } from 'schemas';
 
 const types: TransactionTypeFilter[] = ['BOTH', 'INCOME', 'EXPENSE'];
 
-const DashboardFilters = () => {
+interface DashboardFiltersProps {
+  accounts: Account[];
+  categories: Category[];
+}
+
+const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
   const { filters, setFilters, resetFilters } = useDashboardFilters();
 
   return (
@@ -47,6 +54,8 @@ const DashboardFilters = () => {
           </MenuItem>
         ))}
       </TextField>
+
+      <CategoryMultiSelect categories={categories} />
 
       {/* Reset button */}
       <Button variant="outlined" size="small" onClick={resetFilters}>
