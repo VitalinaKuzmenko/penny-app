@@ -1,11 +1,13 @@
 'use client';
 
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import { useDashboardFilters } from '@/providers/FilterContext';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import CategoryMultiSelect from './CategoryMultiSelect';
 import { Account, Category } from 'schemas';
 import TypeSelect from './TypeSelect';
+import AccountFilter from './AccountFilter';
+import CategoryFilter from './CategoryFilter';
+import CustomButton from '@/components/ui/CustomButton/CustomButton';
 
 interface DashboardFiltersProps {
   accounts: Account[];
@@ -35,12 +37,15 @@ const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
 
       <TypeSelect />
 
-      <CategoryMultiSelect categories={categories} />
+      {/* <CategoryMultiSelect categories={categories} /> */}
+      <CategoryFilter categories={categories} />
+
+      <AccountFilter accounts={accounts} />
 
       {/* Reset button */}
-      <Button variant="outlined" size="small" onClick={resetFilters}>
+      <CustomButton variantType="secondary" onClick={resetFilters}>
         Reset
-      </Button>
+      </CustomButton>
     </Box>
   );
 };
