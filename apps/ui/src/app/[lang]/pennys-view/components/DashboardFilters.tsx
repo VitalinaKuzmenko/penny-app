@@ -1,16 +1,11 @@
 'use client';
 
-import React from 'react';
-import { Box, TextField, MenuItem, Button } from '@mui/material';
-import {
-  useDashboardFilters,
-  TransactionTypeFilter,
-} from '@/providers/FilterContext';
+import { Box, Button } from '@mui/material';
+import { useDashboardFilters } from '@/providers/FilterContext';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import CategoryMultiSelect from './CategoryMultiSelect';
 import { Account, Category } from 'schemas';
-
-const types: TransactionTypeFilter[] = ['BOTH', 'INCOME', 'EXPENSE'];
+import TypeSelect from './TypeSelect';
 
 interface DashboardFiltersProps {
   accounts: Account[];
@@ -38,22 +33,7 @@ const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
         slotProps={{ textField: { size: 'small' } }}
       />
 
-      {/* Type select */}
-      <TextField
-        select
-        size="small"
-        label="Type"
-        value={filters.type}
-        onChange={(e) =>
-          setFilters({ type: e.target.value as TransactionTypeFilter })
-        }
-      >
-        {types.map((t) => (
-          <MenuItem key={t} value={t}>
-            {t}
-          </MenuItem>
-        ))}
-      </TextField>
+      <TypeSelect />
 
       <CategoryMultiSelect categories={categories} />
 
