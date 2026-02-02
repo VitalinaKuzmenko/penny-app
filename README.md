@@ -1,5 +1,7 @@
 # penny-app
 
+The work is in progress
+
 pnpm install # install all workspaces
 pnpm -r run build # run build in all packages
 
