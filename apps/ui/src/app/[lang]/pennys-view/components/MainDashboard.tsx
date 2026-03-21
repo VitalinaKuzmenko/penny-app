@@ -1,7 +1,7 @@
 'use client';
 
 import { Typography, Box } from '@mui/material';
-import DashboardFilters from './DashboardFilters';
+import DashboardFilters from './filters/DashboardFilters';
 import { Account, Category } from 'schemas';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
