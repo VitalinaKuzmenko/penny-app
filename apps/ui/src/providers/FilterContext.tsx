@@ -4,7 +4,7 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { Dayjs } from 'dayjs';
 
-export type TransactionTypeFilter = 'BOTH' | 'INCOME' | 'EXPENSE';
+export type TransactionTypeFilter = 'ALL' | 'INCOME' | 'EXPENSE';
 
 export interface DashboardFilters {
   startDate: Dayjs | null;
@@ -15,8 +15,10 @@ export interface DashboardFilters {
 }
 
 interface FilterContextProps {
-  filters: DashboardFilters;
+  filters: DashboardFilters; // draft
+  appliedFilters: DashboardFilters; // used by charts
   setFilters: (filters: Partial<DashboardFilters>) => void;
+  applyFilters: () => void;
   resetFilters: () => void;
 }
 
@@ -25,24 +27,37 @@ const defaultFilters: DashboardFilters = {
   endDate: null,
   categoryIds: [],
   accountIds: [],
-  type: 'BOTH',
+  type: 'ALL',
 };
 
 const FilterContext = createContext<FilterContextProps | undefined>(undefined);
 
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [filters, setFiltersState] = useState<DashboardFilters>(defaultFilters);
+  const [appliedFilters, setAppliedFilters] =
+    useState<DashboardFilters>(defaultFilters);
 
   const setFilters = (newFilters: Partial<DashboardFilters>) => {
     setFiltersState((prev) => ({ ...prev, ...newFilters }));
   };
 
+  const applyFilters = () => {
+    setAppliedFilters(filters);
+  };
   const resetFilters = () => {
     setFiltersState(defaultFilters);
   };
 
   return (
-    <FilterContext.Provider value={{ filters, setFilters, resetFilters }}>
+    <FilterContext.Provider
+      value={{
+        filters,
+        appliedFilters,
+        setFilters,
+        applyFilters,
+        resetFilters,
+      }}
+    >
       {children}
     </FilterContext.Provider>
   );

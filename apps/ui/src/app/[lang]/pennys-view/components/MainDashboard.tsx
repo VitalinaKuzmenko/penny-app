@@ -18,9 +18,9 @@ const MainDashboard = ({
   serverErrors,
 }: MainDashboardProps) => {
   return (
-    <div>
+    <Box sx={{ p: { xs: 3, md: 3 } }}>
       {/* Hero */}
-      <Box sx={{ p: { xs: 3, md: 3 } }}>
+      <Box>
         <Typography variant="h4" fontWeight={600} gutterBottom>
           Penny&apos;s View
         </Typography>
@@ -34,7 +34,7 @@ const MainDashboard = ({
         ))}
 
       <DashboardFilters accounts={accounts} categories={categories} />
-    </div>
+    </Box>
   );
 };
 

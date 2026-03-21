@@ -15,10 +15,23 @@ interface DashboardFiltersProps {
 }
 
 const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
-  const { filters, setFilters, resetFilters } = useDashboardFilters();
+  const { filters, appliedFilters, setFilters, resetFilters, applyFilters } =
+    useDashboardFilters();
+
+  const isDirty = JSON.stringify(filters) !== JSON.stringify(appliedFilters);
 
   return (
-    <Box display="flex" gap={2} flexWrap="wrap" alignItems="center" mb={3}>
+    <Box
+      display="grid"
+      gap={2}
+      mb={3}
+      gridTemplateColumns={{
+        xs: '1fr',
+        sm: '1fr 1fr',
+        md: 'repeat(3, 1fr)',
+        lg: 'repeat(7, 1fr)',
+      }}
+    >
       {/* Start date */}
       <DatePicker
         label="From"
@@ -45,6 +58,15 @@ const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
       {/* Reset button */}
       <CustomButton variantType="secondary" onClick={resetFilters}>
         Reset
+      </CustomButton>
+
+      {/* Apply button */}
+      <CustomButton
+        variantType="primary"
+        onClick={applyFilters}
+        disabled={!isDirty}
+      >
+        Apply
       </CustomButton>
     </Box>
   );

@@ -4,7 +4,7 @@ import {
 } from '@/providers/FilterContext';
 import { MenuItem, TextField } from '@mui/material';
 
-const types: TransactionTypeFilter[] = ['BOTH', 'INCOME', 'EXPENSE'];
+const types: TransactionTypeFilter[] = ['ALL', 'INCOME', 'EXPENSE'];
 
 const TypeSelect = () => {
   const { filters, setFilters } = useDashboardFilters();
