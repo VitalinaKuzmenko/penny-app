@@ -15,8 +15,14 @@ interface DashboardFiltersProps {
 }
 
 const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
-  const { filters, appliedFilters, setFilters, resetFilters, applyFilters } =
-    useDashboardFilters();
+  const {
+    filters,
+    appliedFilters,
+    setFilters,
+    resetFilters,
+    applyFilters,
+    isInitialized,
+  } = useDashboardFilters();
 
   const isDirty = JSON.stringify(filters) !== JSON.stringify(appliedFilters);
 
@@ -64,7 +70,7 @@ const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
       <CustomButton
         variantType="primary"
         onClick={applyFilters}
-        disabled={!isDirty}
+        disabled={isInitialized ? !isDirty : true}
       >
         Apply
       </CustomButton>

@@ -2,7 +2,7 @@
 'use client';
 
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 export type TransactionTypeFilter = 'ALL' | 'INCOME' | 'EXPENSE';
 
@@ -20,15 +20,17 @@ interface FilterContextProps {
   setFilters: (filters: Partial<DashboardFilters>) => void;
   applyFilters: () => void;
   resetFilters: () => void;
+  isInitialized: boolean;
+  initFilters: (data: { categoryIds: string[]; accountIds: string[] }) => void;
 }
 
-const defaultFilters: DashboardFilters = {
-  startDate: null,
-  endDate: null,
+const defaultFilters = (): DashboardFilters => ({
+  startDate: dayjs().subtract(1, 'month'),
+  endDate: dayjs(),
   categoryIds: [],
   accountIds: [],
   type: 'ALL',
-};
+});
 
 const FilterContext = createContext<FilterContextProps | undefined>(undefined);
 
@@ -36,6 +38,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [filters, setFiltersState] = useState<DashboardFilters>(defaultFilters);
   const [appliedFilters, setAppliedFilters] =
     useState<DashboardFilters>(defaultFilters);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const setFilters = (newFilters: Partial<DashboardFilters>) => {
     setFiltersState((prev) => ({ ...prev, ...newFilters }));
@@ -48,6 +51,25 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     setFiltersState(defaultFilters);
   };
 
+  const initFilters = ({
+    categoryIds,
+    accountIds,
+  }: {
+    accountIds: string[];
+    categoryIds: string[];
+  }) => {
+    const defaults = {
+      ...defaultFilters(),
+
+      categoryIds,
+      accountIds,
+    };
+
+    setFiltersState(defaults);
+    setAppliedFilters(defaults);
+    setIsInitialized(true);
+  };
+
   return (
     <FilterContext.Provider
       value={{
@@ -56,6 +78,8 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
         setFilters,
         applyFilters,
         resetFilters,
+        isInitialized,
+        initFilters,
       }}
     >
       {children}
