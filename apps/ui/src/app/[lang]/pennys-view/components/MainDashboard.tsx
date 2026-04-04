@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import MonthlyCategoryChart from './charts/MonthlyCategoryChart';
 import MonthlyCategoryTable from './charts/MonthlyCategoryTable';
+import CategoryBreakdownChart from './charts/CategoryBreakdownChart';
 
 interface MainDashboardProps {
   accounts: Account[];
@@ -59,6 +60,7 @@ const MainDashboard = ({
         ) : (
           <Box>
             <IncomeExpenseChart />
+            <CategoryBreakdownChart />
             <MonthlyCategoryChart />
             <MonthlyCategoryTable />
           </Box>
