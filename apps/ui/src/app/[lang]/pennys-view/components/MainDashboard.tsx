@@ -13,6 +13,7 @@ import MonthlyCategoryChart from './charts/MonthlyCategoryChart';
 import MonthlyCategoryTable from './charts/MonthlyCategoryTable';
 import CategoryBreakdownChart from './charts/CategoryBreakdownChart';
 import IncomeExpenseStackedChart from './charts/IncomeExpenseStackedChart';
+import IncomeExpenseGauge from './charts/IncomeExpenseGauge';
 
 interface MainDashboardProps {
   accounts: Account[];
@@ -63,6 +64,7 @@ const MainDashboard = ({
             <IncomeExpenseChart />
             <CategoryBreakdownChart />
             <IncomeExpenseStackedChart />
+            <IncomeExpenseGauge />
             <MonthlyCategoryChart />
             <MonthlyCategoryTable />
           </Box>
