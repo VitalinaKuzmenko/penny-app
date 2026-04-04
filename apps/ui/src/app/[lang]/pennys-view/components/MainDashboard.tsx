@@ -12,6 +12,7 @@ import Spinner from '@/components/ui/Spinner/Spinner';
 import MonthlyCategoryChart from './charts/MonthlyCategoryChart';
 import MonthlyCategoryTable from './charts/MonthlyCategoryTable';
 import CategoryBreakdownChart from './charts/CategoryBreakdownChart';
+import IncomeExpenseStackedChart from './charts/IncomeExpenseStackedChart';
 
 interface MainDashboardProps {
   accounts: Account[];
@@ -61,6 +62,7 @@ const MainDashboard = ({
           <Box>
             <IncomeExpenseChart />
             <CategoryBreakdownChart />
+            <IncomeExpenseStackedChart />
             <MonthlyCategoryChart />
             <MonthlyCategoryTable />
           </Box>
