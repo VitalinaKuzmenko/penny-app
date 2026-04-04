@@ -10,5 +10,4 @@ export const IncomeExpenseStackedQuerySchema = z.object({
   endDate: z.string().optional(),
   accountIds: stringArray,
   categoryIds: stringArray,
-  type: z.enum(['INCOME', 'EXPENSE']).optional(), // optional filter if you want only one
 });
