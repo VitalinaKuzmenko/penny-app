@@ -9,6 +9,8 @@ import IncomeExpenseChart from './charts/IncomeExpenseChart';
 import { useDashboardFilters } from '@/providers/FilterContext';
 import { useEffect } from 'react';
 import Spinner from '@/components/ui/Spinner/Spinner';
+import MonthlyCategoryChart from './charts/MonthlyCategoryChart';
+import MonthlyCategoryTable from './charts/MonthlyCategoryTable';
 
 interface MainDashboardProps {
   accounts: Account[];
@@ -57,6 +59,8 @@ const MainDashboard = ({
         ) : (
           <Box>
             <IncomeExpenseChart />
+            <MonthlyCategoryChart />
+            <MonthlyCategoryTable />
           </Box>
         )}
       </Box>
