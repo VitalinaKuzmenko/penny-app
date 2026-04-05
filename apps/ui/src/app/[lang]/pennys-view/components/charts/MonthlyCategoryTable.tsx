@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import {
   DataGrid,
   GridColDef,
@@ -16,15 +16,26 @@ import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { UiError } from '@/types/interfaces';
 import { ApiError } from '@/utils/clientApiFetch';
-import { MonthlyCategoryResponse } from 'schemas';
+import { Category, MonthlyCategoryResponse } from 'schemas';
+import { hexToRgba } from '@/utils/hexToRgba';
 
-export default function MonthlyCategoryTable() {
+interface MonthlyCategoryTableProps {
+  categories: Category[];
+}
+
+export default function MonthlyCategoryTable({
+  categories,
+}: MonthlyCategoryTableProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
   const [data, setData] = useState<MonthlyCategoryResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<UiError | null>(null);
 
   const year = appliedFilters.startDate?.year() ?? new Date().getFullYear();
+
+  const categoryColorMap = Object.fromEntries(
+    categories.map((c) => [c.id, c.color]),
+  );
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -84,24 +95,23 @@ export default function MonthlyCategoryTable() {
     return row;
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const categoryCols: GridColDef[] = data.datasets.map((ds: any) => ({
     field: ds.categoryName,
     headerName: ds.categoryName,
     width: 120,
-    valueFormatter: ((value, row) =>
+    valueFormatter: ((value) =>
       formatCurrency(value ?? 0)) as GridValueFormatter,
-    cellClassName: (params: GridCellParams) => {
-      const value = params.value;
-      if (typeof value === 'number' && value > 1000) {
-        return 'high-spending';
-      }
-      return '';
-    },
+
+    cellClassName: `category-${ds.categoryId}`,
   }));
 
   const columns: GridColDef[] = [
-    { field: 'month', headerName: 'Month', width: 100 },
+    {
+      field: 'month',
+      headerName: 'Month',
+      width: 100,
+      cellClassName: 'month-cell',
+    },
     ...categoryCols,
     {
       field: 'total',
@@ -119,37 +129,58 @@ export default function MonthlyCategoryTable() {
         Monthly Spending by Category ({year})
       </Typography>
 
-      <Box sx={{ height: 500, width: '100%' }}>
+      <Paper sx={{ height: 683, width: '100%', borderRadius: 4 }}>
         <DataGrid
           rows={rows}
           columns={columns}
-          disableRowSelectionOnClick
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 12, page: 0 },
+          filterMode="client"
+          hideFooter={true}
+          sx={{
+            '.MuiDataGrid-columnHeaderTitle': {
+              fontWeight: 'bold',
             },
-          }}
-          pageSizeOptions={[12]}
-          getRowClassName={(params) =>
-            params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row'
-          }
-        />
-      </Box>
+            // Remove cell focus highlight
+            '.MuiDataGrid-cell:focus, .MuiDataGrid-columnHeader:focus': {
+              outline: 'none',
+            },
+            // Remove row selection highlight
+            '.MuiDataGrid-row.Mui-selected': {
+              backgroundColor: 'transparent',
+            },
+            '.MuiDataGrid-cell:focus-within': {
+              outline: 'none',
+            },
+            '.month-cell': {
+              fontWeight: 600,
+            },
+            // Apply background to ALL cells in column
+            ...Object.fromEntries(
+              data.datasets.map((ds: any) => [
+                `& .MuiDataGrid-cell.category-${ds.categoryId}`,
+                {
+                  backgroundColor: hexToRgba(
+                    categoryColorMap[ds.categoryId],
+                    0.4,
+                  ),
+                },
+              ]),
+            ),
 
-      <style jsx>{`
-        .high-spending {
-          background-color: rgba(244, 67, 54, 0.2); // light red
-        }
-        .high-total {
-          background-color: rgba(33, 150, 243, 0.2); // light blue
-        }
-        .even-row {
-          background-color: #f9f9f9;
-        }
-        .odd-row {
-          background-color: #fff;
-        }
-      `}</style>
+            // Color header
+            ...Object.fromEntries(
+              data.datasets.map((ds: any) => [
+                `& .MuiDataGrid-columnHeader[data-field="${ds.categoryName}"]`,
+                {
+                  backgroundColor: hexToRgba(
+                    categoryColorMap[ds.categoryId],
+                    0.4,
+                  ),
+                },
+              ]),
+            ),
+          }}
+        />
+      </Paper>
     </Box>
   );
 }

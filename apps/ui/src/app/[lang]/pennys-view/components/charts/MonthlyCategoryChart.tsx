@@ -19,15 +19,24 @@ import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 import { formatCurrency } from '@/utils/formatCurrency';
-import { MonthlyCategoryResponse } from 'schemas';
+import { Category, MonthlyCategoryResponse } from 'schemas';
+interface MonthlyCategoryChartProps {
+  categories: Category[];
+}
 
-export default function MonthlyCategoryChart() {
+export default function MonthlyCategoryChart({
+  categories,
+}: MonthlyCategoryChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
   const [data, setData] = useState<MonthlyCategoryResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<UiError | null>(null);
 
   const year = appliedFilters.startDate?.year() ?? new Date().getFullYear();
+
+  const categoryColorMap = Object.fromEntries(
+    categories.map((c) => [c.id, c.color]),
+  );
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -85,9 +94,6 @@ export default function MonthlyCategoryChart() {
     return row;
   });
 
-  // Pick a palette for bars
-  const colors = ['#4caf50', '#f44336', '#2196f3', '#ff9800', '#9c27b0'];
-
   return (
     <Box sx={{ width: '100%', mt: 3 }}>
       <Typography variant="h6" fontWeight={600} gutterBottom>
@@ -106,7 +112,7 @@ export default function MonthlyCategoryChart() {
               <Bar
                 key={ds.categoryId}
                 dataKey={ds.categoryName}
-                fill={colors[index % colors.length]}
+                fill={categoryColorMap[ds.categoryId] || '#ccc'}
               />
             ))}
           </BarChart>

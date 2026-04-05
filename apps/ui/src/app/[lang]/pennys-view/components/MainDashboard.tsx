@@ -69,13 +69,14 @@ const MainDashboard = ({
                 flexDirection: { xs: 'column', md: 'row' },
               }}
             >
-              <IncomeExpenseGauge /> <CategoryBreakdownChart />
+              <IncomeExpenseGauge />
+              <CategoryBreakdownChart categories={categories} />
             </Box>
 
             <IncomeExpenseStackedChart />
 
-            <MonthlyCategoryChart />
-            <MonthlyCategoryTable />
+            <MonthlyCategoryChart categories={categories} />
+            <MonthlyCategoryTable categories={categories} />
           </Box>
         )}
       </Box>

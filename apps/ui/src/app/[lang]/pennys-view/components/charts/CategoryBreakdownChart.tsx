@@ -13,29 +13,28 @@ import {
 import { useDashboardFilters } from '@/providers/FilterContext';
 import { getCategoryBreakdown } from '@/requests/charts/getCategoryBreakdown';
 import { ApiError } from '@/utils/clientApiFetch';
-import { CategoryBreakdownResponse } from 'schemas';
+import { Category, CategoryBreakdownResponse } from 'schemas';
 import { formatCurrency } from '@/utils/formatCurrency';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 
-const COLORS = [
-  '#4caf50',
-  '#f44336',
-  '#2196f3',
-  '#ff9800',
-  '#9c27b0',
-  '#00bcd4',
-  '#8bc34a',
-  '#ffc107',
-];
+interface CategoryBreakdownChartProps {
+  categories: Category[];
+}
 
-export default function CategoryBreakdownChart() {
+export default function CategoryBreakdownChart({
+  categories,
+}: CategoryBreakdownChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
 
   const [data, setData] = useState<CategoryBreakdownResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<UiError | null>(null);
+
+  const categoryColorMap = Object.fromEntries(
+    categories.map((c) => [c.id, c.color]),
+  );
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -86,6 +85,7 @@ export default function CategoryBreakdownChart() {
     .filter((c) => c.amount > 0)
     .sort((a, b) => b.amount - a.amount)
     .map((c) => ({
+      categoryId: c.categoryId,
       name: c.categoryName,
       value: c.amount,
       percentage: c.percentage,
@@ -139,10 +139,10 @@ export default function CategoryBreakdownChart() {
                 );
               }}
             >
-              {chartData.map((_, index) => (
+              {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={categoryColorMap[entry.categoryId] || '#ccc'}
                 />
               ))}
             </Pie>
