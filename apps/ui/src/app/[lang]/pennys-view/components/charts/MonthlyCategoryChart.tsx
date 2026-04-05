@@ -125,7 +125,7 @@ export default function MonthlyCategoryChart({
             <Tooltip formatter={(value) => formatCurrency(value)} />
             <Legend />
 
-            {data.datasets.map((ds: any, index: number) => (
+            {data.datasets.map((ds: any) => (
               <Bar
                 key={ds.categoryId}
                 dataKey={ds.categoryName}

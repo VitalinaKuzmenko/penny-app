@@ -3,12 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
-import {
-  DataGrid,
-  GridColDef,
-  GridCellParams,
-  GridValueFormatter,
-} from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridValueFormatter } from '@mui/x-data-grid';
 import { useDashboardFilters } from '@/providers/FilterContext';
 import { getMonthlyCategory } from '@/requests/charts/getMonthlyCategory';
 import Spinner from '@/components/ui/Spinner/Spinner';

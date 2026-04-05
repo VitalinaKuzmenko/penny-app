@@ -1,6 +1,6 @@
 'use client';
 
-import { Tooltip, IconButton, Box, Typography } from '@mui/material';
+import { Tooltip, IconButton, Box } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { ReactNode } from 'react';
 
