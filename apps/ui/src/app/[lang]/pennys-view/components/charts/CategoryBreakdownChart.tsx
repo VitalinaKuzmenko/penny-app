@@ -49,7 +49,7 @@ export default function CategoryBreakdownChart({
           startDate: appliedFilters.startDate?.toISOString(),
           endDate: appliedFilters.endDate?.toISOString(),
           accountIds: appliedFilters.accountIds,
-          type: 'EXPENSE', // or make dynamic
+          type: 'EXPENSE',
         });
 
         setData(result);

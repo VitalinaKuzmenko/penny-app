@@ -4,8 +4,6 @@ import { clientApiFetch } from '@/utils/clientApiFetch';
 export const getMonthlyCategory = async (
   params: MonthlyCategoryQuery,
 ): Promise<MonthlyCategoryResponse> => {
-  console.log('params', params);
-
   const query = new URLSearchParams({
     year: String(params.year),
   });
@@ -18,7 +16,6 @@ export const getMonthlyCategory = async (
     query.set('categoryIds', params.categoryIds.join(','));
   }
 
-  console.log('query', query);
   return clientApiFetch<MonthlyCategoryResponse>(
     `/charts/monthly-category?${query.toString()}`,
   );
