@@ -218,7 +218,7 @@ export class ImportService {
             userId,
             date: row.date,
             description: row.description,
-            amount: row.amount,
+            amount: Math.abs(Number(row.amount)),
             currency: dto.currency,
             accountId: dto.accountId,
             categoryId: input.categoryId ?? null,

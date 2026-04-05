@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   TransactionTypeFilter,
   useDashboardFilters,
@@ -6,13 +7,17 @@ import { MenuItem, TextField } from '@mui/material';
 
 const types: TransactionTypeFilter[] = ['ALL', 'INCOME', 'EXPENSE'];
 
-const TypeSelect = () => {
+interface TypeSelectProps {
+  pennysViewPageText: Record<string, any>;
+}
+
+const TypeSelect = ({ pennysViewPageText }: TypeSelectProps) => {
   const { filters, setFilters } = useDashboardFilters();
   return (
     <TextField
       select
       size="small"
-      label="Type"
+      label={pennysViewPageText.FILTERS.TYPE_SELECT.LABEL}
       value={filters.type}
       onChange={(e) =>
         setFilters({ type: e.target.value as TransactionTypeFilter })

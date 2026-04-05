@@ -12,3 +12,14 @@ body {
   flex-direction: column;
   align-content: space-between;
 }
+
+.app-main {
+  flex: 1;
+  padding: 20px; /* default for desktop */
+}
+
+@media (max-width: 600px) {
+  .app-main {
+    padding: 10px; /* smaller padding on mobile */
+  }
+}

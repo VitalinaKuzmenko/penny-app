@@ -61,13 +61,18 @@ export default function TransactionsClient({
   const router = useRouter();
   // const [areButtonsEnabled, setAreButtonsEnabled] = useState<boolean>(false);
   const areButtonsEnabled = useMemo(() => {
-    const assignedCategoriesCount =
-      Object.values(rowCategories).filter(Boolean).length;
+    const rowsToCheck = rows.filter((row) => Number(row.amount) <= 0); // only rows where amount <= 0
+    const assignedCategoriesCount = Object.entries(rowCategories).filter(
+      ([rowId, categoryId]) => {
+        const row = rows.find((r) => r.id === rowId);
+        return row && Number(row.amount) <= 0 && categoryId; // only count relevant rows
+      },
+    ).length;
 
     return Boolean(
-      accountId && currency && rows.length === assignedCategoriesCount,
+      accountId && currency && rowsToCheck.length === assignedCategoriesCount,
     );
-  }, [accountId, currency, rowCategories, rows.length]);
+  }, [accountId, currency, rowCategories, rows]);
 
   const refetchAccounts = async () => {
     const freshAccounts = await getAccounts();

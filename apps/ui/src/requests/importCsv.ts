@@ -14,7 +14,6 @@ export async function uploadCsvFile(file: File): Promise<ImportCsvResponse> {
   );
 
   if (!response.ok) {
-    console.log('response', response);
     const error = await response.json().catch(() => ({}));
     throw error;
   }

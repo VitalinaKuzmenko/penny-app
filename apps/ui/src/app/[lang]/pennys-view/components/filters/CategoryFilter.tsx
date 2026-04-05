@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Category } from 'schemas';
@@ -7,9 +8,10 @@ import { useMemo } from 'react';
 
 interface Props {
   categories: Category[];
+  pennysViewPageText: Record<string, any>;
 }
 
-const CategoryFilter = ({ categories }: Props) => {
+const CategoryFilter = ({ categories, pennysViewPageText }: Props) => {
   const { filters, setFilters } = useDashboardFilters();
 
   const items = useMemo(
@@ -25,7 +27,7 @@ const CategoryFilter = ({ categories }: Props) => {
 
   return (
     <FilterMultiSelect
-      label="Categories"
+      label={pennysViewPageText.FILTERS.CATEGORY_FILTER.LABEL}
       items={items}
       value={filters.categoryIds}
       onChange={(categoryIds) => setFilters({ categoryIds })}

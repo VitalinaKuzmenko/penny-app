@@ -180,7 +180,11 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
                   sx={{ p: 0 }}
                   href={user ? `/profile` : `/signin`}
                 >
-                  <AccountCircle />
+                  <AccountCircle
+                    sx={{
+                      display: { xs: 'none', sm: 'block' },
+                    }}
+                  />
                   <Typography sx={{ ml: 1 }}>
                     {user ? user.userName : headerText.PAGES.SIGN_IN.NAME}
                   </Typography>

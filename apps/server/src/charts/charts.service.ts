@@ -60,12 +60,13 @@ export class ChartsService {
     const income = rows.find((r) => r.type === 'INCOME')?._sum.amount ?? 0;
 
     const expense = rows.find((r) => r.type === 'EXPENSE')?._sum.amount ?? 0;
+    const savings = Number(income) - Number(expense);
 
     return {
       year,
       income: Number(income),
       expense: Number(expense),
-      savings: Number(income) - Number(expense),
+      savings: savings < 0 ? 0 : savings,
     };
   }
 
@@ -205,9 +206,8 @@ export class ChartsService {
     userId: string,
     query: IncomeExpenseStackedQueryDto,
   ) {
-    const { startDate, endDate, accountIds, categoryIds, type } = query;
+    const { startDate, endDate, accountIds, categoryIds } = query;
 
-    // convert dates to Date objects if needed
     const gte = startDate ? new Date(startDate) : undefined;
     const lte = endDate ? new Date(endDate) : undefined;
 
@@ -216,7 +216,6 @@ export class ChartsService {
       where: {
         userId,
         ...excludeInternalTransfers,
-        ...(type && { type }),
         ...(accountIds && { accountId: { in: accountIds } }),
         ...(categoryIds && { categoryId: { in: categoryIds } }),
         ...(gte && { date: { gte } }),
@@ -225,20 +224,60 @@ export class ChartsService {
       _sum: { amount: true },
     });
 
-    // aggregate by month/year
+    // 1. Aggregate into months
     const grouped: Record<string, { INCOME: number; EXPENSE: number }> = {};
 
     rows.forEach((r) => {
-      const key = `${r.date.getFullYear()}-${r.date.getMonth() + 1}`; // e.g., "2026-01"
-      if (!grouped[key]) grouped[key] = { INCOME: 0, EXPENSE: 0 };
-      grouped[key][r.type] = Number(r._sum.amount ?? 0);
+      const year = r.date.getFullYear();
+      const month = String(r.date.getMonth() + 1).padStart(2, '0');
+      const key = `${year}-${month}`;
+
+      if (!grouped[key]) {
+        grouped[key] = { INCOME: 0, EXPENSE: 0 };
+      }
+
+      grouped[key][r.type] += Number(r._sum.amount ?? 0);
     });
 
-    return Object.entries(grouped).map(([month, data]) => ({
-      month,
-      income: data.INCOME,
-      expense: data.EXPENSE,
-    }));
+    // 2. Generate full month range (fill missing months)
+    if (!gte || !lte) {
+      // fallback: just return sorted existing data
+      return Object.entries(grouped)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([month, data]) => ({
+          month,
+          income: data.INCOME,
+          expense: data.EXPENSE,
+        }));
+    }
+
+    const result: {
+      month: string;
+      income: number;
+      expense: number;
+    }[] = [];
+
+    const current = new Date(gte.getFullYear(), gte.getMonth(), 1);
+    const end = new Date(lte.getFullYear(), lte.getMonth(), 1);
+
+    while (current <= end) {
+      const year = current.getFullYear();
+      const month = String(current.getMonth() + 1).padStart(2, '0');
+      const key = `${year}-${month}`;
+
+      const data = grouped[key] || { INCOME: 0, EXPENSE: 0 };
+
+      result.push({
+        month: key,
+        income: data.INCOME,
+        expense: data.EXPENSE,
+      });
+
+      // move to next month
+      current.setMonth(current.getMonth() + 1);
+    }
+
+    return result;
   }
 
   async getIncomeExpenseRatio(

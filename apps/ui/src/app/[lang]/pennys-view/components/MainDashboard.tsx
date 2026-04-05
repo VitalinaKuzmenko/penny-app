@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Typography, Box } from '@mui/material';
@@ -5,24 +6,46 @@ import DashboardFilters from './filters/DashboardFilters';
 import { Account, Category } from 'schemas';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
+import IncomeExpenseChart from './charts/IncomeExpenseChart';
+import { useDashboardFilters } from '@/providers/FilterContext';
+import { useEffect } from 'react';
+import Spinner from '@/components/ui/Spinner/Spinner';
+import MonthlyCategoryChart from './charts/MonthlyCategoryChart';
+import MonthlyCategoryTable from './charts/MonthlyCategoryTable';
+import CategoryBreakdownChart from './charts/CategoryBreakdownChart';
+import IncomeExpenseStackedChart from './charts/IncomeExpenseStackedChart';
+import IncomeExpenseGauge from './charts/IncomeExpenseGauge';
 
 interface MainDashboardProps {
   accounts: Account[];
   categories: Category[];
   serverErrors: UiError[] | null;
+  pennysViewPageText: Record<string, any>;
 }
 
 const MainDashboard = ({
   accounts,
   categories,
   serverErrors,
+  pennysViewPageText,
 }: MainDashboardProps) => {
+  const { initFilters, isInitialized } = useDashboardFilters();
+
+  useEffect(() => {
+    if (!isInitialized) {
+      initFilters({
+        categoryIds: categories.map((c) => c.id),
+        accountIds: accounts.map((a) => a.id),
+      });
+    }
+  }, [accounts, categories, isInitialized]);
+
   return (
-    <Box sx={{ p: { xs: 3, md: 3 } }}>
+    <Box sx={{ p: { xs: 1, md: 3 } }}>
       {/* Hero */}
       <Box>
         <Typography variant="h4" fontWeight={600} gutterBottom>
-          Penny&apos;s View
+          {pennysViewPageText.TITLE}
         </Typography>
       </Box>
 
@@ -33,7 +56,48 @@ const MainDashboard = ({
           <ErrorBanner key={error.message} error={error} />
         ))}
 
-      <DashboardFilters accounts={accounts} categories={categories} />
+      <DashboardFilters
+        accounts={accounts}
+        categories={categories}
+        pennysViewPageText={pennysViewPageText}
+      />
+
+      {/* Charts */}
+      <Box>
+        {!isInitialized ? (
+          <Spinner fullScreen />
+        ) : (
+          <Box>
+            <IncomeExpenseChart pennysViewPageText={pennysViewPageText} />
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: { xs: 'column', md: 'row' },
+              }}
+            >
+              <IncomeExpenseGauge pennysViewPageText={pennysViewPageText} />
+              <CategoryBreakdownChart
+                categories={categories}
+                pennysViewPageText={pennysViewPageText}
+              />
+            </Box>
+
+            <IncomeExpenseStackedChart
+              pennysViewPageText={pennysViewPageText}
+            />
+
+            <MonthlyCategoryChart
+              categories={categories}
+              pennysViewPageText={pennysViewPageText}
+            />
+            <MonthlyCategoryTable
+              categories={categories}
+              pennysViewPageText={pennysViewPageText}
+            />
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };
