@@ -83,7 +83,12 @@ export default function IncomeExpenseGauge() {
 
   return (
     <Box sx={{ width: '100%', mt: 3, textAlign: 'center' }}>
-      <Typography variant="h6" fontWeight={600} gutterBottom>
+      <Typography
+        variant="h6"
+        fontWeight={600}
+        gutterBottom
+        sx={{ textAlign: 'left', width: '100%' }}
+      >
         Spending Ratio
       </Typography>
 

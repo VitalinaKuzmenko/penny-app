@@ -46,7 +46,13 @@ export default async function PennysViewPage({
   });
 
   return (
-    <Container maxWidth="xl">
+    <Container
+      maxWidth="xl"
+      sx={{
+        px: { xs: 0, md: 3 },
+        maxWidth: { xs: '100%', md: 'xl' },
+      }}
+    >
       <MainDashboard
         accounts={accounts}
         categories={categories}

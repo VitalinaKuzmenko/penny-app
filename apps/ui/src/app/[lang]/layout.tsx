@@ -41,7 +41,7 @@ export default async function RootLayout({
           <ThemeProvider>
             <AuthProvider initialUser={user}>
               <Header lang={lang} />
-              <main style={{ flex: 1, padding: '20px' }}>{children}</main>
+              <main className="app-main">{children}</main>
               <Footer />
             </AuthProvider>
           </ThemeProvider>

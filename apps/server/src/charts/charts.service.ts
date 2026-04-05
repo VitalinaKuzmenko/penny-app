@@ -60,12 +60,13 @@ export class ChartsService {
     const income = rows.find((r) => r.type === 'INCOME')?._sum.amount ?? 0;
 
     const expense = rows.find((r) => r.type === 'EXPENSE')?._sum.amount ?? 0;
+    const savings = Number(income) - Number(expense);
 
     return {
       year,
       income: Number(income),
       expense: Number(expense),
-      savings: Number(income) - Number(expense),
+      savings: savings < 0 ? 0 : savings,
     };
   }
 

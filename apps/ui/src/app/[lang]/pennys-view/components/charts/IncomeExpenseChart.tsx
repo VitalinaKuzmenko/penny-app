@@ -7,7 +7,6 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
   ResponsiveContainer,
   Cell,
   LabelList,
@@ -16,7 +15,7 @@ import { useDashboardFilters } from '@/providers/FilterContext';
 import { getIncomeExpense } from '@/requests/charts/getIncomeExpense';
 import { ApiError } from '@/utils/clientApiFetch';
 import { GetIncomeExpenseResponse } from 'schemas';
-import { formatCurrencyLabel, formatCurrency } from '@/utils/formatCurrency';
+import { formatCurrencyLabel } from '@/utils/formatCurrency';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
@@ -93,8 +92,6 @@ export default function IncomeExpenseChart() {
           <BarChart data={chartData}>
             <XAxis dataKey="name" />
             <YAxis />
-
-            {/* <Tooltip formatter={(value) => formatCurrency(value)} /> */}
 
             <Bar dataKey="value">
               <Cell fill="#4caf50" />

@@ -16,7 +16,13 @@ export default async function UploadCsvPage({
   const uploadCsvPageText = dict.UPLOAD_CSV_PAGE;
 
   return (
-    <Container maxWidth="xl">
+    <Container
+      maxWidth="xl"
+      sx={{
+        px: { xs: 0, md: 3 },
+        maxWidth: { xs: '100%', md: 'xl' },
+      }}
+    >
       <UploadCsvSection uploadCsvPageText={uploadCsvPageText} />
     </Container>
   );

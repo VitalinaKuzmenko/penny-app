@@ -38,7 +38,7 @@ const MainDashboard = ({
   }, [accounts, categories, isInitialized]);
 
   return (
-    <Box sx={{ p: { xs: 3, md: 3 } }}>
+    <Box sx={{ p: { xs: 1, md: 3 } }}>
       {/* Hero */}
       <Box>
         <Typography variant="h4" fontWeight={600} gutterBottom>
@@ -62,9 +62,18 @@ const MainDashboard = ({
         ) : (
           <Box>
             <IncomeExpenseChart />
-            <CategoryBreakdownChart />
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: { xs: 'column', md: 'row' },
+              }}
+            >
+              <IncomeExpenseGauge /> <CategoryBreakdownChart />
+            </Box>
+
             <IncomeExpenseStackedChart />
-            <IncomeExpenseGauge />
+
             <MonthlyCategoryChart />
             <MonthlyCategoryTable />
           </Box>
