@@ -12,6 +12,7 @@ import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 import { getIncomeExpenseRatio } from '@/requests/charts/getIncomeExpenseRatio';
+import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
 export default function IncomeExpenseGauge() {
   const { appliedFilters, isInitialized } = useDashboardFilters();
@@ -85,14 +86,20 @@ export default function IncomeExpenseGauge() {
 
   return (
     <Box sx={{ width: '100%', mt: 3, textAlign: 'center' }}>
-      <Typography
-        variant="h6"
-        fontWeight={600}
-        gutterBottom
-        sx={{ textAlign: 'left', width: '100%' }}
-      >
-        Spending Ratio
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <Typography variant="h6" fontWeight={600}>
+          Spending Ratio
+        </Typography>
+
+        <InfoTooltip
+          content={
+            <Typography variant="body2">
+              Compares your total expenses to income. A higher percentage means
+              you’re spending more of what you earn.
+            </Typography>
+          }
+        />
+      </Box>
 
       <Box sx={{ width: '100%', height: 260 }}>
         <ResponsiveContainer>

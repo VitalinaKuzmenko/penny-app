@@ -20,6 +20,7 @@ import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 import { useTheme } from '@mui/material/styles';
+import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
 export default function IncomeExpenseChart() {
   const { appliedFilters, isInitialized } = useDashboardFilters();
@@ -86,9 +87,26 @@ export default function IncomeExpenseChart() {
   return (
     <Box sx={{ width: '100%', mt: 3 }}>
       {/* Title */}
-      <Typography variant="h6" fontWeight={600} gutterBottom>
-        Income vs Expense ({year})
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <Typography variant="h6" fontWeight={600}>
+          Income vs Expense ({year})
+        </Typography>
+
+        <InfoTooltip
+          content={
+            <>
+              <Typography variant="body2">
+                The year is based on the selected start date.
+              </Typography>
+
+              <Typography variant="body2">
+                Shows your total income, expenses, and resulting savings for the
+                selected year.
+              </Typography>
+            </>
+          }
+        />
+      </Box>
 
       <Box sx={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>

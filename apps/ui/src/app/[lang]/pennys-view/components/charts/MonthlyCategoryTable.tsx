@@ -18,6 +18,7 @@ import { UiError } from '@/types/interfaces';
 import { ApiError } from '@/utils/clientApiFetch';
 import { Category, MonthlyCategoryResponse } from 'schemas';
 import { hexToRgba } from '@/utils/hexToRgba';
+import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
 interface MonthlyCategoryTableProps {
   categories: Category[];
@@ -125,9 +126,25 @@ export default function MonthlyCategoryTable({
 
   return (
     <Box sx={{ width: '100%', mt: 3 }}>
-      <Typography variant="h6" fontWeight={600} gutterBottom>
-        Monthly Spending by Category ({year})
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <Typography variant="h6" fontWeight={600}>
+          Monthly Spending by Category ({year})
+        </Typography>
+
+        <InfoTooltip
+          content={
+            <>
+              <Typography variant="body2">
+                The year is based on the selected start date.
+              </Typography>
+
+              <Typography variant="body2">
+                Detailed monthly spending by category for precise comparison.
+              </Typography>
+            </>
+          }
+        />
+      </Box>
 
       <Paper sx={{ height: 683, width: '100%', borderRadius: 4 }}>
         <DataGrid

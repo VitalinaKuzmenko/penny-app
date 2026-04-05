@@ -19,6 +19,7 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
+import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
 export default function IncomeExpenseStackedChart() {
   const { appliedFilters, isInitialized } = useDashboardFilters();
@@ -89,9 +90,20 @@ export default function IncomeExpenseStackedChart() {
 
   return (
     <Box sx={{ width: '100%', mt: 3 }}>
-      <Typography variant="h6" fontWeight={600} gutterBottom>
-        Income vs Expense Over Time
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <Typography variant="h6" fontWeight={600}>
+          Income vs Expense Over Time
+        </Typography>
+
+        <InfoTooltip
+          content={
+            <Typography variant="body2">
+              Tracks how your income and expenses change over time to identify
+              trends and gaps.
+            </Typography>
+          }
+        />
+      </Box>
 
       <Box sx={{ width: '100%', height: 320 }}>
         <ResponsiveContainer>

@@ -18,6 +18,7 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
+import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
 interface CategoryBreakdownChartProps {
   categories: Category[];
@@ -93,9 +94,20 @@ export default function CategoryBreakdownChart({
 
   return (
     <Box sx={{ width: '100%', mt: 3 }}>
-      <Typography variant="h6" fontWeight={600} gutterBottom>
-        Category Breakdown
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <Typography variant="h6" fontWeight={600}>
+          Category Breakdown
+        </Typography>
+
+        <InfoTooltip
+          content={
+            <Typography variant="body2">
+              Shows how your total spending is distributed across categories for
+              the selected period.
+            </Typography>
+          }
+        />
+      </Box>
 
       <Box sx={{ width: '100%', height: 320 }}>
         <ResponsiveContainer>

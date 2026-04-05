@@ -20,6 +20,7 @@ import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { Category, MonthlyCategoryResponse } from 'schemas';
+import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 interface MonthlyCategoryChartProps {
   categories: Category[];
 }
@@ -96,9 +97,25 @@ export default function MonthlyCategoryChart({
 
   return (
     <Box sx={{ width: '100%', mt: 3 }}>
-      <Typography variant="h6" fontWeight={600} gutterBottom>
-        Monthly Spending by Category ({year})
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <Typography variant="h6" fontWeight={600}>
+          Monthly Spending by Category ({year})
+        </Typography>
+
+        <InfoTooltip
+          content={
+            <>
+              <Typography variant="body2">
+                The year is based on the selected start date.
+              </Typography>
+
+              <Typography variant="body2">
+                Shows how much you spend in each category every month.
+              </Typography>
+            </>
+          }
+        />
+      </Box>
 
       <Box sx={{ width: '100%', height: 400 }}>
         <ResponsiveContainer>
