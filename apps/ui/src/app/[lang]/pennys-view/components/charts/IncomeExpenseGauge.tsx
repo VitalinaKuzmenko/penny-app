@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { useDashboardFilters } from '@/providers/FilterContext';
 
@@ -19,6 +19,8 @@ export default function IncomeExpenseGauge() {
   const [data, setData] = useState<IncomeExpenseRatioResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<UiError | null>(null);
+
+  const theme = useTheme();
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -76,9 +78,9 @@ export default function IncomeExpenseGauge() {
 
   // Color logic
   const getColor = () => {
-    if (ratio < 70) return '#4caf50';
-    if (ratio < 100) return '#ff9800';
-    return '#f44336';
+    if (ratio < 70) return theme.palette.success.main;
+    if (ratio < 100) return theme.palette.warning.main;
+    return theme.palette.error.main;
   };
 
   return (

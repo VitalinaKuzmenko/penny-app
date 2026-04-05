@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import {
   BarChart,
   Bar,
@@ -26,6 +26,8 @@ export default function IncomeExpenseStackedChart() {
   const [data, setData] = useState<IncomeExpenseStackedResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<UiError | null>(null);
+
+  const theme = useTheme();
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -102,8 +104,16 @@ export default function IncomeExpenseStackedChart() {
             <Legend />
 
             {/* Stacked bars */}
-            <Bar dataKey="income" stackId="total" fill="#4caf50" />
-            <Bar dataKey="expense" stackId="total" fill="#f44336" />
+            <Bar
+              dataKey="income"
+              stackId="total"
+              fill={theme.palette.chart.income}
+            />
+            <Bar
+              dataKey="expense"
+              stackId="total"
+              fill={theme.palette.chart.expense}
+            />
           </BarChart>
         </ResponsiveContainer>
       </Box>

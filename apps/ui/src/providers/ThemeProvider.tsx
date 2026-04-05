@@ -56,6 +56,12 @@ export const theme = createTheme({
       800: '#1F2937',
       900: '#111827',
     },
+    chart: {
+      income: '#10B981', // same as success.main
+      expense: '#EF4444', // same as error.main
+      savings: '#38BDF8', // same as info.main
+      neutral: '#E5E7EB',
+    },
   },
 });
 
@@ -66,4 +72,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       {children}
     </MuiThemeProvider>
   );
+}
+
+declare module '@mui/material/styles' {
+  interface Palette {
+    chart: {
+      income: string;
+      expense: string;
+      savings: string;
+      neutral: string;
+    };
+  }
+  interface PaletteOptions {
+    chart?: {
+      income?: string;
+      expense?: string;
+      savings?: string;
+      neutral?: string;
+    };
+  }
 }

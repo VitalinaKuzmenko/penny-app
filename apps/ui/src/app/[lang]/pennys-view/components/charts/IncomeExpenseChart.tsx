@@ -19,6 +19,7 @@ import { formatCurrencyLabel } from '@/utils/formatCurrency';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
+import { useTheme } from '@mui/material/styles';
 
 export default function IncomeExpenseChart() {
   const { appliedFilters, isInitialized } = useDashboardFilters();
@@ -26,6 +27,8 @@ export default function IncomeExpenseChart() {
   const [data, setData] = useState<GetIncomeExpenseResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<UiError | null>(null);
+
+  const theme = useTheme();
 
   const year = appliedFilters.startDate
     ? appliedFilters.startDate.year()
@@ -94,15 +97,15 @@ export default function IncomeExpenseChart() {
             <YAxis />
 
             <Bar dataKey="value">
-              <Cell fill="#4caf50" />
-              <Cell fill="#f44336" />
-              <Cell fill="#2196f3" />
+              <Cell fill={theme.palette.chart.income} />
+              <Cell fill={theme.palette.chart.expense} />
+              <Cell fill={theme.palette.chart.savings} />
 
-              {/* Always visible labels */}
               <LabelList
                 dataKey="value"
                 position="top"
                 formatter={formatCurrencyLabel}
+                fill={theme.palette.text.primary}
               />
             </Bar>
           </BarChart>
