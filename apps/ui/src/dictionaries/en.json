@@ -212,7 +212,8 @@
         "DESCRIPTION": "Description",
         "AMOUNT": "Amount",
         "CATEGORY": "Category"
-      }
+      },
+      "CUSTOM_CATEGORY_CELL_NAME": "None, just income"
     },
     "FOOTER": {
       "BACK_TO_HOME_PAGE": "Back to home",

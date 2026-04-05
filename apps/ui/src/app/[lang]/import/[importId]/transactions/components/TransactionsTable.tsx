@@ -59,34 +59,68 @@ export default function TransactionsTable({
           const categoryId = rowCategories[rowId];
           return categories.find((c) => c.id === categoryId)?.name ?? '';
         },
-        renderCell: (params) => (
-          <FormControl
-            size="small"
-            fullWidth
-            sx={{
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center', // vertically center
-            }}
-          >
-            <Select
-              value={rowCategories[params.row.id] ?? ''}
-              onChange={(e) => onChangeCategory(params.row.id, e.target.value)}
-              sx={{
-                width: '100%',
-              }}
+        renderCell: (params) => {
+          const amount = Number(params.row.amount);
+
+          // Early exit: hide selector for positive amounts without internal transfer
+          if (amount > 0) {
+            const internalTransferCategory = categories.find(
+              (cat) => cat.name === 'Internal Transfer',
+            );
+            if (!internalTransferCategory) return null;
+
+            return (
+              <FormControl
+                size="small"
+                fullWidth
+                sx={{ height: '100%', display: 'flex', alignItems: 'center' }}
+              >
+                <Select
+                  value={rowCategories[params.row.id] ?? ''}
+                  onChange={(e) =>
+                    onChangeCategory(params.row.id, e.target.value)
+                  }
+                  sx={{ width: '100%' }}
+                >
+                  <MenuItem value={internalTransferCategory.id}>
+                    {internalTransferCategory.name}
+                  </MenuItem>
+                  <MenuItem value={undefined}>
+                    {pageText.CUSTOM_CATEGORY_CELL_NAME}
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            );
+          }
+
+          // Options for normal rows
+          const options = categories.map((cat) => (
+            <MenuItem key={cat.id} value={cat.id}>
+              {cat.name}
+            </MenuItem>
+          ));
+
+          return (
+            <FormControl
+              size="small"
+              fullWidth
+              sx={{ height: '100%', display: 'flex', alignItems: 'center' }}
             >
-              {categories.map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>
-                  {cat.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        ),
+              <Select
+                value={rowCategories[params.row.id] ?? ''}
+                onChange={(e) =>
+                  onChangeCategory(params.row.id, e.target.value)
+                }
+                sx={{ width: '100%' }}
+              >
+                {options}
+              </Select>
+            </FormControl>
+          );
+        },
       },
     ],
-    [categories, onChangeCategory, rowCategories],
+    [categories, onChangeCategory, rowCategories, pageText],
   );
 
   return (
