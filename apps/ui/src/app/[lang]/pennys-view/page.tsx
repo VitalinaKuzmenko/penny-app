@@ -35,12 +35,15 @@ export default async function PennysViewPage({
           break;
       }
     } else {
+      const labels = [
+        dict.DASHBOARD_PAGE.FILTERS.ACCOUNT_FILTER.LABEL,
+        dict.DASHBOARD_PAGE.FILTERS.CATEGORY_FILTER.LABEL,
+      ];
+
       errors.push({
         severity: 'error',
-        title: `Failed to load ${['accounts', 'categories'][index]}`,
-        message: `Could not fetch ${
-          ['accounts', 'categories'][index]
-        }. Please try refresh the page.`,
+        title: `Failed to load ${labels[index]}`,
+        message: `Could not fetch ${labels[index]}. Please try refreshing the page.`,
       });
     }
   });
@@ -57,6 +60,7 @@ export default async function PennysViewPage({
         accounts={accounts}
         categories={categories}
         serverErrors={errors}
+        pennysViewPageText={dict.DASHBOARD_PAGE}
       />
     </Container>
   );

@@ -249,5 +249,78 @@
       "ERROR_ALREADY_EXISTS": "Account with this name already exists",
       "ERROR_GENERIC": "Failed to create account"
     }
+  },
+  "DASHBOARD_PAGE": {
+    "TITLE": "Penny's View",
+    "FILTERS": {
+      "START_DATE": {
+        "LABEL": "From"
+      },
+      "END_DATE": {
+        "LABEL": "To"
+      },
+      "TYPE_SELECT": {
+        "LABEL": "Type"
+      },
+      "CATEGORY_FILTER": {
+        "LABEL": "Categories"
+      },
+      "ACCOUNT_FILTER": {
+        "LABEL": "Accounts"
+      },
+      "RESET_BUTTON": "Reset",
+      "APPLY_BUTTON": "Apply"
+    },
+    "CHARTS": {
+      "CATEGORY_BREAKDOWN": {
+        "TITLE": "Category Breakdown",
+        "TOOLTIP": "Shows how your total spending is distributed across categories for the selected period."
+      },
+      "INCOME_EXPENSE": {
+        "TITLE": "Income vs Expense",
+        "TOOLTIP_1": "Shows your total income, expenses, and resulting savings for the selected year. ",
+        "TOOLTIP_2": "The year is based on the selected start date.",
+        "CHART_NAMES": {
+          "INCOME": "Income",
+          "EXPENSE": "Expense",
+          "SAVINGS": "Savings"
+        }
+      },
+      "SPENDING_RATIO": {
+        "TITLE": "Spending Ratio",
+        "TOOLTIP": "Compares your total expenses to income. A higher percentage means you’re spending more of what you earn."
+      },
+      "INCOME_EXPENSE_STACKED": {
+        "TITLE": "Income & Expense Over Time",
+        "TOOLTIP": "Tracks how your income and expenses change over time to identify trends and gaps."
+      },
+      "MONTHLY_SPENDING": {
+        "TITLE": "Monthly Spending by Category",
+        "TOOLTIP_1": "Shows how much you spend in each category every month.",
+        "TOOLTIP_2": "The year is based on the selected start date."
+      },
+      "MONTHLY_SPENDING_TABLE": {
+        "TITLE": "Monthly Spending by Category",
+        "TOOLTIP_1": "Detailed monthly spending by category for precise comparison.",
+        "TOOLTIP_2": "The year is based on the selected start date.",
+        "COLUMNS": {
+          "MONTH": "Month",
+          "TOTAL": "Total"
+        }
+      }
+    },
+    "ERRORS": {
+      "FILTERS": {
+        "ACCOUNT_FILTER": { "LABEL": "Accounts" },
+        "CATEGORY_FILTER": { "LABEL": "Categories" }
+      },
+      "CHARTS": {
+        "NO_DATA": "No data available",
+        "LOAD_DATA": {
+          "TITLE": "Failed to load data",
+          "MESSAGE": "Failed to load data. Please try again."
+        }
+      }
+    }
   }
 }

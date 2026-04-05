@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Typography, Box } from '@mui/material';
@@ -19,12 +20,14 @@ interface MainDashboardProps {
   accounts: Account[];
   categories: Category[];
   serverErrors: UiError[] | null;
+  pennysViewPageText: Record<string, any>;
 }
 
 const MainDashboard = ({
   accounts,
   categories,
   serverErrors,
+  pennysViewPageText,
 }: MainDashboardProps) => {
   const { initFilters, isInitialized } = useDashboardFilters();
 
@@ -42,7 +45,7 @@ const MainDashboard = ({
       {/* Hero */}
       <Box>
         <Typography variant="h4" fontWeight={600} gutterBottom>
-          Penny&apos;s View
+          {pennysViewPageText.TITLE}
         </Typography>
       </Box>
 
@@ -53,7 +56,11 @@ const MainDashboard = ({
           <ErrorBanner key={error.message} error={error} />
         ))}
 
-      <DashboardFilters accounts={accounts} categories={categories} />
+      <DashboardFilters
+        accounts={accounts}
+        categories={categories}
+        pennysViewPageText={pennysViewPageText}
+      />
 
       {/* Charts */}
       <Box>
@@ -61,7 +68,7 @@ const MainDashboard = ({
           <Spinner fullScreen />
         ) : (
           <Box>
-            <IncomeExpenseChart />
+            <IncomeExpenseChart pennysViewPageText={pennysViewPageText} />
             <Box
               sx={{
                 display: 'flex',
@@ -69,14 +76,25 @@ const MainDashboard = ({
                 flexDirection: { xs: 'column', md: 'row' },
               }}
             >
-              <IncomeExpenseGauge />
-              <CategoryBreakdownChart categories={categories} />
+              <IncomeExpenseGauge pennysViewPageText={pennysViewPageText} />
+              <CategoryBreakdownChart
+                categories={categories}
+                pennysViewPageText={pennysViewPageText}
+              />
             </Box>
 
-            <IncomeExpenseStackedChart />
+            <IncomeExpenseStackedChart
+              pennysViewPageText={pennysViewPageText}
+            />
 
-            <MonthlyCategoryChart categories={categories} />
-            <MonthlyCategoryTable categories={categories} />
+            <MonthlyCategoryChart
+              categories={categories}
+              pennysViewPageText={pennysViewPageText}
+            />
+            <MonthlyCategoryTable
+              categories={categories}
+              pennysViewPageText={pennysViewPageText}
+            />
           </Box>
         )}
       </Box>

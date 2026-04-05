@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -22,10 +23,12 @@ import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
 interface CategoryBreakdownChartProps {
   categories: Category[];
+  pennysViewPageText: Record<string, any>;
 }
 
 export default function CategoryBreakdownChart({
   categories,
+  pennysViewPageText,
 }: CategoryBreakdownChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
 
@@ -62,8 +65,8 @@ export default function CategoryBreakdownChart({
           });
         } else {
           setError({
-            title: 'Failed to load data',
-            message: 'Please refresh the page',
+            title: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.TITLE}`,
+            message: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.MESSAGE}`,
             severity: 'error',
           });
         }
@@ -79,7 +82,7 @@ export default function CategoryBreakdownChart({
   if (loading) return <Spinner fullScreen />;
   if (error) return <ErrorBanner error={error} />;
   if (!data || !data.categories.length)
-    return <Typography>No data available</Typography>;
+    return <Typography>{pennysViewPageText.ERRORS.CHARTS.NO_DATA}</Typography>;
 
   // 🔑 Transform API → chart format
   const chartData = data.categories
@@ -96,14 +99,13 @@ export default function CategoryBreakdownChart({
     <Box sx={{ width: '100%', mt: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography variant="h6" fontWeight={600}>
-          Category Breakdown
+          {pennysViewPageText.CHARTS.CATEGORY_BREAKDOWN.TITLE}
         </Typography>
 
         <InfoTooltip
           content={
             <Typography variant="body2">
-              Shows how your total spending is distributed across categories for
-              the selected period.
+              {pennysViewPageText.CHARTS.CATEGORY_BREAKDOWN.TOOLTIP}
             </Typography>
           }
         />

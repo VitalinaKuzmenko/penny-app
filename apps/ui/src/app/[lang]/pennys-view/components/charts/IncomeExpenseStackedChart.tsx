@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -21,7 +22,13 @@ import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
-export default function IncomeExpenseStackedChart() {
+interface IncomeExpenceStackedChartProps {
+  pennysViewPageText: Record<string, any>;
+}
+
+export default function IncomeExpenseStackedChart({
+  pennysViewPageText,
+}: IncomeExpenceStackedChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
 
   const [data, setData] = useState<IncomeExpenseStackedResponse | null>(null);
@@ -55,8 +62,8 @@ export default function IncomeExpenseStackedChart() {
           });
         } else {
           setError({
-            title: 'Failed to load data',
-            message: 'Please refresh the page',
+            title: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.TITLE}`,
+            message: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.MESSAGE}`,
             severity: 'error',
           });
         }
@@ -71,7 +78,8 @@ export default function IncomeExpenseStackedChart() {
   if (!isInitialized) return null;
   if (loading) return <Spinner fullScreen />;
   if (error) return <ErrorBanner error={error} />;
-  if (!data || !data.length) return <Typography>No data available</Typography>;
+  if (!data || !data.length)
+    return <Typography>{pennysViewPageText.ERRORS.CHARTS.NO_DATA}</Typography>;
 
   // Format month label → "Jan 2026"
   const chartData = data.map((item) => {
@@ -92,14 +100,13 @@ export default function IncomeExpenseStackedChart() {
     <Box sx={{ width: '100%', mt: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography variant="h6" fontWeight={600}>
-          Income vs Expense Over Time
+          {pennysViewPageText.CHARTS.INCOME_EXPENSE_STACKED.TITLE}
         </Typography>
 
         <InfoTooltip
           content={
             <Typography variant="body2">
-              Tracks how your income and expenses change over time to identify
-              trends and gaps.
+              {pennysViewPageText.CHARTS.INCOME_EXPENSE_STACKED.TOOLTIP}
             </Typography>
           }
         />

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Account } from 'schemas';
@@ -6,9 +7,10 @@ import FilterMultiSelect from '@/components/FilterMultiSelect/FilterMultiSelect'
 
 interface Props {
   accounts: Account[];
+  pennysViewPageText: Record<string, any>;
 }
 
-const AccountFilter = ({ accounts }: Props) => {
+const AccountFilter = ({ accounts, pennysViewPageText }: Props) => {
   const { filters, setFilters } = useDashboardFilters();
 
   const items = accounts.map((a) => ({
@@ -18,7 +20,7 @@ const AccountFilter = ({ accounts }: Props) => {
 
   return (
     <FilterMultiSelect
-      label="Accounts"
+      label={pennysViewPageText.FILTERS.ACCOUNT_FILTER.LABEL}
       items={items}
       value={filters.accountIds}
       onChange={(accountIds) => setFilters({ accountIds })}

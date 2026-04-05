@@ -17,10 +17,12 @@ import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
 interface MonthlyCategoryTableProps {
   categories: Category[];
+  pennysViewPageText: Record<string, any>;
 }
 
 export default function MonthlyCategoryTable({
   categories,
+  pennysViewPageText,
 }: MonthlyCategoryTableProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
   const [data, setData] = useState<MonthlyCategoryResponse | null>(null);
@@ -57,8 +59,8 @@ export default function MonthlyCategoryTable({
           });
         } else {
           setError({
-            title: 'Failed to load data',
-            message: 'Failed to load chart. Please refresh.',
+            title: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.TITLE}`,
+            message: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.MESSAGE}`,
             severity: 'error',
           });
         }
@@ -78,7 +80,8 @@ export default function MonthlyCategoryTable({
   if (!isInitialized) return null;
   if (loading) return <Spinner fullScreen />;
   if (error) return <ErrorBanner error={error} />;
-  if (!data) return <Typography>No data available</Typography>;
+  if (!data)
+    return <Typography>{pennysViewPageText.ERRORS.CHARTS.NO_DATA}</Typography>;
 
   const rows = data.labels.map((month: string, idx: number) => {
     const row: any = { id: idx, month };
@@ -104,14 +107,14 @@ export default function MonthlyCategoryTable({
   const columns: GridColDef[] = [
     {
       field: 'month',
-      headerName: 'Month',
+      headerName: `${pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.COLUMNS.MONTH}`,
       width: 100,
       cellClassName: 'month-cell',
     },
     ...categoryCols,
     {
       field: 'total',
-      headerName: 'Total',
+      headerName: `${pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.COLUMNS.TOTAL}`,
       width: 120,
       valueFormatter: (value) =>
         formatCurrency(typeof value === 'number' ? value : 0),
@@ -124,17 +127,18 @@ export default function MonthlyCategoryTable({
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography variant="h6" fontWeight={600}>
           Monthly Spending by Category ({year})
+          {`${pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TITLE} (${year})`}
         </Typography>
 
         <InfoTooltip
           content={
             <>
               <Typography variant="body2">
-                The year is based on the selected start date.
+                {pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TOOLTIP_1}
               </Typography>
 
               <Typography variant="body2">
-                Detailed monthly spending by category for precise comparison.
+                {pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TOOLTIP_2}
               </Typography>
             </>
           }

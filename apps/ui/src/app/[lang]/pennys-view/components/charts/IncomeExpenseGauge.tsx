@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -14,7 +15,13 @@ import { UiError } from '@/types/interfaces';
 import { getIncomeExpenseRatio } from '@/requests/charts/getIncomeExpenseRatio';
 import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
-export default function IncomeExpenseGauge() {
+interface IncomeExpenseGaugeProps {
+  pennysViewPageText: Record<string, any>;
+}
+
+export default function IncomeExpenseGauge({
+  pennysViewPageText,
+}: IncomeExpenseGaugeProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
 
   const [data, setData] = useState<IncomeExpenseRatioResponse | null>(null);
@@ -48,8 +55,8 @@ export default function IncomeExpenseGauge() {
           });
         } else {
           setError({
-            title: 'Failed to load data',
-            message: 'Please refresh the page',
+            title: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.TITLE}`,
+            message: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.MESSAGE}`,
             severity: 'error',
           });
         }
@@ -64,7 +71,8 @@ export default function IncomeExpenseGauge() {
   if (!isInitialized) return null;
   if (loading) return <Spinner fullScreen />;
   if (error) return <ErrorBanner error={error} />;
-  if (!data) return <Typography>No data available</Typography>;
+  if (!data)
+    return <Typography>{pennysViewPageText.ERRORS.CHARTS.NO_DATA}</Typography>;
 
   const { income, expense, ratio } = data;
 
@@ -88,14 +96,13 @@ export default function IncomeExpenseGauge() {
     <Box sx={{ width: '100%', mt: 3, textAlign: 'center' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography variant="h6" fontWeight={600}>
-          Spending Ratio
+          {pennysViewPageText.CHARTS.SPENDING_RATIO.TITLE}
         </Typography>
 
         <InfoTooltip
           content={
             <Typography variant="body2">
-              Compares your total expenses to income. A higher percentage means
-              you’re spending more of what you earn.
+              {pennysViewPageText.CHARTS.SPENDING_RATIO.TOOLTIP}
             </Typography>
           }
         />

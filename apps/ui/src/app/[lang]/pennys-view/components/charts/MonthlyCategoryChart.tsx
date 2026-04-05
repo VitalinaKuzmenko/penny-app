@@ -23,10 +23,12 @@ import { Category, MonthlyCategoryResponse } from 'schemas';
 import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 interface MonthlyCategoryChartProps {
   categories: Category[];
+  pennysViewPageText: Record<string, any>;
 }
 
 export default function MonthlyCategoryChart({
   categories,
+  pennysViewPageText,
 }: MonthlyCategoryChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
   const [data, setData] = useState<MonthlyCategoryResponse | null>(null);
@@ -63,8 +65,8 @@ export default function MonthlyCategoryChart({
           });
         } else {
           setError({
-            title: 'Failed to load data',
-            message: 'Failed to load chart. Please refresh.',
+            title: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.TITLE}`,
+            message: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.MESSAGE}`,
             severity: 'error',
           });
         }
@@ -84,7 +86,8 @@ export default function MonthlyCategoryChart({
   if (!isInitialized) return null;
   if (loading) return <Spinner fullScreen />;
   if (error) return <ErrorBanner error={error} />;
-  if (!data) return <Typography>No data available</Typography>;
+  if (!data)
+    return <Typography>{pennysViewPageText.ERRORS.CHARTS.NO_DATA}</Typography>;
 
   // Transform data: each month as a row, each category as a key
   const chartData = data.labels.map((month: string, idx: number) => {
@@ -99,18 +102,18 @@ export default function MonthlyCategoryChart({
     <Box sx={{ width: '100%', mt: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography variant="h6" fontWeight={600}>
-          Monthly Spending by Category ({year})
+          {`${pennysViewPageText.CHARTS.MONTHLY_SPENDING.TITLE} (${year})`}
         </Typography>
 
         <InfoTooltip
           content={
             <>
               <Typography variant="body2">
-                The year is based on the selected start date.
+                {pennysViewPageText.CHARTS.MONTHLY_SPENDING.TOOLTIP_1}
               </Typography>
 
               <Typography variant="body2">
-                Shows how much you spend in each category every month.
+                {pennysViewPageText.CHARTS.MONTHLY_SPENDING.TOOLTIP_2}
               </Typography>
             </>
           }

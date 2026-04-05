@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -22,7 +23,13 @@ import { UiError } from '@/types/interfaces';
 import { useTheme } from '@mui/material/styles';
 import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
-export default function IncomeExpenseChart() {
+interface IncomeExpenseChartProps {
+  pennysViewPageText: Record<string, any>;
+}
+
+export default function IncomeExpenseChart({
+  pennysViewPageText,
+}: IncomeExpenseChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
 
   const [data, setData] = useState<GetIncomeExpenseResponse | null>(null);
@@ -57,9 +64,8 @@ export default function IncomeExpenseChart() {
           });
         } else {
           setError({
-            title: 'Failed to load data',
-            message:
-              'Sorry, failed to load data. Please try to refresh the page',
+            title: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.TITLE}`,
+            message: `${pennysViewPageText.ERRORS.CHARTS.LOAD_DATA.MESSAGE}`,
             severity: 'error',
           });
         }
@@ -76,12 +82,22 @@ export default function IncomeExpenseChart() {
   if (loading) return <Spinner fullScreen />;
 
   if (error) return <ErrorBanner error={error} />;
-  if (!data) return <Typography>No data available</Typography>;
+  if (!data)
+    return <Typography>{pennysViewPageText.ERRORS.CHARTS.NO_DATA}</Typography>;
 
   const chartData = [
-    { name: 'Income', value: data.income },
-    { name: 'Expense', value: Math.abs(data.expense) },
-    { name: 'Savings', value: data.savings },
+    {
+      name: `${pennysViewPageText.CHARTS.INCOME_EXPENSE.CHART_NAMES.INCOME}`,
+      value: data.income,
+    },
+    {
+      name: `${pennysViewPageText.CHARTS.INCOME_EXPENSE.CHART_NAMES.EXPENSE}`,
+      value: Math.abs(data.expense),
+    },
+    {
+      name: `${pennysViewPageText.CHARTS.INCOME_EXPENSE.CHART_NAMES.SAVINGS}`,
+      value: data.savings,
+    },
   ];
 
   return (
@@ -89,19 +105,18 @@ export default function IncomeExpenseChart() {
       {/* Title */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography variant="h6" fontWeight={600}>
-          Income vs Expense ({year})
+          {`${pennysViewPageText.CHARTS.INCOME_EXPENSE.TITLE} (${year})`}
         </Typography>
 
         <InfoTooltip
           content={
             <>
               <Typography variant="body2">
-                The year is based on the selected start date.
+                {pennysViewPageText.CHARTS.INCOME_EXPENSE.TOOLTIP_1}
               </Typography>
 
               <Typography variant="body2">
-                Shows your total income, expenses, and resulting savings for the
-                selected year.
+                {pennysViewPageText.CHARTS.INCOME_EXPENSE.TOOLTIP_2}
               </Typography>
             </>
           }

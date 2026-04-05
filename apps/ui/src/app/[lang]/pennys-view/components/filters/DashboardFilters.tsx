@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Box } from '@mui/material';
@@ -12,9 +13,14 @@ import CustomButton from '@/components/ui/CustomButton/CustomButton';
 interface DashboardFiltersProps {
   accounts: Account[];
   categories: Category[];
+  pennysViewPageText: Record<string, any>;
 }
 
-const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
+const DashboardFilters = ({
+  accounts,
+  categories,
+  pennysViewPageText,
+}: DashboardFiltersProps) => {
   const {
     filters,
     appliedFilters,
@@ -40,7 +46,7 @@ const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
     >
       {/* Start date */}
       <DatePicker
-        label="From"
+        label={pennysViewPageText.FILTERS.START_DATE.LABEL}
         value={filters.startDate}
         onChange={(newValue) => setFilters({ startDate: newValue })}
         slotProps={{ textField: { size: 'small' } }}
@@ -48,22 +54,28 @@ const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
 
       {/* End date */}
       <DatePicker
-        label="To"
+        label={pennysViewPageText.FILTERS.END_DATE.LABEL}
         value={filters.endDate}
         onChange={(newValue) => setFilters({ endDate: newValue })}
         slotProps={{ textField: { size: 'small' } }}
       />
 
-      <TypeSelect />
+      <TypeSelect pennysViewPageText={pennysViewPageText} />
 
       {/* <CategoryMultiSelect categories={categories} /> */}
-      <CategoryFilter categories={categories} />
+      <CategoryFilter
+        categories={categories}
+        pennysViewPageText={pennysViewPageText}
+      />
 
-      <AccountFilter accounts={accounts} />
+      <AccountFilter
+        accounts={accounts}
+        pennysViewPageText={pennysViewPageText}
+      />
 
       {/* Reset button */}
       <CustomButton variantType="secondary" onClick={resetFilters}>
-        Reset
+        {pennysViewPageText.FILTERS.RESET_BUTTON}
       </CustomButton>
 
       {/* Apply button */}
@@ -72,7 +84,7 @@ const DashboardFilters = ({ accounts, categories }: DashboardFiltersProps) => {
         onClick={applyFilters}
         disabled={isInitialized ? !isDirty : true}
       >
-        Apply
+        {pennysViewPageText.FILTERS.APPLY_BUTTON}
       </CustomButton>
     </Box>
   );
