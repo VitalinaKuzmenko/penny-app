@@ -3,15 +3,19 @@
 import { Box, Typography, Stack, Link } from '@mui/material';
 import CustomButton from '../ui/CustomButton/CustomButton';
 import { useRouter } from 'next/navigation';
-import dashboardPreviewImage from '../../../public/dashboard_preview.png';
 import Image from 'next/image';
+import { LanguageType } from '@/utils/interfaces';
+
+interface HomeHeroSectionProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  homePageText: Record<string, any>;
+  lang: LanguageType;
+}
 
 export default function HomeHeroSection({
   homePageText,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  homePageText: Record<string, any>;
-}) {
+  lang,
+}: HomeHeroSectionProps) {
   const router = useRouter();
 
   const handleSignUpClick = () => {
@@ -110,7 +114,7 @@ export default function HomeHeroSection({
           }}
         >
           <Image
-            src={dashboardPreviewImage}
+            src={`/dashboard_preview/dashboard_preview_${lang}.png`}
             alt="Penny dashboard preview"
             fill
             style={{ objectFit: 'contain' }}
