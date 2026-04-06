@@ -1,12 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
-import { availableLanguages } from './utils/interfaces';
+import { availableLanguages, LanguageType } from './utils/interfaces';
 
 const defaultLocale = 'en';
 const protectedPaths = ['/profile', '/upload-csv', '/pennys-view', '/import'];
 
 export const getLocale = (request: Request) => {
+  // 1️⃣ Check for manually selected language cookie
+  const matchLang = request.headers
+    .get('cookie')
+    ?.match(/selected_locale=(\w+)/);
+  const manualLocale = matchLang?.[1];
+
+  if (
+    manualLocale &&
+    availableLanguages.includes(manualLocale as LanguageType)
+  ) {
+    return manualLocale as LanguageType;
+  }
+
+  // 2️⃣ Fallback to browser's preferred language
   const headers = Object.fromEntries(request.headers.entries());
   const languages = new Negotiator({ headers }).languages();
   return match(languages, availableLanguages, defaultLocale);

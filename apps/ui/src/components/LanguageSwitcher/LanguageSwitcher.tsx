@@ -2,7 +2,12 @@
 
 import { usePathname, useRouter, useParams } from 'next/navigation';
 import { availableLanguages, LanguageType } from '@/utils/interfaces';
-import { FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import {
+  FormControl,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from '@mui/material';
 
 export const LanguageSwitcher = () => {
   const router = useRouter();
@@ -19,6 +24,9 @@ export const LanguageSwitcher = () => {
     // Replace the language segment
     segments[1] = event.target.value;
 
+    // Set the cookie on the client
+    document.cookie = `selected_locale=${event.target.value}; path=/; max-age=31536000`;
+
     const newPath = segments.join('/');
 
     router.push(newPath);
@@ -28,11 +36,11 @@ export const LanguageSwitcher = () => {
     <div>
       <FormControl
         sx={{
-          'm': 1,
-          'minWidth': 50,
+          m: 1,
+          minWidth: 50,
 
           '& .MuiOutlinedInput-root': {
-            'color': 'white',
+            color: 'white',
             '& .MuiOutlinedInput-notchedOutline': {
               borderColor: 'white',
             },
@@ -54,18 +62,15 @@ export const LanguageSwitcher = () => {
           onChange={switchLanguage}
           displayEmpty
           sx={{
-            'fontSize': 12,
-            'height': 32,
+            fontSize: 12,
+            height: 32,
             '& .MuiSelect-select': {
               padding: '1px 8px',
             },
           }}
         >
           {availableLanguages.map((lang) => (
-            <MenuItem
-              key={lang}
-              value={lang}
-            >
+            <MenuItem key={lang} value={lang}>
               {lang.toUpperCase()}
             </MenuItem>
           ))}
