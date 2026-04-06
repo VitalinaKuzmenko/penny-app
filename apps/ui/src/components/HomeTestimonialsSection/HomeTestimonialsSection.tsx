@@ -13,19 +13,19 @@ export default function HomeTestimonialsSection({
       name: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[0].NAME,
       role: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[0].ROLE,
       text: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[0].TEXT,
-      avatar: '/avatars/alex.png',
+      avatar: '/avatars/alex.jpeg',
     },
     {
       name: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[1].NAME,
       role: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[1].ROLE,
       text: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[1].TEXT,
-      avatar: '/avatars/sophie.png',
+      avatar: '/avatars/sophie.jpeg',
     },
     {
       name: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[2].NAME,
       role: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[2].ROLE,
       text: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[2].TEXT,
-      avatar: '/avatars/michael.png',
+      avatar: '/avatars/michael.jpeg',
     },
   ];
 
