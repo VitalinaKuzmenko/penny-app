@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Container, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import SecurityIcon from '@mui/icons-material/Security';
 import FlashOnIcon from '@mui/icons-material/FlashOn';
 import PublicIcon from '@mui/icons-material/Public';

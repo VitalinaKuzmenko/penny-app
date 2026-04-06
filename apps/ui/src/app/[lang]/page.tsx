@@ -3,6 +3,7 @@ import { getDictionary } from '@/utils/getDictionary';
 import { LanguageType } from '@/utils/interfaces';
 import HomeHeroSection from '@/components/HomeHeroSection/HomeHeroSection';
 import HomeFeaturesSection from '@/components/HomeFeaturesSection/HomeFeaturesSection';
+import HomeHowItWorksSection from '@/components/HomeHowItWorksSection/HomeHowItWorksSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +25,7 @@ export default async function Page({
     >
       <HomeHeroSection />
       <HomeFeaturesSection />
+      <HomeHowItWorksSection />
     </Container>
   );
 }
