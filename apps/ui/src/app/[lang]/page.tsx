@@ -2,6 +2,7 @@ import { Container } from '@mui/material';
 import { getDictionary } from '@/utils/getDictionary';
 import { LanguageType } from '@/utils/interfaces';
 import HomeHeroSection from '@/components/HomeHeroSection/HomeHeroSection';
+import HomeFeaturesSection from '@/components/HomeFeaturesSection/HomeFeaturesSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +23,7 @@ export default async function Page({
       }}
     >
       <HomeHeroSection />
+      <HomeFeaturesSection />
     </Container>
   );
 }
