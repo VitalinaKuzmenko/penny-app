@@ -4,6 +4,8 @@ import { LanguageType } from '@/utils/interfaces';
 import HomeHeroSection from '@/components/HomeHeroSection/HomeHeroSection';
 import HomeFeaturesSection from '@/components/HomeFeaturesSection/HomeFeaturesSection';
 import HomeHowItWorksSection from '@/components/HomeHowItWorksSection/HomeHowItWorksSection';
+import HomeTestimonialsSection from '@/components/HomeTestimonialsSection/HomeTestimonialsSection';
+import HomeFinalCTASection from '@/components/HomeFinalCTASection/HomeFinalCTASection';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +28,8 @@ export default async function Page({
       <HomeHeroSection />
       <HomeFeaturesSection />
       <HomeHowItWorksSection />
+      <HomeTestimonialsSection />
+      <HomeFinalCTASection />
     </Container>
   );
 }
