@@ -26,7 +26,7 @@ export default async function Page({
         maxWidth: { xs: '100%', md: 'xl' },
       }}
     >
-      <HomeHeroSection homePageText={homePageText} />
+      <HomeHeroSection homePageText={homePageText} lang={lang} />
       <HomeFeaturesSection homePageText={homePageText} />
       <HomeHowItWorksSection homePageText={homePageText} />
       <HomeTestimonialsSection homePageText={homePageText} />

@@ -57,7 +57,7 @@ export default function HomeFeaturesSection({
               <Box sx={{ mb: 1.5 }}>{feature.icon}</Box>
 
               <Typography variant="subtitle1" fontWeight={600}>
-                {homePageText.FEATURES_SECTION.TITLE}
+                {feature.title}
               </Typography>
 
               <Typography

@@ -126,7 +126,6 @@ export default function MonthlyCategoryTable({
     <Box sx={{ width: '100%', mt: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography variant="h6" fontWeight={600}>
-          Monthly Spending by Category ({year})
           {`${pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TITLE} (${year})`}
         </Typography>
 
