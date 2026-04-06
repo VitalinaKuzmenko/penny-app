@@ -16,6 +16,7 @@ export default async function Page({
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
+  const homePageText = dict.HOMEPAGE;
 
   return (
     <Container
@@ -25,11 +26,11 @@ export default async function Page({
         maxWidth: { xs: '100%', md: 'xl' },
       }}
     >
-      <HomeHeroSection />
-      <HomeFeaturesSection />
-      <HomeHowItWorksSection />
-      <HomeTestimonialsSection />
-      <HomeFinalCTASection />
+      <HomeHeroSection homePageText={homePageText} />
+      <HomeFeaturesSection homePageText={homePageText} />
+      <HomeHowItWorksSection homePageText={homePageText} />
+      <HomeTestimonialsSection homePageText={homePageText} />
+      <HomeFinalCTASection homePageText={homePageText} />
     </Container>
   );
 }

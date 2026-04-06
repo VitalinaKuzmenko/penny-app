@@ -6,30 +6,34 @@ import FlashOnIcon from '@mui/icons-material/FlashOn';
 import PublicIcon from '@mui/icons-material/Public';
 import PaymentsIcon from '@mui/icons-material/Payments';
 
-const features = [
-  {
-    icon: <SecurityIcon color="primary" />,
-    title: 'Secure',
-    description: 'No bank login needed',
-  },
-  {
-    icon: <FlashOnIcon sx={{ color: 'warning.main' }} />,
-    title: 'Fast',
-    description: 'Upload & analyze in seconds',
-  },
-  {
-    icon: <PublicIcon sx={{ color: 'info.main' }} />,
-    title: 'Universal',
-    description: 'Works with any bank CSV',
-  },
-  {
-    icon: <PaymentsIcon sx={{ color: 'success.main' }} />,
-    title: 'All-in-one tracking',
-    description: 'Track cash & card expenses together',
-  },
-];
-
-export default function HomeFeaturesSection() {
+export default function HomeFeaturesSection({
+  homePageText,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  homePageText: Record<string, any>;
+}) {
+  const features = [
+    {
+      icon: <SecurityIcon color="primary" />,
+      title: homePageText.FEATURES_SECTION.FEATURES[0].TITLE,
+      description: homePageText.FEATURES_SECTION.FEATURES[0].DESCRIPTION,
+    },
+    {
+      icon: <FlashOnIcon sx={{ color: 'warning.main' }} />,
+      title: homePageText.FEATURES_SECTION.FEATURES[1].TITLE,
+      description: homePageText.FEATURES_SECTION.FEATURES[1].DESCRIPTION,
+    },
+    {
+      icon: <PublicIcon sx={{ color: 'info.main' }} />,
+      title: homePageText.FEATURES_SECTION.FEATURES[2].TITLE,
+      description: homePageText.FEATURES_SECTION.FEATURES[2].DESCRIPTION,
+    },
+    {
+      icon: <PaymentsIcon sx={{ color: 'success.main' }} />,
+      title: homePageText.FEATURES_SECTION.FEATURES[3].TITLE,
+      description: homePageText.FEATURES_SECTION.FEATURES[3].DESCRIPTION,
+    },
+  ];
   return (
     <Box sx={{ py: { xs: 6, md: 8 } }}>
       <Grid container spacing={3}>
@@ -53,7 +57,7 @@ export default function HomeFeaturesSection() {
               <Box sx={{ mb: 1.5 }}>{feature.icon}</Box>
 
               <Typography variant="subtitle1" fontWeight={600}>
-                {feature.title}
+                {homePageText.FEATURES_SECTION.TITLE}
               </Typography>
 
               <Typography

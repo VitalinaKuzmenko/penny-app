@@ -6,8 +6,15 @@ import { useRouter } from 'next/navigation';
 import dashboardPreviewImage from '../../../public/dashboard_preview.png';
 import Image from 'next/image';
 
-export default function HomeHeroSection() {
+export default function HomeHeroSection({
+  homePageText,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  homePageText: Record<string, any>;
+}) {
   const router = useRouter();
+
+  console.log('homePageText', homePageText);
 
   const handleSignUpClick = () => {
     router.push('/register');
@@ -38,7 +45,7 @@ export default function HomeHeroSection() {
             fontSize: { xs: '2rem', md: '3rem' },
           }}
         >
-          Meet Penny — your money companion
+          {homePageText.HERO_SECTION.TITLE}
         </Typography>
 
         <Typography
@@ -46,8 +53,7 @@ export default function HomeHeroSection() {
           color="text.secondary"
           sx={{ mb: 4, maxWidth: 500 }}
         >
-          Upload your bank CSV or add cash expenses in seconds. Get instant
-          insights into your spending, income, and savings.
+          {homePageText.HERO_SECTION.SUBTITLE}
         </Typography>
 
         <Stack direction="column" spacing={3} flexWrap="wrap">
@@ -62,7 +68,7 @@ export default function HomeHeroSection() {
               minWidth: { xs: '100%', sm: '320px' },
             }}
           >
-            Upload CSV
+            {homePageText.HERO_SECTION.BUTTONS.UPLOAD_CSV}
           </CustomButton>{' '}
           <CustomButton
             sx={{
@@ -73,15 +79,17 @@ export default function HomeHeroSection() {
             variantType="secondary"
             onClick={handleSignUpClick}
           >
-            Create free account
+            {homePageText.HERO_SECTION.BUTTONS.CREATE_ACCOUNT}
           </CustomButton>
         </Stack>
 
         {/* Subtitle */}
         <Stack spacing={1} mb={5} mt={3} direction="row">
-          <Typography variant="body2">Already have an account?</Typography>
+          <Typography variant="body2">
+            {homePageText.HERO_SECTION.SUBTEXT}
+          </Typography>
           <Link href="/signin" color="text.primary" variant="body2">
-            Sign in
+            {homePageText.HERO_SECTION.SIGN_IN_LINK}
           </Link>
         </Stack>
       </Box>

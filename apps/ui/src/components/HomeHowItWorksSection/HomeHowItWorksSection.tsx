@@ -2,28 +2,30 @@
 
 import { Box, Container, Typography, Grid } from '@mui/material';
 
-const steps = [
-  {
-    step: '01',
-    title: 'Upload your data',
-    description:
-      'Upload your bank CSV in seconds — simple, secure, and connection-free.',
-  },
-  {
-    step: '02',
-    title: 'Take back control',
-    description:
-      'No generic auto-categories — you decide how every expense is classified.',
-  },
-  {
-    step: '03',
-    title: 'Turn data into clarity',
-    description:
-      'Track trends, uncover patterns, and finally understand your spending.',
-  },
-];
+export default function HomeHowItWorksSection({
+  homePageText,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  homePageText: Record<string, any>;
+}) {
+  const steps = [
+    {
+      step: homePageText.HOW_IT_WORKS_SECTION.STEPS[0].STEP_NUMBER,
+      title: homePageText.HOW_IT_WORKS_SECTION.STEPS[0].TITLE,
+      description: homePageText.HOW_IT_WORKS_SECTION.STEPS[0].DESCRIPTION,
+    },
+    {
+      step: homePageText.HOW_IT_WORKS_SECTION.STEPS[1].STEP_NUMBER,
+      title: homePageText.HOW_IT_WORKS_SECTION.STEPS[1].TITLE,
+      description: homePageText.HOW_IT_WORKS_SECTION.STEPS[1].DESCRIPTION,
+    },
+    {
+      step: homePageText.HOW_IT_WORKS_SECTION.STEPS[2].STEP_NUMBER,
+      title: homePageText.HOW_IT_WORKS_SECTION.STEPS[2].TITLE,
+      description: homePageText.HOW_IT_WORKS_SECTION.STEPS[2].DESCRIPTION,
+    },
+  ];
 
-export default function HomeHowItWorksSection() {
   const stepColors = ['primary.main', 'secondary.main', 'info.main'];
 
   return (
@@ -31,7 +33,7 @@ export default function HomeHowItWorksSection() {
       <Container maxWidth="lg">
         {/* Title */}
         <Typography variant="h4" fontWeight={700} textAlign="center" mb={6}>
-          How it works
+          {homePageText.HOW_IT_WORKS_SECTION.TITLE}
         </Typography>
 
         <Grid container spacing={4}>

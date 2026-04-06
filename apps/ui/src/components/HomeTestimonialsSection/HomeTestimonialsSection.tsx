@@ -2,34 +2,39 @@
 
 import { Box, Container, Grid, Typography, Avatar } from '@mui/material';
 
-const testimonials = [
-  {
-    name: 'Alex R.',
-    role: 'Freelancer',
-    text: 'Penny helped me finally understand where my money goes every month. Super easy to use!',
-    avatar: '/avatars/alex.png',
-  },
-  {
-    name: 'Sophie L.',
-    role: 'Marketing Manager',
-    text: 'I love that I can assign my own categories — no more guessing by the app.',
-    avatar: '/avatars/sophie.png',
-  },
-  {
-    name: 'Michael T.',
-    role: 'Software Engineer',
-    text: 'Seeing trends visually makes budgeting so much simpler and faster.',
-    avatar: '/avatars/michael.png',
-  },
-];
+export default function HomeTestimonialsSection({
+  homePageText,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  homePageText: Record<string, any>;
+}) {
+  const testimonials = [
+    {
+      name: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[0].NAME,
+      role: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[0].ROLE,
+      text: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[0].TEXT,
+      avatar: '/avatars/alex.png',
+    },
+    {
+      name: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[1].NAME,
+      role: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[1].ROLE,
+      text: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[1].TEXT,
+      avatar: '/avatars/sophie.png',
+    },
+    {
+      name: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[2].NAME,
+      role: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[2].ROLE,
+      text: homePageText.TESTIMONIALS_SECTION.TESTIMONIALS[2].TEXT,
+      avatar: '/avatars/michael.png',
+    },
+  ];
 
-export default function HomeTestimonialsSection() {
   const avatarColors = ['primary.main', 'secondary.main', 'info.main'];
   return (
     <Box sx={{ py: { xs: 6, md: 10 }, backgroundColor: 'background.paper' }}>
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight={700} textAlign="center" mb={6}>
-          What our users say
+          {homePageText.TESTIMONIALS_SECTION.TITLE}
         </Typography>
 
         <Grid container spacing={4}>

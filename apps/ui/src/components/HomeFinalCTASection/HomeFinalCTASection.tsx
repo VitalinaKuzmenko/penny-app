@@ -4,7 +4,12 @@ import { Box, Container, Typography, Stack } from '@mui/material';
 import CustomButton from '../ui/CustomButton/CustomButton';
 import { useRouter } from 'next/navigation';
 
-export default function HomeFinalCTASection() {
+export default function HomeFinalCTASection({
+  homePageText,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  homePageText: Record<string, any>;
+}) {
   const router = useRouter();
   const handleSignUpClick = () => {
     router.push('/register');
@@ -24,10 +29,10 @@ export default function HomeFinalCTASection() {
     >
       <Container maxWidth="md">
         <Typography variant="h4" fontWeight={700} mb={3}>
-          Start taking control of your money today
+          {homePageText.FINAL_CTA_SECTION.TITLE}
         </Typography>
         <Typography variant="body1" mb={4}>
-          Safe, secure, and effortless. Upload your bank CSV in seconds.
+          {homePageText.FINAL_CTA_SECTION.SUBTITLE}
         </Typography>
 
         <Stack
@@ -45,7 +50,7 @@ export default function HomeFinalCTASection() {
               borderColor: 'primary.contrastText',
             }}
           >
-            Upload CSV
+            {homePageText.FINAL_CTA_SECTION.BUTTONS.UPLOAD_CSV}
           </CustomButton>
           <CustomButton
             sx={{
@@ -56,7 +61,7 @@ export default function HomeFinalCTASection() {
             variantType="outlined"
             onClick={handleSignUpClick}
           >
-            Create free account
+            {homePageText.FINAL_CTA_SECTION.BUTTONS.CREATE_ACCOUNT}
           </CustomButton>
         </Stack>
       </Container>
