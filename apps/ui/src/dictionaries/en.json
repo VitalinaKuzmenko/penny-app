@@ -24,7 +24,87 @@
       "SIGN_IN_USER": "Go to Profile"
     }
   },
-  "HOMEPAGE": {},
+  "HOMEPAGE": {
+    "HERO_SECTION": {
+      "TITLE": "Meet Penny — your money companion",
+      "SUBTITLE": "Upload your bank CSV or add cash expenses in seconds. Get instant insights into your spending, income, and savings.",
+      "BUTTONS": {
+        "UPLOAD_CSV": "Upload CSV",
+        "CREATE_ACCOUNT": "Create free account"
+      },
+      "SUBTEXT": "Already have an account?",
+      "SIGN_IN_LINK": "Sign in"
+    },
+    "FEATURES_SECTION": {
+      "TITLE": "Features",
+      "FEATURES": [
+        {
+          "TITLE": "Secure",
+          "DESCRIPTION": "No bank login needed"
+        },
+        {
+          "TITLE": "Fast",
+          "DESCRIPTION": "Upload & analyze in seconds"
+        },
+        {
+          "TITLE": "Universal",
+          "DESCRIPTION": "Works with any bank CSV"
+        },
+        {
+          "TITLE": "All-in-one tracking",
+          "DESCRIPTION": "Track cash & card expenses together"
+        }
+      ]
+    },
+    "HOW_IT_WORKS_SECTION": {
+      "TITLE": "How it works",
+      "STEPS": [
+        {
+          "STEP_NUMBER": "01",
+          "TITLE": "Upload your data",
+          "DESCRIPTION": "Upload your bank CSV in seconds — simple, secure, and connection-free."
+        },
+        {
+          "STEP_NUMBER": "02",
+          "TITLE": "Take back control",
+          "DESCRIPTION": "No generic auto-categories — you decide how every expense is classified."
+        },
+        {
+          "STEP_NUMBER": "03",
+          "TITLE": "Turn data into clarity",
+          "DESCRIPTION": "Track trends, uncover patterns, and finally understand your spending."
+        }
+      ]
+    },
+    "TESTIMONIALS_SECTION": {
+      "TITLE": "What our users say",
+      "TESTIMONIALS": [
+        {
+          "NAME": "Alex R.",
+          "ROLE": "Freelancer",
+          "TEXT": "Penny helped me finally understand where my money goes every month. Super easy to use!"
+        },
+        {
+          "NAME": "Sophie L.",
+          "ROLE": "Marketing Manager",
+          "TEXT": "I love that I can assign my own categories — no more guessing by the app."
+        },
+        {
+          "NAME": "Michael T.",
+          "ROLE": "Software Engineer",
+          "TEXT": "Seeing trends visually makes budgeting so much simpler and faster."
+        }
+      ]
+    },
+    "FINAL_CTA_SECTION": {
+      "TITLE": "Start taking control of your money today",
+      "SUBTITLE": "Safe, secure, and effortless. Upload your bank CSV in seconds.",
+      "BUTTONS": {
+        "UPLOAD_CSV": "Upload CSV",
+        "CREATE_ACCOUNT": "Create free account"
+      }
+    }
+  },
   "SIGN_IN_PAGE": {
     "FORM": {
       "SIGN_IN_TITLE": "Sign In",

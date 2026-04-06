@@ -1,6 +1,11 @@
-import { Box, Button, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import { getDictionary } from '@/utils/getDictionary';
 import { LanguageType } from '@/utils/interfaces';
+import HomeHeroSection from '@/components/HomeHeroSection/HomeHeroSection';
+import HomeFeaturesSection from '@/components/HomeFeaturesSection/HomeFeaturesSection';
+import HomeHowItWorksSection from '@/components/HomeHowItWorksSection/HomeHowItWorksSection';
+import HomeTestimonialsSection from '@/components/HomeTestimonialsSection/HomeTestimonialsSection';
+import HomeFinalCTASection from '@/components/HomeFinalCTASection/HomeFinalCTASection';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,20 +16,21 @@ export default async function Page({
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
+  const homePageText = dict.HOMEPAGE;
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Welcome!
-      </Typography>
-
-      <Typography variant="body1" gutterBottom>
-        {dict.HEADER.TITLE}
-      </Typography>
-
-      <Button variant="contained" color="primary">
-        Get Started
-      </Button>
-    </Box>
+    <Container
+      maxWidth="xl"
+      sx={{
+        px: { xs: 0, md: 3 },
+        maxWidth: { xs: '100%', md: 'xl' },
+      }}
+    >
+      <HomeHeroSection homePageText={homePageText} />
+      <HomeFeaturesSection homePageText={homePageText} />
+      <HomeHowItWorksSection homePageText={homePageText} />
+      <HomeTestimonialsSection homePageText={homePageText} />
+      <HomeFinalCTASection homePageText={homePageText} />
+    </Container>
   );
 }
