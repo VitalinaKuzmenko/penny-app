@@ -14,8 +14,6 @@ export default function HomeHeroSection({
 }) {
   const router = useRouter();
 
-  console.log('homePageText', homePageText);
-
   const handleSignUpClick = () => {
     router.push('/register');
   };

@@ -1,6 +1,5 @@
 {
   "HEADER": {
-    "TITLE": "Welcome to Penny App!",
     "PAGES": {
       "HOME": {
         "NAME": "Home",
@@ -36,7 +35,6 @@
       "SIGN_IN_LINK": "Sign in"
     },
     "FEATURES_SECTION": {
-      "TITLE": "Features",
       "FEATURES": [
         {
           "TITLE": "Secure",

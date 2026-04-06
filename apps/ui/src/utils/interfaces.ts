@@ -2,6 +2,6 @@
 
 // export const availableLanguages: LanguageType[] = ['en', 'ru', 'ua'];
 
-export type LanguageType = 'en';
+export type LanguageType = 'en' | 'ru';
 
-export const availableLanguages: LanguageType[] = ['en'];
+export const availableLanguages: LanguageType[] = ['en', 'ru'];
