@@ -58,7 +58,7 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
       await registerUser(payload);
 
       await refetchUser();
-      router.push('/');
+      router.push('/pennys-view');
     } catch (err: any) {
       if (err.data?.field && err.data?.code) {
         const translatedMessage = getNestedDict(
