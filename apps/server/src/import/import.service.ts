@@ -16,6 +16,7 @@ import {
   TransactionType,
 } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { formatDateToString } from '../utils/formatDateToString';
 import { WinstonLogger } from '../utils/logger/logger';
 import { parseDate } from '../utils/parse-date';
 
@@ -89,7 +90,7 @@ export class ImportService {
       }
 
       const result = CsvRowSchema.safeParse({
-        date,
+        date: formatDateToString(date), // Date object
         description: row.description,
         amount,
       });
@@ -102,7 +103,7 @@ export class ImportService {
         });
       }
 
-      return result.data;
+      return result.data; // { date: Date, description, amount }
     });
 
     this.logger.info('CSV validation passed', {
@@ -116,7 +117,7 @@ export class ImportService {
         rows: {
           createMany: {
             data: rowsToInsert.map((row) => ({
-              date: new Date(row.date),
+              date: parseDate(row.date),
               description: row.description,
               amount: row.amount,
             })),
@@ -161,7 +162,7 @@ export class ImportService {
 
     return importEntity.rows.map((row) => ({
       id: row.id,
-      date: parseDate(row.date.toString()),
+      date: formatDateToString(row.date),
       description: row.description,
       amount: Number(row.amount),
     }));
