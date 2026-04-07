@@ -61,7 +61,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
     try {
       await loginUser(data);
       await refetchUser();
-      router.push('/');
+      router.push('/pennys-view');
     } catch (err: any) {
       if (err.data?.field && err.data?.code) {
         const translatedMessage = getNestedDict(
