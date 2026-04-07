@@ -53,6 +53,9 @@ export default function TransactionsClient({
   const [rowCategories, setRowCategories] = useState<Record<string, string>>(
     {},
   );
+  const [rowDescriptions, setRowDescriptions] = useState<
+    Record<string, string>
+  >(() => Object.fromEntries(rows.map((r) => [r.id, r.description ?? ''])));
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [apiError, setApiError] = useState<UiError | null>(null);
   const [accountsState, setAccountsState] = useState<Account[]>(accounts);
@@ -93,6 +96,7 @@ export default function TransactionsClient({
       const payloadRows: ConfirmImportInput['rows'] = rows.map((row) => ({
         id: row.id,
         categoryId: rowCategories[row.id],
+        description: rowDescriptions[row.id],
       }));
 
       const payload: ConfirmImportInput = {
@@ -105,7 +109,7 @@ export default function TransactionsClient({
 
       await saveTransactions(importId, payload);
 
-      router.push('/');
+      router.push('/pennys-view');
     } catch (error: any) {
       console.error('Confirm import failed:', error.data);
 
@@ -206,6 +210,13 @@ export default function TransactionsClient({
           setRowCategories((prev) => ({
             ...prev,
             [rowId]: categoryId,
+          }))
+        }
+        rowDescriptions={rowDescriptions}
+        onChangeDescription={(rowId: string, value: string) =>
+          setRowDescriptions((prev) => ({
+            ...prev,
+            [rowId]: value,
           }))
         }
       />

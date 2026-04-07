@@ -14,6 +14,8 @@ interface TransactionsTableProps {
   onSelectRows: React.Dispatch<React.SetStateAction<string[]>>;
   rowCategories: Record<string, string>;
   onChangeCategory: (rowId: string, categoryId: string) => void;
+  rowDescriptions: Record<string, string>;
+  onChangeDescription: (rowId: string, value: string) => void;
 }
 
 export default function TransactionsTable({
@@ -24,6 +26,8 @@ export default function TransactionsTable({
   onSelectRows,
   rowCategories,
   onChangeCategory,
+  rowDescriptions,
+  onChangeDescription,
 }: TransactionsTableProps) {
   const columns = React.useMemo<GridColDef<CsvImportResponse>[]>(
     () => [
@@ -40,6 +44,24 @@ export default function TransactionsTable({
         minWidth: 150,
         flex: 2,
         filterable: true,
+        renderCell: (params) => {
+          const value = rowDescriptions[params.row.id] ?? '';
+
+          return (
+            <input
+              value={value}
+              onChange={(e) =>
+                onChangeDescription(params.row.id, e.target.value)
+              }
+              style={{
+                width: '100%',
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+              }}
+            />
+          );
+        },
       },
       {
         field: 'amount',
@@ -120,7 +142,14 @@ export default function TransactionsTable({
         },
       },
     ],
-    [categories, onChangeCategory, rowCategories, pageText],
+    [
+      categories,
+      onChangeCategory,
+      rowCategories,
+      rowDescriptions,
+      onChangeDescription,
+      pageText,
+    ],
   );
 
   return (
