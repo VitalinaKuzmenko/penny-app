@@ -75,7 +75,7 @@ export default function IncomeExpenseChart({
     };
 
     fetchData();
-  }, [year, appliedFilters.accountIds, isInitialized]);
+  }, [appliedFilters, isInitialized]);
 
   if (!isInitialized) return null;
 
