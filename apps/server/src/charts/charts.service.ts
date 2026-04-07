@@ -155,8 +155,21 @@ export class ChartsService {
     userId: string,
     { startDate, endDate, accountIds, type }: CategoryBreakdownQueryDto,
   ) {
-    const gte = startDate ? new Date(startDate) : undefined;
-    const lte = endDate ? new Date(endDate) : undefined;
+    const gte = startDate
+      ? (() => {
+          const d = new Date(startDate);
+          d.setHours(0, 0, 0, 0);
+          return d;
+        })()
+      : undefined;
+
+    const lte = endDate
+      ? (() => {
+          const d = new Date(endDate);
+          d.setHours(0, 0, 0, 0);
+          return d;
+        })()
+      : undefined;
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['categoryId'],
@@ -208,8 +221,21 @@ export class ChartsService {
   ) {
     const { startDate, endDate, accountIds, categoryIds } = query;
 
-    const gte = startDate ? new Date(startDate) : undefined;
-    const lte = endDate ? new Date(endDate) : undefined;
+    const gte = startDate
+      ? (() => {
+          const d = new Date(startDate);
+          d.setHours(0, 0, 0, 0);
+          return d;
+        })()
+      : undefined;
+
+    const lte = endDate
+      ? (() => {
+          const d = new Date(endDate);
+          d.setHours(0, 0, 0, 0);
+          return d;
+        })()
+      : undefined;
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['type', 'date'],
@@ -284,8 +310,21 @@ export class ChartsService {
     userId: string,
     { from, to }: IncomeExpenseRatioQueryDto,
   ) {
-    const gte = from ? new Date(from) : undefined;
-    const lte = to ? new Date(to) : undefined;
+    const gte = from
+      ? (() => {
+          const d = new Date(from);
+          d.setHours(0, 0, 0, 0);
+          return d;
+        })()
+      : undefined;
+
+    const lte = to
+      ? (() => {
+          const d = new Date(to);
+          d.setHours(0, 0, 0, 0);
+          return d;
+        })()
+      : undefined;
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['type'],
