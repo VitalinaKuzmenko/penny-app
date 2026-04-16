@@ -37,7 +37,13 @@ export class ImportService {
 
     try {
       records = parse(buffer, {
-        columns: true,
+        columns: (headers: string[]) =>
+          headers.map((h) =>
+            h
+              .replace(/^\uFEFF/, '') // remove BOM
+              .trim()
+              .toLowerCase(),
+          ),
         skip_empty_lines: true,
         trim: true,
       });
