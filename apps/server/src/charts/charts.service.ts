@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import dayjs from 'dayjs';
 import {
   CategoryBreakdownResponseSchema,
   MonthlyCategoryResponseSchema,
@@ -226,19 +227,14 @@ export class ChartsService {
     userId: string,
     query: IncomeExpenseStackedQueryDto,
   ) {
-    const { startDate, endDate, accountIds, categoryIds } = query;
+    const { startDate, endDate, accountIds } = query;
 
     const gte = startDate
-      ? new Date(new Date(startDate).setHours(0, 0, 0, 0))
+      ? dayjs(startDate).startOf('day').toDate()
       : undefined;
 
-    const lte = endDate
-      ? (() => {
-          const d = new Date(endDate);
-          d.setHours(0, 0, 0, 0);
-          d.setDate(d.getDate() + 1); // 🔥 key fix
-          return d;
-        })()
+    const lt = endDate
+      ? dayjs(endDate).add(1, 'day').startOf('day').toDate()
       : undefined;
 
     const rows = await this.prisma.transaction.groupBy({
@@ -247,10 +243,9 @@ export class ChartsService {
         userId,
         ...excludeInternalTransfers,
         ...(accountIds && { accountId: { in: accountIds } }),
-        ...(categoryIds && { categoryId: { in: categoryIds } }),
         date: {
           ...(gte && { gte }),
-          ...(lte && { lt: lte }),
+          ...(lt && { lt }),
         },
       },
       _sum: { amount: true },
@@ -272,7 +267,7 @@ export class ChartsService {
     });
 
     // 2. Generate full month range (fill missing months)
-    if (!gte || !lte) {
+    if (!gte || !lt) {
       // fallback: just return sorted existing data
       return Object.entries(grouped)
         .sort(([a], [b]) => a.localeCompare(b))
@@ -290,7 +285,7 @@ export class ChartsService {
     }[] = [];
 
     const current = new Date(gte.getFullYear(), gte.getMonth(), 1);
-    const end = new Date(lte.getFullYear(), lte.getMonth(), 1);
+    const end = new Date(lt.getFullYear(), lt.getMonth(), 1);
 
     while (current <= end) {
       const year = current.getFullYear();

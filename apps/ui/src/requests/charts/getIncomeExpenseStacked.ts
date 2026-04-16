@@ -17,10 +17,6 @@ export const getIncomeExpenseStacked = async (
     query.set('accountIds', params.accountIds.join(','));
   }
 
-  if (params.categoryIds?.length) {
-    query.set('categoryIds', params.categoryIds.join(','));
-  }
-
   return clientApiFetch<IncomeExpenseStackedResponse>(
     `/charts/income-expense-stacked?${query.toString()}`,
   );
