@@ -50,6 +50,7 @@ const DashboardFilters = ({
         value={filters.startDate}
         onChange={(newValue) => setFilters({ startDate: newValue })}
         slotProps={{ textField: { size: 'small' } }}
+        format="DD/MM/YYYY"
       />
 
       {/* End date */}
@@ -58,6 +59,7 @@ const DashboardFilters = ({
         value={filters.endDate}
         onChange={(newValue) => setFilters({ endDate: newValue })}
         slotProps={{ textField: { size: 'small' } }}
+        format="DD/MM/YYYY"
       />
 
       <TypeSelect pennysViewPageText={pennysViewPageText} />
