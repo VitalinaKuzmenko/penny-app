@@ -15,11 +15,18 @@ import { PrismaService } from '../prisma/prisma.service';
 const EXCLUDED_CATEGORY_NAME = 'Internal Transfer';
 
 const excludeInternalTransfers = {
-  category: {
-    name: {
-      not: EXCLUDED_CATEGORY_NAME,
+  OR: [
+    {
+      category: null, // include rows without category
     },
-  },
+    {
+      category: {
+        name: {
+          not: EXCLUDED_CATEGORY_NAME,
+        },
+      },
+    },
+  ],
 };
 
 @Injectable()
@@ -222,17 +229,14 @@ export class ChartsService {
     const { startDate, endDate, accountIds, categoryIds } = query;
 
     const gte = startDate
-      ? (() => {
-          const d = new Date(startDate);
-          d.setHours(0, 0, 0, 0);
-          return d;
-        })()
+      ? new Date(new Date(startDate).setHours(0, 0, 0, 0))
       : undefined;
 
     const lte = endDate
       ? (() => {
           const d = new Date(endDate);
           d.setHours(0, 0, 0, 0);
+          d.setDate(d.getDate() + 1); // 🔥 key fix
           return d;
         })()
       : undefined;
@@ -244,8 +248,10 @@ export class ChartsService {
         ...excludeInternalTransfers,
         ...(accountIds && { accountId: { in: accountIds } }),
         ...(categoryIds && { categoryId: { in: categoryIds } }),
-        ...(gte && { date: { gte } }),
-        ...(lte && { date: { lte } }),
+        date: {
+          ...(gte && { gte }),
+          ...(lte && { lt: lte }),
+        },
       },
       _sum: { amount: true },
     });
