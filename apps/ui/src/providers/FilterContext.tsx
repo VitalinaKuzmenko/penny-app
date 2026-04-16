@@ -25,8 +25,8 @@ interface FilterContextProps {
 }
 
 const defaultFilters = (): DashboardFilters => ({
-  startDate: dayjs().subtract(1, 'month'),
-  endDate: dayjs(),
+  startDate: dayjs().startOf('year'),
+  endDate: dayjs().endOf('year'),
   categoryIds: [],
   accountIds: [],
   type: 'ALL',
