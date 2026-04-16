@@ -9,7 +9,6 @@ export const IncomeExpenseStackedQuerySchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   accountIds: stringArray,
-  categoryIds: stringArray,
 });
 
 export type IncomeExpenseStackedQuery = z.infer<

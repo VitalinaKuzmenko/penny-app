@@ -47,7 +47,6 @@ export default function MonthlyCategoryTable({
           year,
           accountIds: appliedFilters.accountIds,
           categoryIds: appliedFilters.categoryIds,
-          type: 'EXPENSE',
         });
         setData(result);
       } catch (err) {

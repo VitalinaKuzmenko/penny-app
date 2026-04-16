@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import dayjs from 'dayjs';
 import {
   CategoryBreakdownResponseSchema,
   MonthlyCategoryResponseSchema,
@@ -79,7 +80,7 @@ export class ChartsService {
 
   async getMonthlyCategoryChart(
     userId: string,
-    { year, accountIds, categoryIds, type }: MonthlyCategoryQueryDto,
+    { year, accountIds, categoryIds }: MonthlyCategoryQueryDto,
   ) {
     const start = new Date(year, 0, 1);
     const end = new Date(year + 1, 0, 1);
@@ -87,7 +88,7 @@ export class ChartsService {
     const rows = await this.prisma.transaction.findMany({
       where: {
         userId,
-        type,
+        type: 'EXPENSE',
         date: {
           gte: start,
           lt: end,
@@ -162,30 +163,19 @@ export class ChartsService {
     userId: string,
     { startDate, endDate, accountIds, type }: CategoryBreakdownQueryDto,
   ) {
-    const gte = startDate
-      ? (() => {
-          const d = new Date(startDate);
-          d.setHours(0, 0, 0, 0);
-          return d;
-        })()
-      : undefined;
-
-    const lte = endDate
-      ? (() => {
-          const d = new Date(endDate);
-          d.setHours(0, 0, 0, 0);
-          return d;
-        })()
-      : undefined;
+    const start = dayjs(startDate).startOf('day').toDate();
+    const end = dayjs(endDate).endOf('day').toDate();
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['categoryId'],
       where: {
         userId,
         type,
+        date: {
+          gte: start,
+          lte: end,
+        },
         ...excludeInternalTransfers,
-        ...(gte && { date: { gte } }),
-        ...(lte && { date: { lte } }),
         ...(accountIds && { accountId: { in: accountIds } }),
       },
       _sum: {
@@ -226,32 +216,21 @@ export class ChartsService {
     userId: string,
     query: IncomeExpenseStackedQueryDto,
   ) {
-    const { startDate, endDate, accountIds, categoryIds } = query;
+    const { startDate, endDate, accountIds } = query;
 
-    const gte = startDate
-      ? new Date(new Date(startDate).setHours(0, 0, 0, 0))
-      : undefined;
-
-    const lte = endDate
-      ? (() => {
-          const d = new Date(endDate);
-          d.setHours(0, 0, 0, 0);
-          d.setDate(d.getDate() + 1); // 🔥 key fix
-          return d;
-        })()
-      : undefined;
+    const start = dayjs(startDate).startOf('day').toDate();
+    const end = dayjs(endDate).endOf('day').toDate();
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['type', 'date'],
       where: {
         userId,
+        date: {
+          gte: start,
+          lte: end,
+        },
         ...excludeInternalTransfers,
         ...(accountIds && { accountId: { in: accountIds } }),
-        ...(categoryIds && { categoryId: { in: categoryIds } }),
-        date: {
-          ...(gte && { gte }),
-          ...(lte && { lt: lte }),
-        },
       },
       _sum: { amount: true },
     });
@@ -272,7 +251,7 @@ export class ChartsService {
     });
 
     // 2. Generate full month range (fill missing months)
-    if (!gte || !lte) {
+    if (!start || !end) {
       // fallback: just return sorted existing data
       return Object.entries(grouped)
         .sort(([a], [b]) => a.localeCompare(b))
@@ -289,10 +268,10 @@ export class ChartsService {
       expense: number;
     }[] = [];
 
-    const current = new Date(gte.getFullYear(), gte.getMonth(), 1);
-    const end = new Date(lte.getFullYear(), lte.getMonth(), 1);
+    const current = new Date(start.getFullYear(), start.getMonth(), 1);
+    const endYear = new Date(end.getFullYear(), end.getMonth(), 1);
 
-    while (current <= end) {
+    while (current <= endYear) {
       const year = current.getFullYear();
       const month = String(current.getMonth() + 1).padStart(2, '0');
       const key = `${year}-${month}`;
@@ -314,31 +293,20 @@ export class ChartsService {
 
   async getIncomeExpenseRatio(
     userId: string,
-    { from, to }: IncomeExpenseRatioQueryDto,
+    { startDate, endDate }: IncomeExpenseRatioQueryDto,
   ) {
-    const gte = from
-      ? (() => {
-          const d = new Date(from);
-          d.setHours(0, 0, 0, 0);
-          return d;
-        })()
-      : undefined;
-
-    const lte = to
-      ? (() => {
-          const d = new Date(to);
-          d.setHours(0, 0, 0, 0);
-          return d;
-        })()
-      : undefined;
+    const start = dayjs(startDate).startOf('day').toDate();
+    const end = dayjs(endDate).endOf('day').toDate();
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['type'],
       where: {
         userId,
+        date: {
+          gte: start,
+          lte: end,
+        },
         ...excludeInternalTransfers,
-        ...(gte && { date: { gte } }),
-        ...(lte && { date: { lte } }),
       },
       _sum: {
         amount: true,

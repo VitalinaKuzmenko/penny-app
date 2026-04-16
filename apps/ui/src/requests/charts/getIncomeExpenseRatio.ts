@@ -7,8 +7,8 @@ export const getIncomeExpenseRatio = async (
 ): Promise<IncomeExpenseRatioResponse> => {
   const query = new URLSearchParams();
 
-  if (params.from) query.set('from', params.from);
-  if (params.to) query.set('to', params.to);
+  if (params.startDate) query.set('startDate', params.startDate);
+  if (params.endDate) query.set('endDate', params.endDate);
 
   return clientApiFetch<IncomeExpenseRatioResponse>(
     `/charts/income-expense-ratio?${query.toString()}`,

@@ -7,12 +7,8 @@ const stringArray = z
 
 export const MonthlyCategoryQuerySchema = z.object({
   year: z.coerce.number().int().min(2000),
-
   accountIds: stringArray,
   categoryIds: stringArray,
-
-  // default to expenses only (most common use case)
-  type: z.enum(['INCOME', 'EXPENSE']).default('EXPENSE'),
 });
 
 export type MonthlyCategoryQuery = z.infer<typeof MonthlyCategoryQuerySchema>;
