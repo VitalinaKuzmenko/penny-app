@@ -49,7 +49,6 @@ export default function IncomeExpenseStackedChart({
           startDate: appliedFilters.startDate?.toISOString(),
           endDate: appliedFilters.endDate?.toISOString(),
           accountIds: appliedFilters.accountIds,
-          categoryIds: appliedFilters.categoryIds,
         });
 
         setData(result);

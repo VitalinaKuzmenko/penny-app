@@ -41,8 +41,8 @@ export default function IncomeExpenseGauge({
         if (!appliedFilters.startDate || !appliedFilters.endDate) return;
 
         const result = await getIncomeExpenseRatio({
-          from: appliedFilters.startDate?.toISOString(),
-          to: appliedFilters.endDate?.toISOString(),
+          startDate: appliedFilters.startDate?.toISOString(),
+          endDate: appliedFilters.endDate?.toISOString(),
         });
 
         setData(result);
