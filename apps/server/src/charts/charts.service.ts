@@ -79,7 +79,7 @@ export class ChartsService {
 
   async getMonthlyCategoryChart(
     userId: string,
-    { year, accountIds, categoryIds, type }: MonthlyCategoryQueryDto,
+    { year, accountIds, categoryIds }: MonthlyCategoryQueryDto,
   ) {
     const start = new Date(year, 0, 1);
     const end = new Date(year + 1, 0, 1);
@@ -87,7 +87,7 @@ export class ChartsService {
     const rows = await this.prisma.transaction.findMany({
       where: {
         userId,
-        type,
+        type: 'EXPENSE',
         date: {
           gte: start,
           lt: end,
