@@ -97,7 +97,7 @@ Add support for multiple import formats
 
 ---
 
-###📌 Motivation
+### 📌 Motivation
 Penny App was built as a practical solution to simplify personal and family financial tracking, turning raw bank data into clear, actionable insights.
 
 ---
