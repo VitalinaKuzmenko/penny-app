@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ConflictException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 
@@ -37,7 +38,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
       done(null, user);
     } catch (err) {
-      done(err, false);
+      if (err instanceof ConflictException) {
+        // Pass error code as part of the user object so the controller can redirect with it
+        const code = (err.getResponse() as Record<string, string>)?.code ?? 'auth.error';
+        done(null, { oauthError: code });
+      } else {
+        done(err as Error, false);
+      }
     }
   }
 }

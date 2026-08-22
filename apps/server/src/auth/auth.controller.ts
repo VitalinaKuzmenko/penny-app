@@ -178,9 +178,15 @@ export class AuthController {
     @Req() req: AuthenticatedRequest,
     @Res() res: ExpressResponse,
   ) {
-    const accessToken = req.user.accessToken;
+    const user = req.user as { accessToken?: string; oauthError?: string };
 
-    res.cookie('access_token', accessToken, {
+    if (user?.oauthError) {
+      return res.redirect(
+        `${process.env.UI_APP_URL}/signin?error=${user.oauthError}`,
+      );
+    }
+
+    res.cookie('access_token', user.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
