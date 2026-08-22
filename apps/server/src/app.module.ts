@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
+import Joi from 'joi';
 import { ZodValidationPipe } from 'nestjs-zod';
 
 import { AccountsModule } from './accounts/accounts.module';
@@ -31,7 +32,19 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
     TransactionModule,
     AuthModule,
     UsersModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        PORT: Joi.number().default(8080),
+        DATABASE_URL: Joi.string().required(),
+        JWT_SECRET: Joi.string().min(32).required(),
+        GOOGLE_CLIENT_ID: Joi.string().required(),
+        GOOGLE_CLIENT_SECRET: Joi.string().required(),
+        GOOGLE_CALLBACK_URL: Joi.string().required(),
+        UI_APP_URL: Joi.string().required(),
+        DOMAIN: Joi.string().required(),
+      }),
+    }),
     ImportModule,
     AccountsModule,
     CurrenciesModule,

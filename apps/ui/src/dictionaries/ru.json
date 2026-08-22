@@ -123,7 +123,9 @@
         },
         "AUTH": {
           "EMAIL_NOT_FOUND": "Извините, email не найден",
-          "PASSWORD_INVALID": "Извините, пароль неверный"
+          "PASSWORD_INVALID": "Извините, пароль неверный",
+          "OAUTH_ONLY_ACCOUNT": "Этот аккаунт создан через Google. Используйте кнопку \"Продолжить через Google\".",
+          "EMAIL_REGISTERED_LOCALLY": "Этот email уже зарегистрирован с паролем. Войдите с помощью пароля."
         }
       }
     },
