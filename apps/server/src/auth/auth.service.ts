@@ -71,6 +71,15 @@ export class AuthService {
       });
     }
 
+    if (!user.passwordHash) {
+      // OAuth-only account — no password was ever set
+      this.logger.warn('Login failed: OAuth-only account', { userId: user.id, email });
+      throw new UnauthorizedException({
+        field: 'email',
+        code: 'auth.oauth_only_account',
+      });
+    }
+
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
       this.logger.warn('Login failed: invalid password', {
