@@ -64,9 +64,10 @@ export class ImportController {
       });
     }
 
-    if (!file.mimetype.includes('csv')) {
+    if (!file.mimetype.includes('csv') && !file.originalname.endsWith('.csv')) {
       this.logger.warn('uploadCsv failed: file not CSV', {
         mimetype: file.mimetype,
+        originalname: file.originalname,
       });
       throw new BadRequestException({
         code: 'import.file_not_csv',
