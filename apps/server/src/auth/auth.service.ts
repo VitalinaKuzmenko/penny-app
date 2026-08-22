@@ -1,6 +1,7 @@
 import {
   Injectable,
   BadRequestException,
+  ConflictException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -160,6 +161,18 @@ export class AuthService {
     let user = await this.usersService.findByProviderId(provider, providerId);
 
     if (!user) {
+      // Check if this email is already registered as a local (password) account
+      const existing = await this.usersService.findByEmail(email);
+      if (existing) {
+        this.logger.warn('OAuth login failed: email already has a local account', {
+          email,
+          provider,
+        });
+        throw new ConflictException({
+          code: 'auth.email_registered_locally',
+        });
+      }
+
       user = await this.usersService.createOAuthUser({
         provider,
         providerId,
