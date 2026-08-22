@@ -41,17 +41,17 @@ penny-monorepo/
     └── schemas-nest/    ← NestJS-compatible DTOs (wrap schemas/)
 ```
 
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js 16 (App Router), React 19, TypeScript |
-| UI Library | Material UI v7 (MUI), Recharts |
-| Backend | NestJS 10, TypeScript |
-| ORM | Prisma 7 (with `@prisma/adapter-pg`) |
-| Database | PostgreSQL 16 |
-| Auth | JWT (HTTP-only cookie) + Google OAuth 2.0 (Passport.js) |
-| Validation | Zod (shared), class-validator (NestJS DTOs) |
-| Logging | Winston + Loki transport |
-| Package manager | pnpm workspaces |
+| Layer           | Technology                                              |
+| --------------- | ------------------------------------------------------- |
+| Frontend        | Next.js 16 (App Router), React 19, TypeScript           |
+| UI Library      | Material UI v7 (MUI), Recharts                          |
+| Backend         | NestJS 10, TypeScript                                   |
+| ORM             | Prisma 7 (with `@prisma/adapter-pg`)                    |
+| Database        | PostgreSQL 16                                           |
+| Auth            | JWT (HTTP-only cookie) + Google OAuth 2.0 (Passport.js) |
+| Validation      | Zod (shared), class-validator (NestJS DTOs)             |
+| Logging         | Winston + Loki transport                                |
+| Package manager | pnpm workspaces                                         |
 
 ---
 
@@ -61,19 +61,19 @@ penny-monorepo/
 
 `apps/server/src/`
 
-| Folder | Purpose |
-|---|---|
-| `auth/` | Login, register, Google OAuth, JWT strategy, logout |
-| `accounts/` | User bank account CRUD |
+| Folder        | Purpose                                                |
+| ------------- | ------------------------------------------------------ |
+| `auth/`       | Login, register, Google OAuth, JWT strategy, logout    |
+| `accounts/`   | User bank account CRUD                                 |
 | `categories/` | Per-user categories (seeded with defaults on register) |
-| `import/` | CSV upload → staging → confirm → write transactions |
-| `charts/` | Aggregation queries for all dashboard charts |
-| `currencies/` | Static list of supported currencies (from DB enum) |
-| `users/` | Internal user service (not exposed as public API) |
-| `prisma/` | PrismaService + generated client |
-| `utils/` | Logger, date parser, Prisma error helper |
-| `config/` | NestJS ConfigModule registration |
-| `modules/` | ⚠️ **EMPTY stubs** — see Critical Issues |
+| `import/`     | CSV upload → staging → confirm → write transactions    |
+| `charts/`     | Aggregation queries for all dashboard charts           |
+| `currencies/` | Static list of supported currencies (from DB enum)     |
+| `users/`      | Internal user service (not exposed as public API)      |
+| `prisma/`     | PrismaService + generated client                       |
+| `utils/`      | Logger, date parser, Prisma error helper               |
+| `config/`     | NestJS ConfigModule registration                       |
+| `modules/`    | ⚠️ **EMPTY stubs** — see Critical Issues               |
 
 **Key services:**
 
@@ -86,22 +86,22 @@ penny-monorepo/
 
 `apps/ui/src/`
 
-| Folder | Purpose |
-|---|---|
-| `app/[lang]/` | Internationalised route group (en / ru / ua) |
-| `app/[lang]/page.tsx` | Landing page (hero, features, how it works, testimonials) |
-| `app/[lang]/signin/` | Sign-in form |
-| `app/[lang]/register/` | Registration form |
-| `app/[lang]/upload-csv/` | Step 1 of import — file picker |
-| `app/[lang]/import/` | Step 2 of import — review & categorise rows |
-| `app/[lang]/pennys-view/` | Main dashboard with filters + charts |
-| `app/[lang]/profile/` | User profile page |
-| `components/` | Shared UI components (Header, Footer, Navbar, charts, etc.) |
-| `providers/` | `AuthProvider` (user context), `ThemeProvider` |
-| `requests/` | API call functions (client-side and server-side fetch wrappers) |
-| `utils/` | `clientApiFetch`, `serverApiFetch`, dictionary helpers |
-| `dictionaries/` | i18n JSON files (en, ru, ua) |
-| `proxy.ts` | Next.js middleware — locale redirect + auth guard |
+| Folder                    | Purpose                                                         |
+| ------------------------- | --------------------------------------------------------------- |
+| `app/[lang]/`             | Internationalised route group (en / ru / ua)                    |
+| `app/[lang]/page.tsx`     | Landing page (hero, features, how it works, testimonials)       |
+| `app/[lang]/signin/`      | Sign-in form                                                    |
+| `app/[lang]/register/`    | Registration form                                               |
+| `app/[lang]/upload-csv/`  | Step 1 of import — file picker                                  |
+| `app/[lang]/import/`      | Step 2 of import — review & categorise rows                     |
+| `app/[lang]/pennys-view/` | Main dashboard with filters + charts                            |
+| `app/[lang]/profile/`     | User profile page                                               |
+| `components/`             | Shared UI components (Header, Footer, Navbar, charts, etc.)     |
+| `providers/`              | `AuthProvider` (user context), `ThemeProvider`                  |
+| `requests/`               | API call functions (client-side and server-side fetch wrappers) |
+| `utils/`                  | `clientApiFetch`, `serverApiFetch`, dictionary helpers          |
+| `dictionaries/`           | i18n JSON files (en, ru, ua)                                    |
+| `proxy.ts`                | Next.js middleware — locale redirect + auth guard               |
 
 **Auth in the UI:**
 
@@ -112,6 +112,7 @@ penny-monorepo/
 ### 3.3 Shared Packages
 
 **`packages/schemas`** — Zod schemas shared between frontend and backend:
+
 - Auth: `LoginInput`, `RegisterInput`, `UserInfo`
 - Transactions: `CsvRowSchema`, `ConfirmImportInput`
 - Charts: query/response schemas for all 5 chart types
@@ -134,11 +135,13 @@ TransactionImport       ← staging table for CSV import
 ```
 
 **Enums in DB:**
+
 - `TransactionType`: `INCOME | EXPENSE`
 - `Currency`: `USD | EUR | UAH | GBP | PLN`
 - `ImportStatus`: `PENDING | CONFIRMED`
 
 **Indexes:**
+
 - `Transaction(userId, date)`
 - `Transaction(accountId, date)`
 - `Transaction(categoryId, date)`
@@ -254,6 +257,7 @@ const valid = await bcrypt.compare(password, user.passwordHash);
 If an OAuth-only user (no `passwordHash`) tries to log in via the email/password form, `user.passwordHash` is `null`. `bcrypt.compare` with a null hash will throw, resulting in an unhandled 500 instead of a clean "login not available" error.
 
 **Fix:** Add a null check before the `bcrypt.compare` call:
+
 ```typescript
 if (!user.passwordHash) {
   throw new UnauthorizedException({ code: 'auth.oauth_only_account' });
@@ -273,6 +277,7 @@ if (!user.passwordHash) {
 No `limits` option is passed, so Multer will accept files of any size. A malicious user could send a multi-GB file, causing out-of-memory issues.
 
 **Fix:**
+
 ```typescript
 @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } })) // 5 MB
 ```
@@ -401,8 +406,11 @@ Once the JWT expires, users get 401s with no way to recover without manually re-
 ### 8.3 Tests are skeleton-only
 
 Every test file contains just:
+
 ```typescript
-it('should be defined', () => { expect(controller).toBeDefined(); });
+it('should be defined', () => {
+  expect(controller).toBeDefined();
+});
 ```
 
 There are no real unit or integration tests. Critical flows (auth, import, charts) are completely untested.

@@ -123,7 +123,9 @@
         },
         "AUTH": {
           "EMAIL_NOT_FOUND": "Sorry, email is not found",
-          "PASSWORD_INVALID": "Sorry, password is invalid"
+          "PASSWORD_INVALID": "Sorry, password is invalid",
+          "OAUTH_ONLY_ACCOUNT": "This account was created with Google. Please use the \"Continue with Google\" button.",
+          "EMAIL_REGISTERED_LOCALLY": "This email is already registered with a password. Please sign in with your password instead."
         }
       }
     },

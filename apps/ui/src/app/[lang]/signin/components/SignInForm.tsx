@@ -15,8 +15,8 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import GoogleIcon from '@mui/icons-material/Google';
 
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -37,6 +37,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<UiError | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { refetchUser } = useAuth();
 
@@ -48,6 +49,20 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   } = useForm<LoginInput>({
     resolver: zodResolver(LoginSchema),
   });
+
+  useEffect(() => {
+    const oauthError = searchParams.get('error');
+    if (!oauthError) return;
+
+    const translated = getNestedDict(
+      signInPageText.FORM.ERRORS,
+      oauthError.toUpperCase(),
+    );
+    setError({
+      title: signInPageText.FORM.ERRORS.GENERAL.TITLE,
+      message: translated ?? signInPageText.FORM.ERRORS.GENERAL.MESSAGE,
+    });
+  }, [searchParams, signInPageText]);
 
   const handleSignUpClick = () => {
     router.push('/register');
