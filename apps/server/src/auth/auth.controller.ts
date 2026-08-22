@@ -29,6 +29,9 @@ import {
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
+// Must match JWT expiresIn in auth.module.ts
+const JWT_COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24; // 24h
+
 export interface AuthenticatedRequest extends ExpressRequest {
   user: {
     userId: string;
@@ -71,7 +74,7 @@ export class AuthController {
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain:
         process.env.DOMAIN === 'localhost' ? undefined : process.env.DOMAIN,
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      maxAge: JWT_COOKIE_MAX_AGE_MS,
       path: '/',
     });
 
@@ -104,7 +107,7 @@ export class AuthController {
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain:
         process.env.DOMAIN === 'localhost' ? undefined : process.env.DOMAIN,
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      maxAge: JWT_COOKIE_MAX_AGE_MS,
       path: '/',
     });
 
@@ -183,7 +186,7 @@ export class AuthController {
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain:
         process.env.DOMAIN === 'localhost' ? undefined : process.env.DOMAIN,
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: JWT_COOKIE_MAX_AGE_MS,
       path: '/',
     });
 
