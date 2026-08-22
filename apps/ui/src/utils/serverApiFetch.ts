@@ -12,10 +12,12 @@ export async function serverApiFetch<TResponse, TBody = unknown>(
   const cookieStore = cookies();
   const accessToken = (await cookieStore).get('access_token')?.value;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}${path}`, {
+  const res = await fetch(`${process.env.SERVER_URL}${path}`, {
     method: options?.method ?? 'GET',
     headers: {
       Cookie: `access_token=${accessToken}`,
+      ...(options?.body ? { 'Content-Type': 'application/json' } : {}),
+      ...options?.headers,
     },
 
     body: options?.body ? JSON.stringify(options.body) : undefined,

@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import Joi from 'joi';
 import { ZodValidationPipe } from 'nestjs-zod';
 
@@ -26,6 +27,10 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
   imports: [
     LoggerModule,
     PrismaModule,
+    ThrottlerModule.forRoot([
+      { name: 'global', ttl: 60_000, limit: 100 },
+      { name: 'auth', ttl: 60_000, limit: 10 },
+    ]),
     UserModule,
     AccountModule,
     CategoryModule,
@@ -56,6 +61,7 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
   providers: [
     AppService,
     UsersService,
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
     {
       provide: APP_PIPE,
       useClass: ZodValidationPipe, // 🎯 Global Zod validation
