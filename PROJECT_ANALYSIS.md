@@ -266,7 +266,9 @@ if (!user.passwordHash) {
 
 ---
 
-### 7.5 No file size limit on CSV upload
+### 7.5 No file size limit on CSV upload ✅ FIXED
+
+> Commit: `fix(import): add 5 MB file size limit to CSV upload`
 
 **File:** `apps/server/src/import/import.controller.ts`
 
@@ -297,7 +299,9 @@ JWT `expiresIn: '1h'` but the cookie `maxAge` is 24 hours. After 1 hour the cook
 
 ---
 
-### 7.7 Empty `src/modules/` folder — dead code in production DI
+### 7.7 Empty `src/modules/` folder — dead code in production DI ✅ FIXED
+
+> Commit: `fix(server): remove empty stub modules and duplicate UsersService from DI`
 
 **File:** `apps/server/src/app.module.ts`
 
@@ -314,7 +318,9 @@ All four of these are scaffold stubs with empty controllers and empty services. 
 
 ---
 
-### 7.8 `UsersService` registered twice in the DI container
+### 7.8 `UsersService` registered twice in the DI container ✅ FIXED
+
+> Commit: `fix(server): remove empty stub modules and duplicate UsersService from DI`
 
 **File:** `apps/server/src/app.module.ts`
 
@@ -347,7 +353,10 @@ const app = await NestFactory.create(AppModule);
 
 ---
 
-### 7.10 `importCsvDirect` — development migration utility exposed in production
+### 7.10 `importCsvDirect` — development migration utility exposed in production ✅ ACKNOWLEDGED
+
+> Commit: `chore(import): mark importCsvDirect as legacy data migration tool`
+> Intentionally kept — marked with a LEGACY comment. Not wired to any public API endpoint.
 
 **File:** `apps/server/src/import/import.service.ts`
 
@@ -357,7 +366,9 @@ The `importCsvDirect` method reads a hardcoded local file `cleaned_transactions.
 
 ---
 
-### 7.11 `serverApiFetch` uses `NEXT_PUBLIC_SERVER_URL` (public env var)
+### 7.11 `serverApiFetch` uses `NEXT_PUBLIC_SERVER_URL` (public env var) ✅ FIXED
+
+> Commit: `fix(ui): use private SERVER_URL and add Content-Type header in serverApiFetch`
 
 **File:** `apps/ui/src/utils/serverApiFetch.ts`
 
@@ -371,7 +382,9 @@ const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}${path}`, ...)
 
 ---
 
-### 7.12 `serverApiFetch` missing `Content-Type: application/json` header
+### 7.12 `serverApiFetch` missing `Content-Type: application/json` header ✅ FIXED
+
+> Commit: `fix(ui): use private SERVER_URL and add Content-Type header in serverApiFetch`
 
 **File:** `apps/ui/src/utils/serverApiFetch.ts`
 
