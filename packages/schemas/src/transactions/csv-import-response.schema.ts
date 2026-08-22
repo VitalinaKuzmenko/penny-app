@@ -5,6 +5,8 @@ export const CsvImportResponseSchema = z.object({
   date: z.string(),
   description: z.string().trim().min(1),
   amount: z.number(),
+  suggestedCategoryId: z.string().uuid().nullable(),
+  autoAssigned: z.boolean(),
 });
 
 export type CsvImportResponse = z.infer<typeof CsvImportResponseSchema>;
