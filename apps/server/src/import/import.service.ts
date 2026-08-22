@@ -145,15 +145,8 @@ export class ImportService {
   ): Promise<CsvImportResponseDTO[] | null> {
     this.logger.info('Getting import rows', { importId, userId });
     const importEntity = await this.prisma.transactionImport.findFirst({
-      where: {
-        id: importId,
-        userId,
-      },
-      include: {
-        rows: {
-          orderBy: { date: 'asc' },
-        },
-      },
+      where: { id: importId, userId },
+      include: { rows: { orderBy: { date: 'asc' } } },
     });
 
     if (!importEntity) {
@@ -161,17 +154,34 @@ export class ImportService {
       return null;
     }
 
+    // Bulk-fetch all mappings for this user keyed by normalised description
+    const normalisedDescriptions = importEntity.rows.map((r) =>
+      r.description.trim().toLowerCase(),
+    );
+    const mappings = await this.prisma.categoryMapping.findMany({
+      where: { userId, description: { in: normalisedDescriptions } },
+      select: { description: true, categoryId: true },
+    });
+    const mappingMap = new Map(mappings.map((m) => [m.description, m.categoryId]));
+
     this.logger.info('Import found', {
       importId: importEntity.id,
       rows: importEntity.rows.length,
+      mappedRows: mappingMap.size,
     });
 
-    return importEntity.rows.map((row) => ({
-      id: row.id,
-      date: formatDateToString(row.date),
-      description: row.description,
-      amount: Number(row.amount),
-    }));
+    return importEntity.rows.map((row) => {
+      const key = row.description.trim().toLowerCase();
+      const suggestedCategoryId = mappingMap.get(key) ?? null;
+      return {
+        id: row.id,
+        date: formatDateToString(row.date),
+        description: row.description,
+        amount: Number(row.amount),
+        suggestedCategoryId,
+        autoAssigned: suggestedCategoryId !== null,
+      };
+    });
   }
 
   async confirmImport(
@@ -237,12 +247,31 @@ export class ImportService {
         }),
       });
 
-      // 2️⃣ Mark import as confirmed
+      // 2️⃣ Upsert category mappings for every row that has a categoryId
+      const mappingsToUpsert = importEntity.rows
+        .map((row) => {
+          const input = rowInputMap.get(row.id);
+          const categoryId = input?.categoryId;
+          if (!categoryId) return null;
+          return {
+            description: (input?.description ?? row.description).trim().toLowerCase(),
+            categoryId,
+          };
+        })
+        .filter((m): m is { description: string; categoryId: string } => m !== null);
+
+      for (const mapping of mappingsToUpsert) {
+        await tx.categoryMapping.upsert({
+          where: { userId_description: { userId, description: mapping.description } },
+          create: { userId, description: mapping.description, categoryId: mapping.categoryId },
+          update: { categoryId: mapping.categoryId },
+        });
+      }
+
+      // 3️⃣ Mark import as confirmed
       await tx.transactionImport.update({
         where: { id: importId },
-        data: {
-          status: ImportStatus.CONFIRMED,
-        },
+        data: { status: ImportStatus.CONFIRMED },
       });
     });
 
