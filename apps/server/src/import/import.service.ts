@@ -162,7 +162,9 @@ export class ImportService {
       where: { userId, description: { in: normalisedDescriptions } },
       select: { description: true, categoryId: true },
     });
-    const mappingMap = new Map(mappings.map((m) => [m.description, m.categoryId]));
+    const mappingMap = new Map(
+      mappings.map((m) => [m.description, m.categoryId]),
+    );
 
     this.logger.info('Import found', {
       importId: importEntity.id,
@@ -215,7 +217,9 @@ export class ImportService {
       });
     }
 
-    const rowInputMap = new Map(dto.rows.map((row) => [row.id, row]));
+    const rowInputMap = new Map<string, ConfirmImportInput['rows'][number]>(
+      dto.rows.map((row) => [row.id, row]),
+    );
 
     await this.prisma.$transaction(async (tx) => {
       // 1️⃣ Create real transactions
@@ -254,16 +258,26 @@ export class ImportService {
           const categoryId = input?.categoryId;
           if (!categoryId) return null;
           return {
-            description: (input?.description ?? row.description).trim().toLowerCase(),
+            description: (input?.description ?? row.description)
+              .trim()
+              .toLowerCase(),
             categoryId,
           };
         })
-        .filter((m): m is { description: string; categoryId: string } => m !== null);
+        .filter(
+          (m): m is { description: string; categoryId: string } => m !== null,
+        );
 
       for (const mapping of mappingsToUpsert) {
         await tx.categoryMapping.upsert({
-          where: { userId_description: { userId, description: mapping.description } },
-          create: { userId, description: mapping.description, categoryId: mapping.categoryId },
+          where: {
+            userId_description: { userId, description: mapping.description },
+          },
+          create: {
+            userId,
+            description: mapping.description,
+            categoryId: mapping.categoryId,
+          },
           update: { categoryId: mapping.categoryId },
         });
       }
