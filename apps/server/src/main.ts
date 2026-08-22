@@ -1,25 +1,10 @@
-import { ConfigModule } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
-import Joi from 'joi';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
 
 import { AppModule } from './app.module';
-import configuration from './config/configuration';
 
-ConfigModule.forRoot({
-  load: [configuration],
-  validationSchema: Joi.object({
-    PORT: Joi.number().default(8080),
-    DATABASE_URL: Joi.string().required(),
-    GOOGLE_CLIENT_ID: Joi.string().required(),
-    GOOGLE_CLIENT_SECRET: Joi.string().required(),
-    GOOGLE_CALLBACK_URL: Joi.string().required(),
-    UI_APP_URL: Joi.string().required(),
-    DOMAIN: Joi.string().required(),
-  }),
-});
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
