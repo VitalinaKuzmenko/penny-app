@@ -47,6 +47,12 @@ start: check-env
 test:
 	pnpm run test
 
+test-watch:
+	pnpm run test:watch
+
+test-cov:
+	pnpm run test:cov
+
 lint:
 	pnpm run lint
 
