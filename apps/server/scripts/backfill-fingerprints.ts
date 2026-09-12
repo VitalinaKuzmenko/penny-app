@@ -23,7 +23,7 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { parse } from 'pg-connection-string';
 
-import { PrismaClient } from '../src/prisma/generated/prisma/client';
+import { Prisma, PrismaClient } from '../src/prisma/generated/prisma/client';
 import { buildTransactionFingerprint } from '../src/utils/transaction-fingerprint';
 
 const BATCH_SIZE = 500;
@@ -105,15 +105,18 @@ async function main() {
     }));
 
     if (apply) {
-      await prisma.$transaction(
-        updates.map((u) =>
-          prisma.transaction.update({
-            where: { id: u.id },
-            data: { fingerprint: u.fingerprint },
-          }),
-        ),
+      // One statement per batch. Individual update() calls inside an interactive
+      // transaction exceed Prisma's 5s timeout over a remote pooler.
+      const values = Prisma.join(
+        updates.map((u) => Prisma.sql`(${u.id}, ${u.fingerprint})`),
       );
-      updated += updates.length;
+      const count = await prisma.$executeRaw`
+        UPDATE "Transaction" AS t
+        SET fingerprint = v.fingerprint
+        FROM (VALUES ${values}) AS v(id, fingerprint)
+        WHERE t.id = v.id AND t.fingerprint IS NULL
+      `;
+      updated += count;
     } else if (processed === 0) {
       console.log('Sample of what would be written:');
       for (const u of updates.slice(0, 3)) {

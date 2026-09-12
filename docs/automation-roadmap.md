@@ -105,10 +105,10 @@ Implemented:
 Two Prisma migrations must be applied to the **production** database. Both
 are safe on live data and take milliseconds on a table this size:
 
-| Migration | What it does | Risk |
-| --- | --- | --- |
-| `20260912142826_add_transaction_fingerprint` | `ADD COLUMN fingerprint TEXT` (nullable) + unique index on `(account_id, fingerprint)` | None — all existing rows get `NULL`, and Postgres treats NULLs as distinct in unique indexes, so it cannot fail on existing data |
-| `20260912143556_relax_transaction_fingerprint_uniqueness` | Drops that unique index, creates a plain index in its place | None |
+| Migration                                                 | What it does                                                                           | Risk                                                                                                                             |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `20260912142826_add_transaction_fingerprint`              | `ADD COLUMN fingerprint TEXT` (nullable) + unique index on `(account_id, fingerprint)` | None — all existing rows get `NULL`, and Postgres treats NULLs as distinct in unique indexes, so it cannot fail on existing data |
+| `20260912143556_relax_transaction_fingerprint_uniqueness` | Drops that unique index, creates a plain index in its place                            | None                                                                                                                             |
 
 Order of operations (do **not** start the new server build before the
 migrations have run — the new code writes `fingerprint` on every confirm and
