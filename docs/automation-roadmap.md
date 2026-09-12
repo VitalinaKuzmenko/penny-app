@@ -100,6 +100,50 @@ Implemented:
   when `duplicate && !forceImport`. `skippedDuplicates` is still returned
   (useful for logging) but the UI no longer relies on it.
 
+### ⚠️ Production deploy checklist for this PR (#105)
+
+Two Prisma migrations must be applied to the **production** database. Both
+are safe on live data and take milliseconds on a table this size:
+
+| Migration | What it does | Risk |
+| --- | --- | --- |
+| `20260912142826_add_transaction_fingerprint` | `ADD COLUMN fingerprint TEXT` (nullable) + unique index on `(account_id, fingerprint)` | None — all existing rows get `NULL`, and Postgres treats NULLs as distinct in unique indexes, so it cannot fail on existing data |
+| `20260912143556_relax_transaction_fingerprint_uniqueness` | Drops that unique index, creates a plain index in its place | None |
+
+Order of operations (do **not** start the new server build before the
+migrations have run — the new code writes `fingerprint` on every confirm and
+will 500 if the column is missing):
+
+1. Back up the prod DB (or confirm the platform snapshot is recent).
+2. Run migrations against prod, from `apps/server`, with the **prod**
+   connection string explicitly set:
+   ```bash
+   DATABASE_URL="postgresql://…prod…" pnpm prisma migrate deploy
+   ```
+   Do **not** use `make prisma-migrate-deploy` without overriding
+   `DATABASE_URL` — the Makefile defaults it to the local docker DB
+   (`test_user@localhost:5432/penny`), so it would silently migrate the wrong
+   database and report success.
+3. Verify:
+   ```bash
+   DATABASE_URL="postgresql://…prod…" pnpm prisma migrate status
+   ```
+   Expect `Database schema is up to date!` and both migration names listed
+   as applied.
+4. Deploy the new server build. `prisma generate` is part of the build, so
+   the client already knows about `fingerprint`.
+5. Deploy the UI (new `duplicate` / `duplicateOf` / `forceImport` fields
+   are additive; old UI against new server still works, new UI against old
+   server would show no duplicate flags but not break).
+6. Smoke test: upload a CSV you've imported before → pick the same account →
+   rows should be flagged "Duplicate" before you save.
+
+Existing transactions keep `fingerprint = NULL` and are therefore **never**
+matched as duplicates of a new import. Only rows confirmed after this deploy
+participate in dedupe. If you want historical rows to count, a one-off
+backfill script (compute the fingerprint from `date`, `amount`, `type`,
+`description`) is needed — not included in this PR.
+
 ### Correction (2026-09-12): false-positive risk found and fixed
 
 Original design used a hard `@@unique([accountId, fingerprint])` DB
