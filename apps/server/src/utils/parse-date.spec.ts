@@ -25,6 +25,8 @@ describe('parseDate', () => {
     // Regression: rows from penny_template.csv were stored as 1 March instead of 3 January
     expect(ymd(parseDate('03/01/2025'))).toEqual([2025, 1, 3]);
     expect(ymd(parseDate('01/03/2025'))).toEqual([2025, 3, 1]);
+    // fully ambiguous — native parser says 11 Dec, UK convention says 12 Nov
+    expect(ymd(parseDate('12/11/2025'))).toEqual([2025, 11, 12]);
   });
 
   it('still accepts full ISO timestamps via the native parser', () => {
