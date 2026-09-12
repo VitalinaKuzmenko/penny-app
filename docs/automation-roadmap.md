@@ -140,9 +140,30 @@ will 500 if the column is missing):
 
 Existing transactions keep `fingerprint = NULL` and are therefore **never**
 matched as duplicates of a new import. Only rows confirmed after this deploy
-participate in dedupe. If you want historical rows to count, a one-off
-backfill script (compute the fingerprint from `date`, `amount`, `type`,
-`description`) is needed — not included in this PR.
+participate in dedupe — unless you run the backfill below.
+
+7. **Backfill historical fingerprints** (optional, recommended). Computes
+   `fingerprint` for every existing row using the exact same function the
+   import flow uses, so old and new rows compare identically. Idempotent —
+   only touches `fingerprint IS NULL`, safe to re-run. Batched (500/tx).
+   ```bash
+   cd apps/server
+   # dry run — prints host, row count and a sample; writes nothing
+   DATABASE_URL="postgresql://…prod…" pnpm backfill:fingerprints
+   # write. --remote is required for any non-localhost host, on purpose.
+   DATABASE_URL="postgresql://…prod…" pnpm backfill:fingerprints --apply --remote
+   ```
+   Or for the local docker DB: `make backfill-fingerprints` (dry run) /
+   `make backfill-fingerprints APPLY=1`.
+   Script: `apps/server/scripts/backfill-fingerprints.ts`. As of 2026-09-12
+   prod had 4,870 rows without a fingerprint.
+
+> ⚠️ `apps/server/.env` currently points `DATABASE_URL` at **Supabase (prod)**
+> with the localhost line commented out (done to check `migrate status` on
+> prod). Anything that reads `.env` — `make dev`, `prisma migrate dev`,
+> `pnpm backfill:fingerprints` without an explicit `DATABASE_URL` — will hit
+> prod until it's switched back. The backfill refuses `--apply` on a
+> non-local host without `--remote` for exactly this reason.
 
 ### Correction (2026-09-12): false-positive risk found and fixed
 

@@ -5,6 +5,7 @@ APP_NAME=penny-app
 
 DATABASE_URL ?= "postgresql://test_user:test_password@localhost:5432/penny?schema=public"
 
+
 install:
 	pnpm install
 
@@ -34,6 +35,11 @@ prisma-migrate-dev:
 
 prisma-migrate-deploy:
 	DATABASE_URL=$(DATABASE_URL) pnpm prisma migrate deploy
+
+# One-off: compute fingerprints for transactions created before dedupe existed.
+# Dry run by default; pass APPLY=1 to write. Override DATABASE_URL for prod.
+backfill-fingerprints:
+	DATABASE_URL=$(DATABASE_URL) pnpm backfill:fingerprints $(if $(APPLY),--apply,)
 
 dev: check-env
 	pnpm run start:dev

@@ -21,7 +21,8 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
-    "prisma:migrate:dev": "prisma migrate dev"
+    "prisma:migrate:dev": "prisma migrate dev",
+    "backfill:fingerprints": "ts-node --transpile-only -r dotenv/config scripts/backfill-fingerprints.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
