@@ -451,7 +451,7 @@ export class ImportService {
     // Prepare transactions
     const transactions = records.map((row) => ({
       userId,
-      date: new Date(row.date),
+      date: parseDate(row.date) ?? new Date(row.date),
       description: row.description?.trim() || 'No description',
       amount: parseFloat(row.amount),
       currency: row.currency,

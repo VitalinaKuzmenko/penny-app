@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import dayjs from 'dayjs';
 import {
   CategoryBreakdownResponseSchema,
   MonthlyCategoryResponseSchema,
@@ -14,6 +13,34 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 
 const EXCLUDED_CATEGORY_NAME = 'Internal Transfer';
+
+const utcYearRange = (year: number) => ({
+  start: new Date(Date.UTC(year, 0, 1)),
+  end: new Date(Date.UTC(year + 1, 0, 1)),
+});
+
+// Missing bounds fall back to "today", matching the previous dayjs(undefined) behaviour
+const utcDayRange = (startDate?: string, endDate?: string) => {
+  const s = startDate ? new Date(startDate) : new Date();
+  const e = endDate ? new Date(endDate) : new Date();
+
+  return {
+    start: new Date(
+      Date.UTC(s.getUTCFullYear(), s.getUTCMonth(), s.getUTCDate()),
+    ),
+    end: new Date(
+      Date.UTC(
+        e.getUTCFullYear(),
+        e.getUTCMonth(),
+        e.getUTCDate(),
+        23,
+        59,
+        59,
+        999,
+      ),
+    ),
+  };
+};
 
 const excludeInternalTransfers = {
   OR: [
@@ -44,8 +71,7 @@ export class ChartsService {
       accountIds?: string[];
     },
   ) {
-    const start = new Date(year, 0, 1);
-    const end = new Date(year + 1, 0, 1);
+    const { start, end } = utcYearRange(year);
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['type'],
@@ -82,8 +108,7 @@ export class ChartsService {
     userId: string,
     { year, accountIds, categoryIds }: MonthlyCategoryQueryDto,
   ) {
-    const start = new Date(year, 0, 1);
-    const end = new Date(year + 1, 0, 1);
+    const { start, end } = utcYearRange(year);
 
     const rows = await this.prisma.transaction.findMany({
       where: {
@@ -133,7 +158,7 @@ export class ChartsService {
     const map = new Map<string, { categoryName: string; data: number[] }>();
 
     for (const row of rows) {
-      const monthIndex = row.date.getMonth();
+      const monthIndex = row.date.getUTCMonth();
 
       if (!map.has(row.categoryId)) {
         map.set(row.categoryId, {
@@ -163,8 +188,7 @@ export class ChartsService {
     userId: string,
     { startDate, endDate, accountIds, type }: CategoryBreakdownQueryDto,
   ) {
-    const start = dayjs(startDate).startOf('day').toDate();
-    const end = dayjs(endDate).endOf('day').toDate();
+    const { start, end } = utcDayRange(startDate, endDate);
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['categoryId'],
@@ -218,8 +242,7 @@ export class ChartsService {
   ) {
     const { startDate, endDate, accountIds } = query;
 
-    const start = dayjs(startDate).startOf('day').toDate();
-    const end = dayjs(endDate).endOf('day').toDate();
+    const { start, end } = utcDayRange(startDate, endDate);
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['type', 'date'],
@@ -239,8 +262,8 @@ export class ChartsService {
     const grouped: Record<string, { INCOME: number; EXPENSE: number }> = {};
 
     rows.forEach((r) => {
-      const year = r.date.getFullYear();
-      const month = String(r.date.getMonth() + 1).padStart(2, '0');
+      const year = r.date.getUTCFullYear();
+      const month = String(r.date.getUTCMonth() + 1).padStart(2, '0');
       const key = `${year}-${month}`;
 
       if (!grouped[key]) {
@@ -268,12 +291,16 @@ export class ChartsService {
       expense: number;
     }[] = [];
 
-    const current = new Date(start.getFullYear(), start.getMonth(), 1);
-    const endYear = new Date(end.getFullYear(), end.getMonth(), 1);
+    const current = new Date(
+      Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), 1),
+    );
+    const endYear = new Date(
+      Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), 1),
+    );
 
     while (current <= endYear) {
-      const year = current.getFullYear();
-      const month = String(current.getMonth() + 1).padStart(2, '0');
+      const year = current.getUTCFullYear();
+      const month = String(current.getUTCMonth() + 1).padStart(2, '0');
       const key = `${year}-${month}`;
 
       const data = grouped[key] || { INCOME: 0, EXPENSE: 0 };
@@ -285,7 +312,7 @@ export class ChartsService {
       });
 
       // move to next month
-      current.setMonth(current.getMonth() + 1);
+      current.setUTCMonth(current.getUTCMonth() + 1);
     }
 
     return result;
@@ -295,8 +322,7 @@ export class ChartsService {
     userId: string,
     { startDate, endDate }: IncomeExpenseRatioQueryDto,
   ) {
-    const start = dayjs(startDate).startOf('day').toDate();
-    const end = dayjs(endDate).endOf('day').toDate();
+    const { start, end } = utcDayRange(startDate, endDate);
 
     const rows = await this.prisma.transaction.groupBy({
       by: ['type'],
