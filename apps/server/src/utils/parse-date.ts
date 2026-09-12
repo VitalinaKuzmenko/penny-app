@@ -10,7 +10,15 @@ export const parseDate = (value: string): Date | null => {
   if (!isNumericTriple) {
     // Anything else (ISO timestamps, "15 Jan 2025", …) — let the runtime try
     const native = new Date(value);
-    return isNaN(native.getTime()) ? null : native;
+    if (isNaN(native.getTime())) return null;
+
+    // Date-only strings without a zone are parsed as local by V8; re-anchor to UTC
+    const hasTime = /[T\s]\d{1,2}:\d{2}/.test(value);
+    return hasTime
+      ? native
+      : new Date(
+          Date.UTC(native.getFullYear(), native.getMonth(), native.getDate()),
+        );
   }
 
   // Detect separator
@@ -67,14 +75,15 @@ export const parseDate = (value: string): Date | null => {
     }
   }
 
-  // JS months are 0-based
-  const date = new Date(year, month - 1, day);
+  // JS months are 0-based; anchor to UTC midnight so the stored day never
+  // shifts with the server's local timezone / DST offset
+  const date = new Date(Date.UTC(year, month - 1, day));
 
   // Validate that JS didn't roll over (e.g., 31/02 -> 02/03)
   if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== month - 1 ||
-    date.getDate() !== day
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
   ) {
     return null;
   }

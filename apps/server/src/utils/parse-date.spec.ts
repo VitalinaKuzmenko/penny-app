@@ -1,7 +1,7 @@
 import { parseDate } from './parse-date';
 
 const ymd = (d: Date | null) =>
-  d ? [d.getFullYear(), d.getMonth() + 1, d.getDate()] : null;
+  d ? [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()] : null;
 
 describe('parseDate', () => {
   it('returns null for empty input', () => {
@@ -10,6 +10,18 @@ describe('parseDate', () => {
 
   it('parses ISO dates', () => {
     expect(ymd(parseDate('2025-01-15'))).toEqual([2025, 1, 15]);
+  });
+
+  it('anchors date-only values to UTC midnight regardless of server timezone', () => {
+    expect(parseDate('2025-01-15')?.toISOString()).toBe(
+      '2025-01-15T00:00:00.000Z',
+    );
+    expect(parseDate('07/03/2025')?.toISOString()).toBe(
+      '2025-03-07T00:00:00.000Z',
+    );
+    expect(parseDate('15 Jan 2025')?.toISOString()).toBe(
+      '2025-01-15T00:00:00.000Z',
+    );
   });
 
   it('parses YYYY/MM/DD', () => {
