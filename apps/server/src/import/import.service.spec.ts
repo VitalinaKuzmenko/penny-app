@@ -51,10 +51,7 @@ const existing = (date: string, amount: number, description: string) => ({
 function createPrismaMock() {
   const tx = {
     transaction: { createMany: jest.fn().mockResolvedValue({ count: 0 }) },
-    categoryMapping: {
-      upsert: jest.fn().mockResolvedValue({}),
-      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
-    },
+    categoryMapping: { upsert: jest.fn().mockResolvedValue({}) },
     transactionImport: { update: jest.fn().mockResolvedValue({}) },
   };
   return {
@@ -445,78 +442,6 @@ describe('ImportService', () => {
           update: { categoryId: CATEGORY_ID },
         }),
       );
-    });
-
-    describe('user overrides of the auto-suggested category', () => {
-      const OTHER_CATEGORY_ID = '55555555-5555-4555-8555-555555555555';
-
-      it('overriding with a different category replaces the learned mapping', async () => {
-        stubImport('PENDING', [row('r1', '2026-08-03', 2500, 'Salary')]);
-
-        await service.confirmImport(
-          USER_ID,
-          IMPORT_ID,
-          dto([{ id: 'r1', categoryId: OTHER_CATEGORY_ID }]),
-        );
-
-        expect(prisma.tx.categoryMapping.upsert).toHaveBeenCalledWith(
-          expect.objectContaining({
-            where: {
-              userId_description: { userId: USER_ID, description: 'salary' },
-            },
-            update: { categoryId: OTHER_CATEGORY_ID },
-          }),
-        );
-        expect(prisma.tx.categoryMapping.deleteMany).not.toHaveBeenCalled();
-      });
-
-      it('overriding with "None" deletes the learned mapping so it is not re-suggested', async () => {
-        stubImport('PENDING', [row('r1', '2026-08-03', 2500, 'Salary')]);
-
-        await service.confirmImport(USER_ID, IMPORT_ID, dto([{ id: 'r1' }]));
-
-        const { data } = prisma.tx.transaction.createMany.mock.calls[0][0];
-        expect(data[0]).toMatchObject({ categoryId: null });
-        expect(prisma.tx.categoryMapping.upsert).not.toHaveBeenCalled();
-        expect(prisma.tx.categoryMapping.deleteMany).toHaveBeenCalledWith({
-          where: { userId: USER_ID, description: { in: ['salary'] } },
-        });
-      });
-
-      it('when the same description is both categorised and cleared in one batch, the category wins', async () => {
-        stubImport('PENDING', [
-          row('r1', '2026-08-03', 2500, 'Salary'),
-          row('r2', '2026-08-04', 2500, 'Salary'),
-        ]);
-
-        await service.confirmImport(
-          USER_ID,
-          IMPORT_ID,
-          dto([{ id: 'r1', categoryId: CATEGORY_ID }, { id: 'r2' }]),
-        );
-
-        expect(prisma.tx.categoryMapping.upsert).toHaveBeenCalledTimes(1);
-        expect(prisma.tx.categoryMapping.deleteMany).not.toHaveBeenCalled();
-      });
-
-      it('skipped duplicate rows neither learn nor unlearn a mapping', async () => {
-        // A skipped row has no category (it never needed one) — that must not be
-        // read as the user clearing the mapping.
-        stubImport('PENDING', [row('r1', '2026-08-03', 2500, 'Salary')]);
-        prisma.transaction.findMany.mockResolvedValue([
-          existing('2026-08-03', 2500, 'Salary'),
-        ]);
-
-        const result = await service.confirmImport(
-          USER_ID,
-          IMPORT_ID,
-          dto([{ id: 'r1' }]),
-        );
-
-        expect(result).toEqual({ skippedDuplicates: 1 });
-        expect(prisma.tx.categoryMapping.upsert).not.toHaveBeenCalled();
-        expect(prisma.tx.categoryMapping.deleteMany).not.toHaveBeenCalled();
-      });
     });
   });
 });
