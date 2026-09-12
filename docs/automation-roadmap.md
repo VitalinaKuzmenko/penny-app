@@ -203,25 +203,40 @@ defined')` stubs). Run with `npx jest <path>` from `apps/server`; note that
   edited-description fingerprint, category mapping upsert). Prisma is
   mocked; no DB needed.
 
-### Bug found by the tests: DD/MM dates were being swapped
+### Bug found by the tests: `parseDate` alone returned US month order
 
 `parseDate` tried `new Date(value)` **first** and only fell back to the
 explicit DD/MM/YYYY logic if that failed. V8 parses `"07/03/2025"` as US
-**July 3**, so any UK-format date with day ≤ 12 was silently stored with
-day and month swapped (~40% of a typical statement). `25/12/2025` was fine
-only because month 25 makes the native parse fail. The shipped
-`penny_template.csv` row `03/01/2025` was itself being read as 1 March.
+**July 3**, so on its own the function returned the wrong month for any
+slash date with day ≤ 12. `25/12/2025` was fine only because month 25 makes
+the native parse fail.
+
+**Correction (same day):** this did **not** corrupt existing DD/MM data.
+`importCsv` calls `parseDate` twice — once to validate, then
+`formatDateToString` (→ `DD/MM/YYYY`), then `parseDate` again on that
+string before insert. The second native parse swapped day/month back, so
+two wrongs made a right for UK-format CSVs:
+
+| CSV | 1st parse | formatted | 2nd parse → stored |
+| --- | --- | --- | --- |
+| `05/01/2025` | May 1 ✗ | `01/05/2025` | Jan 5 ✅ |
+| `2025-01-05` | Jan 5 ✓ | `05/01/2025` | May 1 ❌ |
+
+So the real, narrower impact was: **ISO-dated CSVs** with day ≤ 12 were
+stored swapped. UK-format exports (HSBC etc.) were stored correctly by
+accident. Verified against the local DB — rows imported as `05/01/2025`
+are stored as `2025-01-05`.
 
 Fixed: numeric `D/M/Y`-shaped strings now always go through the explicit
 parser; the native parser is only used for other shapes (full ISO
-timestamps etc.). Regression tests added.
+timestamps etc.). `parseDate` is now correct on a single call, which
+matters because the Enable Banking sync will call it once, not twice.
+Regression tests added.
 
-**Follow-up needed:** existing `Transaction.date` values imported before
-this fix may have day/month swapped wherever day ≤ 12. No automatic
-backfill is possible (the swap is not reversible without the source CSV).
-Options: re-import affected statements (dedupe will now treat the corrected
-dates as new rows, so the old wrong ones must be deleted first), or accept
-historical drift. Decide before relying on month-level charts for past data.
+Follow-ups (low priority): remove the redundant second `parseDate` in
+`importCsv` (the intermediate string only exists to satisfy
+`CsvRowSchema`'s string `date`); if anyone ever imported ISO-dated CSVs,
+those rows with day ≤ 12 need checking — not the case for the current user.
 
 ### Known latent inconsistency (not fixed, low risk for a UK user)
 
