@@ -33,9 +33,6 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 // Stricter limit for credential endpoints (brute-force / signup spam)
 const AUTH_THROTTLE = { default: { ttl: 60_000, limit: 10 } };
 
-// Stricter limit for credential endpoints (brute-force / signup spam)
-const AUTH_THROTTLE = { default: { ttl: 60_000, limit: 10 } };
-
 // Must match JWT expiresIn in auth.module.ts
 const JWT_COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24; // 24h
 
