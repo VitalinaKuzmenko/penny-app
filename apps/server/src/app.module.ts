@@ -27,10 +27,7 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
   imports: [
     LoggerModule,
     PrismaModule,
-    ThrottlerModule.forRoot([
-      { name: 'global', ttl: 60_000, limit: 100 },
-      { name: 'auth', ttl: 60_000, limit: 10 },
-    ]),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     UserModule,
     AccountModule,
     CategoryModule,

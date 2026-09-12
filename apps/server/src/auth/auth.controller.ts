@@ -30,6 +30,9 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Throttle } from '@nestjs/throttler';
 
+// Stricter limit for credential endpoints (brute-force / signup spam)
+const AUTH_THROTTLE = { default: { ttl: 60_000, limit: 10 } };
+
 // Must match JWT expiresIn in auth.module.ts
 const JWT_COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24; // 24h
 
@@ -63,7 +66,7 @@ export class AuthController {
     description: 'Registration failed',
   })
   @Post('register')
-  @Throttle({ auth: {} })
+  @Throttle(AUTH_THROTTLE)
   async register(
     @Body() input: RegisterDto,
     @Res({ passthrough: true }) res: ExpressResponse,
@@ -97,7 +100,7 @@ export class AuthController {
     type: AuthResponseDto,
   })
   @Post('login')
-  @Throttle({ auth: {} })
+  @Throttle(AUTH_THROTTLE)
   async login(
     @Body() input: LoginDto,
     @Res({ passthrough: true }) res: ExpressResponse,
