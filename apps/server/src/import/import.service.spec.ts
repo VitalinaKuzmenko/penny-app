@@ -443,5 +443,112 @@ describe('ImportService', () => {
         }),
       );
     });
+
+    // What the user picks in the review table must always be what is saved —
+    // whether they keep the auto-suggestion, replace it, or clear it.
+    describe("auto-suggested category vs the user's final choice", () => {
+      const SUGGESTED = CATEGORY_ID;
+      const OVERRIDE = '55555555-5555-4555-8555-555555555555';
+
+      const savedRow = () =>
+        prisma.tx.transaction.createMany.mock.calls[0][0].data[0];
+      const learnedMappings = () =>
+        prisma.tx.categoryMapping.upsert.mock.calls.map((c) => ({
+          description: c[0].where.userId_description.description,
+          categoryId: c[0].update.categoryId,
+        }));
+
+      beforeEach(() => {
+        // "salary" was previously categorised, so the review table pre-fills SUGGESTED
+        prisma.categoryMapping.findMany.mockResolvedValue([
+          { description: 'salary', categoryId: SUGGESTED },
+        ]);
+        stubImport('PENDING', [row('r1', '2026-08-03', 2500, 'Salary')]);
+      });
+
+      it('pre-fills the review row with the learned category', async () => {
+        const rows = await service.getImportRows(USER_ID, IMPORT_ID);
+
+        expect(rows?.[0]).toMatchObject({
+          suggestedCategoryId: SUGGESTED,
+          autoAssigned: true,
+        });
+      });
+
+      it('keeping the suggestion saves it and reinforces the mapping', async () => {
+        await service.confirmImport(
+          USER_ID,
+          IMPORT_ID,
+          dto([{ id: 'r1', categoryId: SUGGESTED }]),
+        );
+
+        expect(savedRow()).toMatchObject({ categoryId: SUGGESTED });
+        expect(learnedMappings()).toEqual([
+          { description: 'salary', categoryId: SUGGESTED },
+        ]);
+      });
+
+      it('overriding with a different category saves the override and re-learns it', async () => {
+        await service.confirmImport(
+          USER_ID,
+          IMPORT_ID,
+          dto([{ id: 'r1', categoryId: OVERRIDE }]),
+        );
+
+        expect(savedRow()).toMatchObject({ categoryId: OVERRIDE });
+        expect(learnedMappings()).toEqual([
+          { description: 'salary', categoryId: OVERRIDE },
+        ]);
+      });
+
+      it('overriding with "None" saves the row without a category', async () => {
+        await service.confirmImport(USER_ID, IMPORT_ID, dto([{ id: 'r1' }]));
+
+        expect(savedRow()).toMatchObject({ categoryId: null });
+        // nothing is learned from an uncategorised row (the old mapping is left as-is)
+        expect(prisma.tx.categoryMapping.upsert).not.toHaveBeenCalled();
+      });
+
+      it('an edited description is what gets saved and learned', async () => {
+        await service.confirmImport(USER_ID, IMPORT_ID, {
+          accountId: ACCOUNT_ID,
+          currency: 'GBP',
+          rows: [
+            { id: 'r1', description: 'Monthly pay', categoryId: OVERRIDE },
+          ],
+        });
+
+        expect(savedRow()).toMatchObject({
+          description: 'Monthly pay',
+          categoryId: OVERRIDE,
+        });
+        expect(learnedMappings()).toEqual([
+          { description: 'monthly pay', categoryId: OVERRIDE },
+        ]);
+      });
+
+      it("rows imported without an account-level suggestion still learn from the user's choice", async () => {
+        prisma.categoryMapping.findMany.mockResolvedValue([]);
+        stubImport('PENDING', [
+          row('r1', '2026-08-03', -4.5, 'SUMUP *BLUEBIRD'),
+        ]);
+
+        const rows = await service.getImportRows(USER_ID, IMPORT_ID);
+        expect(rows?.[0]).toMatchObject({
+          suggestedCategoryId: null,
+          autoAssigned: false,
+        });
+
+        await service.confirmImport(
+          USER_ID,
+          IMPORT_ID,
+          dto([{ id: 'r1', categoryId: OVERRIDE }]),
+        );
+
+        expect(learnedMappings()).toEqual([
+          { description: 'sumup *bluebird', categoryId: OVERRIDE },
+        ]);
+      });
+    });
   });
 });
