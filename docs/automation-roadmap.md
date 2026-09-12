@@ -217,10 +217,10 @@ the native parse fail.
 string before insert. The second native parse swapped day/month back, so
 two wrongs made a right for UK-format CSVs:
 
-| CSV | 1st parse | formatted | 2nd parse → stored |
-| --- | --- | --- | --- |
-| `05/01/2025` | May 1 ✗ | `01/05/2025` | Jan 5 ✅ |
-| `2025-01-05` | Jan 5 ✓ | `05/01/2025` | May 1 ❌ |
+| CSV          | 1st parse | formatted    | 2nd parse → stored |
+| ------------ | --------- | ------------ | ------------------ |
+| `05/01/2025` | May 1 ✗   | `01/05/2025` | Jan 5 ✅           |
+| `2025-01-05` | Jan 5 ✓   | `05/01/2025` | May 1 ❌           |
 
 So the real, narrower impact was: **ISO-dated CSVs** with day ≤ 12 were
 stored swapped. UK-format exports (HSBC etc.) were stored correctly by
