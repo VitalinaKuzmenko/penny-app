@@ -19,6 +19,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { formatDateToString } from '../utils/formatDateToString';
 import { WinstonLogger } from '../utils/logger/logger';
 import { parseDate } from '../utils/parse-date';
+import { buildTransactionFingerprint } from '../utils/transaction-fingerprint';
 
 @Injectable()
 export class ImportService {
@@ -142,6 +143,7 @@ export class ImportService {
   async getImportRows(
     userId: string,
     importId: string,
+    accountId?: string,
   ): Promise<CsvImportResponseDTO[] | null> {
     this.logger.info('Getting import rows', { importId, userId });
     const importEntity = await this.prisma.transactionImport.findFirst({
@@ -166,15 +168,42 @@ export class ImportService {
       mappings.map((m) => [m.description, m.categoryId]),
     );
 
+    // Only known once an account is chosen, since dedupe is scoped per account.
+    // Counted (not just existence) so genuinely repeated transactions (e.g. two
+    // identical coffees on the same day) aren't all flagged as duplicates.
+    let existingCounts = new Map<string, number>();
+    if (accountId) {
+      const existing = await this.prisma.transaction.findMany({
+        where: { accountId, userId, fingerprint: { not: null } },
+        select: { fingerprint: true },
+      });
+      existingCounts = new Map<string, number>();
+      for (const t of existing) {
+        const fp = t.fingerprint as string;
+        existingCounts.set(fp, (existingCounts.get(fp) ?? 0) + 1);
+      }
+    }
+
     this.logger.info('Import found', {
       importId: importEntity.id,
       rows: importEntity.rows.length,
       mappedRows: mappingMap.size,
     });
 
+    const consumedInPreview = new Map<string, number>();
+
     return importEntity.rows.map((row) => {
       const key = row.description.trim().toLowerCase();
       const suggestedCategoryId = mappingMap.get(key) ?? null;
+      const fingerprint = buildTransactionFingerprint(
+        row.date,
+        Number(row.amount),
+        row.description,
+      );
+      const alreadyConsumed = consumedInPreview.get(fingerprint) ?? 0;
+      const isDuplicate =
+        alreadyConsumed < (existingCounts.get(fingerprint) ?? 0);
+      consumedInPreview.set(fingerprint, alreadyConsumed + 1);
       return {
         id: row.id,
         date: formatDateToString(row.date),
@@ -182,6 +211,7 @@ export class ImportService {
         amount: Number(row.amount),
         suggestedCategoryId,
         autoAssigned: suggestedCategoryId !== null,
+        duplicate: isDuplicate,
       };
     });
   }
@@ -190,7 +220,7 @@ export class ImportService {
     userId: string,
     importId: string,
     dto: ConfirmImportInput,
-  ): Promise<void> {
+  ): Promise<{ skippedDuplicates: number }> {
     this.logger.info('Confirming import', { userId, importId });
 
     const importEntity = await this.prisma.transactionImport.findFirst({
@@ -221,35 +251,74 @@ export class ImportService {
       dto.rows.map((row) => [row.id, row]),
     );
 
+    const existing = await this.prisma.transaction.findMany({
+      where: { accountId: dto.accountId, userId, fingerprint: { not: null } },
+      select: { fingerprint: true },
+    });
+    const existingCounts = new Map<string, number>();
+    for (const t of existing) {
+      const fp = t.fingerprint as string;
+      existingCounts.set(fp, (existingCounts.get(fp) ?? 0) + 1);
+    }
+
+    let skippedDuplicates = 0;
+    // how many rows in this batch already matched an existing transaction,
+    // so a 3rd identical row isn't wrongly skipped when only 2 already exist
+    const consumedInBatch = new Map<string, number>();
+
+    const rowsToInsert = importEntity.rows.flatMap((row) => {
+      const input = rowInputMap.get(row.id);
+
+      if (!input) {
+        this.logger.warn('Missing input for row', { rowId: row.id });
+        throw new BadRequestException({
+          code: 'import.row_missing_input',
+          meta: { rowId: row.id },
+        });
+      }
+
+      const description = input.description ?? row.description;
+      const fingerprint = buildTransactionFingerprint(
+        row.date,
+        Number(row.amount),
+        description,
+      );
+
+      const alreadyConsumed = consumedInBatch.get(fingerprint) ?? 0;
+      const isDuplicate =
+        alreadyConsumed < (existingCounts.get(fingerprint) ?? 0);
+      consumedInBatch.set(fingerprint, alreadyConsumed + 1);
+
+      if (isDuplicate) {
+        skippedDuplicates += 1;
+        return [];
+      }
+
+      return [
+        {
+          userId,
+          date: row.date,
+          description,
+          amount: Math.abs(Number(row.amount)),
+          currency: dto.currency,
+          accountId: dto.accountId,
+          categoryId: input.categoryId ?? null,
+          fingerprint,
+          type:
+            Number(row.amount) > 0
+              ? TransactionType.INCOME
+              : TransactionType.EXPENSE,
+        },
+      ];
+    });
+
     await this.prisma.$transaction(async (tx) => {
-      // 1️⃣ Create real transactions
-      await tx.transaction.createMany({
-        data: importEntity.rows.map((row) => {
-          const input = rowInputMap.get(row.id);
-
-          if (!input) {
-            this.logger.warn('Missing input for row', { rowId: row.id });
-            throw new BadRequestException({
-              code: 'import.row_missing_input',
-              meta: { rowId: row.id },
-            });
-          }
-
-          return {
-            userId,
-            date: row.date,
-            description: input.description ?? row.description,
-            amount: Math.abs(Number(row.amount)),
-            currency: dto.currency,
-            accountId: dto.accountId,
-            categoryId: input.categoryId ?? null,
-            type:
-              Number(row.amount) > 0
-                ? TransactionType.INCOME
-                : TransactionType.EXPENSE,
-          };
-        }),
-      });
+      // 1️⃣ Create real transactions, skipping any that already exist on this account
+      if (rowsToInsert.length) {
+        await tx.transaction.createMany({
+          data: rowsToInsert,
+        });
+      }
 
       // 2️⃣ Upsert category mappings for every row that has a categoryId
       const mappingsToUpsert = importEntity.rows
@@ -292,7 +361,10 @@ export class ImportService {
     this.logger.info('Import confirmed successfully', {
       importId,
       userId,
+      skippedDuplicates,
     });
+
+    return { skippedDuplicates };
   }
 
   //for data migration from excel to DB

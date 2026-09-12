@@ -1,0 +1,179 @@
+# Automation Roadmap — Import & Categorisation
+
+Captured from a planning discussion on 2026-09-12. Priority order as agreed;
+each item is independent and can be picked up on its own.
+
+## 1. Bank connection (Open Banking sync) — highest value, provider confirmed
+
+Replaces manual CSV download/upload entirely, including the HSBC 1.5-month
+PDF-only export limitation (sync gives full history at consent time, then
+incremental pulls after).
+
+- **Provider: Enable Banking — confirmed free for personal use** (2026-09-12).
+  Constraint: free tier only works with accounts the developer registers/owns
+  ("defined accounts") — fine for a single-user personal project, but means
+  this can't be opened up to arbitrary third-party users without moving to a
+  paid plan later.
+- Schema: `Account` gains `provider`, `externalAccountId`, `consentId`,
+  `consentExpiresAt`.
+- Flow: scheduled/on-demand job pulls new transactions per connected account
+  and writes them into a `PENDING TransactionImport` + rows, reusing the
+  existing `/import/:importId/transactions` review screen unchanged.
+- Consent renews periodically (per-bank `maximum_consent_validity`, returned
+  by `GET /aspsps`; often several months but bank-specific) — needs a
+  "Reconnect" banner when a connection expires.
+- Fallback: CSV upload stays as-is for accounts/banks not connected.
+
+### What "only my defined accounts" actually means (confirmed from API docs)
+
+Enable Banking apps run in one of two environments, chosen at registration
+and **not changeable later**:
+
+- `SANDBOX` — auto-activated instantly, free, but only talks to Enable
+  Banking's fake test banks. Not useful for real HSBC/Starling/Capital One
+  data.
+- `PRODUCTION` — real banks, but a newly registered production app starts
+  `pending`. It's activated one of two ways: (a) commercial/contractual
+  agreement with Enable Banking, **or** (b) whitelisting specific accounts
+  in their Control Panel — confirmed by the `NO_ACCOUNTS_ADDED` error
+  ("No allowed accounts added to the application") and the app-registration
+  docs, which explicitly mention this path as an alternative to contracts.
+
+So "free for personal use" = a `PRODUCTION` app where _only the specific
+accounts we whitelist ourselves_ (our own HSBC/Starling/Capital One
+accounts) are allowed to connect — it cannot be opened to other users
+without a commercial agreement. That's a non-issue for a single-user
+personal project, but rules out ever exposing this to friends/family
+without upgrading later.
+
+### API shape (confirmed from docs, useful for implementation)
+
+- **Auth**: generate an RSA keypair + self-signed cert, upload via Control
+  Panel or `POST /applications` → get `app_id`. Every API call needs an
+  `Authorization: Bearer <JWT>` signed with that private key (`RS256`,
+  `kid` = app_id, max TTL 24h).
+- **Connect flow**: `GET /aspsps?country=GB` to list banks (confirms HSBC/
+  Starling/Capital One availability) → `POST /auth` (specify account
+  access scope + `valid_until`) → redirect user to bank login → bank
+  redirects back with a `code` → `POST /sessions` with that code → returns
+  `session_id` + list of `AccountResource` (each with a `uid` used for
+  subsequent calls).
+- **Fetching data**: `GET /accounts/{uid}/transactions?date_from=&date_to=`
+  — paginated via `continuation_key`; each `Transaction` has
+  `entry_reference` (stable id, good dedupe candidate alongside/in place of
+  our own fingerprint), `transaction_amount`, `remittance_information`
+  (description lines), `booking_date`/`value_date`, `credit_debit_indicator`.
+- **Sessions expire** per the bank's consent terms; `DELETE /sessions/{id}`
+  revokes early. No dedicated "refresh" call — re-run the `POST /auth` flow
+  when consent lapses (drives the "Reconnect" banner mentioned above).
+- Official pricing page wasn't reachable (404) — the free/whitelisted-account
+  model above comes from the technical docs (error codes + app registration
+  flow), not a pricing page. Confirm exact cost (if any) once signed into
+  their Control Panel / sales contact, since only the "how it works
+  technically" side is verifiable from public docs.
+
+## 2. Duplicate detection — ✅ done (2026-09-12)
+
+Prevents re-importing the same transactions when export date ranges overlap
+(important once imports happen monthly instead of every 3 months) **and**
+makes it safe to repeatedly test the Enable Banking sync (#1) without
+polluting real transaction history — every sync run/test hits the same
+confirm path, so dedupe needed to exist before that work starts.
+
+Implemented:
+
+- `Transaction.fingerprint` = `sha256(date, |amount|, normalised description)`,
+  computed in `apps/server/src/utils/transaction-fingerprint.ts`. Nullable +
+  `@@unique([accountId, fingerprint])` (migration
+  `20260912142826_add_transaction_fingerprint`).
+- `confirmImport` (`import.service.ts`) computes each row's fingerprint
+  against the chosen `accountId`, skips rows that already exist (checked
+  against the DB, and also against duplicates within the same upload batch),
+  and inserts with `skipDuplicates: true` as a final safety net. Returns
+  `{ skippedDuplicates }`.
+- `GET /import/:importId/rows` accepts an optional `?accountId=` query param
+  and flags each row's `duplicate: boolean` once an account is known.
+- Frontend: `saveTransactions` surfaces `skippedDuplicates`; if > 0,
+  `TransactionsClient` shows an info banner ("N transaction(s) already
+  existed on this account and were skipped") before redirecting.
+- Not yet wired: the review table doesn't call `GET /rows` again with
+  `accountId` when the user picks an account (so duplicates aren't flagged
+  pre-save today) — the guarantee "no duplicate data will ever be created"
+  holds regardless, enforced server-side at confirm time.
+
+### Correction (2026-09-12): false-positive risk found and fixed
+
+Original design used a hard `@@unique([accountId, fingerprint])` DB
+constraint plus an "exists at all" check. That's wrong: two **genuinely
+different** transactions with the same date/amount/description (e.g. two
+identical £3.50 coffees on the same day) would collide — the DB constraint
+would make it structurally impossible to ever store both, and the app logic
+would silently skip the second one as if it were a re-import.
+
+Fixed by:
+
+- Dropping the unique constraint in favour of a plain
+  `@@index([accountId, fingerprint])` (migration
+  `20260912143556_relax_transaction_fingerprint_uniqueness`) — the DB no
+  longer blocks legitimate repeats.
+- Switching both `getImportRows` and `confirmImport` to **count-based**
+  matching: a row is only treated as a duplicate if fewer identical
+  fingerprints have already been "consumed" (existing DB rows + earlier
+  rows in the same batch) than the number of existing matches. E.g. 2
+  identical existing transactions + 3 new identical rows in a fresh import →
+  first 2 are skipped as duplicates, the 3rd is inserted as genuinely new.
+- Frontend: the post-save duplicate notice no longer auto-redirects after
+  2s (easy to miss) — it now stays visible with an explicit "Continue"
+  button.
+
+Still open: no pre-save duplicate indicator in the review table (only a
+post-save summary count). Worth adding later — a "possible duplicate" flag
+per row, with an explicit "import anyway" override, rather than only a
+silent skip.
+
+## 3. Habit nudges — nice to have, low effort
+
+- `Account.lastTransactionDate` (derived or cached) shown on the
+  accounts/dashboard view: _"HSBC — last data 31 days ago → Import"_.
+- Scheduled job (`@nestjs/schedule`) to delete `PENDING` `TransactionImport`
+  rows older than 14 days (currently they persist forever).
+
+## 4. Internal Transfer handling — low priority, refine later
+
+Current behaviour: chart exclusion matches by category **name**
+(`'Internal Transfer'` string in `charts.service.ts`), fragile to renames/
+locale.
+
+Agreed direction — flag **plus** linking, not flag alone:
+
+- Add `Category.isTransfer: Boolean` — replaces name-string matching in
+  chart queries.
+- Add `Transaction.linkedTransactionId` (nullable, self-relation) to pair
+  the outgoing (`EXPENSE`) and incoming (`INCOME`) legs of a transfer
+  between two of the user's own accounts.
+- Auto-detection (most useful once #1 lands and multiple accounts sync):
+  match an unpaired `EXPENSE` on account A with an unpaired `INCOME` on
+  account B, same user, matching (or near-matching) amount, dates within a
+  few days → suggest a one-click link that tags both sides as transfer
+  instead of categorising each leg manually.
+- Linking is additive: a row can still be manually marked as
+  `Internal Transfer` with no linked pair (e.g. the other side isn't a
+  tracked account), same as today.
+
+## Already resolved / no work needed
+
+- **JWT expiry**: already `24h` in both `auth.module.ts` (`signOptions.expiresIn`)
+  and the cookie `maxAge` (`JWT_COOKIE_MAX_AGE_MS` in `auth.controller.ts`) —
+  the 1h/24h mismatch noted in `PROJECT_ANALYSIS.md` no longer applies.
+- **"Apply category to all similar" / merchant grouping**: superseded by the
+  existing manual workflow (filter `description` column → select rows →
+  bulk-apply category) plus the already-built "Rule-from-filter" —
+  saving a filter as a reusable category rule. No further UI needed here.
+
+## Explicitly discussed but not planned
+
+- Merchant-key normalisation + grouped review UI (regex-based description
+  cleanup to group `TESCO STORES 3201` / `TESCO STORES 4410` etc.) — dropped
+  in favour of the simpler, already-existing filter + Rule-from-filter
+  workflow, which achieves the same outcome with far less complexity and
+  lower risk of wrongly merging distinct merchants.

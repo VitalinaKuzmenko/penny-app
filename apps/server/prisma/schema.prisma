@@ -92,6 +92,8 @@ model Transaction {
   currency     Currency
   type         TransactionType
   date         DateTime
+  // hash of (date, |amount|, normalised description); used to skip re-importing the same row
+  fingerprint  String?  @map("fingerprint")
 
   userId       String    @map("user_id")
   user         User      @relation(fields: [userId], references: [id])
@@ -102,6 +104,7 @@ model Transaction {
   accountId    String     @map("account_id")
   account      Account    @relation(fields: [accountId], references: [id])
 
+  @@index([accountId, fingerprint])
   @@index([userId, date])
   @@index([accountId, date])
   @@index([categoryId, date])

@@ -7,6 +7,7 @@ import {
   Req,
   Get,
   Param,
+  Query,
   NotFoundException,
   UseGuards,
   Body,
@@ -85,11 +86,16 @@ export class ImportController {
   @ApiOkResponse({ type: CsvImportResponseDTO, isArray: true })
   async getImportRows(
     @Param('importId') importId: string,
+    @Query('accountId') accountId: string | undefined,
     @Req() req,
   ): Promise<CsvImportResponseDTO[]> {
     const userId = req.user.userId;
 
-    const rows = await this.importService.getImportRows(userId, importId);
+    const rows = await this.importService.getImportRows(
+      userId,
+      importId,
+      accountId,
+    );
 
     if (!rows) {
       this.logger.warn('getImportRows failed: import not found', { importId });
@@ -113,9 +119,13 @@ export class ImportController {
   ) {
     const userId = req.user.userId;
 
-    await this.importService.confirmImport(userId, importId, dto);
+    const { skippedDuplicates } = await this.importService.confirmImport(
+      userId,
+      importId,
+      dto,
+    );
 
-    return { success: true };
+    return { success: true, skippedDuplicates };
   }
 
   /**

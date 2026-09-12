@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { Box, Typography, Stack, Container } from '@mui/material';
+import { Box, Typography, Stack, Container, Alert } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import z from 'zod';
@@ -72,6 +72,7 @@ export default function TransactionsClient({
   const [apiError, setApiError] = useState<UiError | null>(null);
   const [accountsState, setAccountsState] = useState<Account[]>(accounts);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [skippedDuplicates, setSkippedDuplicates] = useState<number>(0);
 
   const router = useRouter();
   // const [areButtonsEnabled, setAreButtonsEnabled] = useState<boolean>(false);
@@ -119,9 +120,14 @@ export default function TransactionsClient({
 
       ConfirmImportSchema.parse(payload);
 
-      await saveTransactions(importId, payload);
+      const result = await saveTransactions(importId, payload);
 
-      router.push('/pennys-view');
+      if (result.skippedDuplicates > 0) {
+        // Let the user actually see the notice instead of navigating away immediately
+        setSkippedDuplicates(result.skippedDuplicates);
+      } else {
+        router.push('/pennys-view');
+      }
     } catch (error: any) {
       console.error('Confirm import failed:', error.data);
 
@@ -163,6 +169,23 @@ export default function TransactionsClient({
       </Box>
 
       {/* Error display */}
+      {skippedDuplicates > 0 && (
+        <Alert
+          severity="info"
+          sx={{ mb: 2 }}
+          action={
+            <CustomButton
+              size="small"
+              onClick={() => router.push('/pennys-view')}
+            >
+              Continue
+            </CustomButton>
+          }
+        >
+          {skippedDuplicates} transaction(s) already existed on this account and
+          were skipped.
+        </Alert>
+      )}
       {serverErrors &&
         serverErrors.length > 0 &&
         serverErrors.map((error) => (
