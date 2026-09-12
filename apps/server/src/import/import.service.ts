@@ -290,6 +290,7 @@ export class ImportService {
     // how many rows in this batch already matched an existing transaction,
     // so a 3rd identical row isn't wrongly skipped when only 2 already exist
     const consumedInBatch = new Map<string, number>();
+    const skippedRowIds = new Set<string>();
 
     const rowsToInsert = importEntity.rows.flatMap((row) => {
       const input = rowInputMap.get(row.id);
@@ -317,6 +318,7 @@ export class ImportService {
       // the user saw the duplicate warning and explicitly chose to import anyway
       if (isDuplicate && !input.forceImport) {
         skippedDuplicates += 1;
+        skippedRowIds.add(row.id);
         return [];
       }
 
@@ -346,34 +348,39 @@ export class ImportService {
         });
       }
 
-      // 2️⃣ Upsert category mappings for every row that has a categoryId
-      const mappingsToUpsert = importEntity.rows
-        .map((row) => {
-          const input = rowInputMap.get(row.id);
-          const categoryId = input?.categoryId;
-          if (!categoryId) return null;
-          return {
-            description: (input?.description ?? row.description)
-              .trim()
-              .toLowerCase(),
-            categoryId,
-          };
-        })
-        .filter(
-          (m): m is { description: string; categoryId: string } => m !== null,
-        );
+      // 2️⃣ Learn from what the user actually saved. Skipped duplicates carry no
+      // decision (they never needed a category), so they neither teach nor unlearn.
+      const learned = new Map<string, string>();
+      const cleared = new Set<string>();
 
-      for (const mapping of mappingsToUpsert) {
+      for (const row of importEntity.rows) {
+        if (skippedRowIds.has(row.id)) continue;
+        const input = rowInputMap.get(row.id);
+        const description = (input?.description ?? row.description)
+          .trim()
+          .toLowerCase();
+        if (input?.categoryId) {
+          learned.set(description, input.categoryId);
+        } else {
+          cleared.add(description);
+        }
+      }
+
+      for (const [description, categoryId] of learned) {
         await tx.categoryMapping.upsert({
-          where: {
-            userId_description: { userId, description: mapping.description },
-          },
-          create: {
-            userId,
-            description: mapping.description,
-            categoryId: mapping.categoryId,
-          },
-          update: { categoryId: mapping.categoryId },
+          where: { userId_description: { userId, description } },
+          create: { userId, description, categoryId },
+          update: { categoryId },
+        });
+      }
+
+      // An explicit "no category" must override a previous suggestion, otherwise
+      // a single mis-tag (e.g. salary → Internal Transfer) is re-suggested forever.
+      // If the same description was also categorised in this batch, that wins.
+      const toUnlearn = [...cleared].filter((d) => !learned.has(d));
+      if (toUnlearn.length) {
+        await tx.categoryMapping.deleteMany({
+          where: { userId, description: { in: toUnlearn } },
         });
       }
 
