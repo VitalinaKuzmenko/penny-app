@@ -185,6 +185,57 @@ Agreed direction — flag **plus** linking, not flag alone:
   `Internal Transfer` with no linked pair (e.g. the other side isn't a
   tracked account), same as today.
 
+## 5. Test coverage — started 2026-09-12
+
+First real unit tests in `apps/server` (previously only `it('should be
+defined')` stubs). Run with `npx jest <path>` from `apps/server`; note that
+`pnpm test -- --testPathPattern=…` mangles the argument.
+
+- `src/utils/transaction-fingerprint.spec.ts` — fingerprint is deterministic,
+  normalises case/whitespace/sign/precision, sensitive to date/amount/
+  description, uses the UTC calendar day.
+- `src/utils/parse-date.spec.ts` — every supported format, disambiguation
+  rules, rollover rejection.
+- `src/import/import.service.spec.ts` — `getImportRows` (ownership, per-
+  account flagging, `duplicateOf`, count-based matching, category
+  suggestion) and `confirmImport` (error cases, insert shape, skip-by-
+  default, `forceImport` override, count-based skip, no-op insert,
+  edited-description fingerprint, category mapping upsert). Prisma is
+  mocked; no DB needed.
+
+### Bug found by the tests: DD/MM dates were being swapped
+
+`parseDate` tried `new Date(value)` **first** and only fell back to the
+explicit DD/MM/YYYY logic if that failed. V8 parses `"07/03/2025"` as US
+**July 3**, so any UK-format date with day ≤ 12 was silently stored with
+day and month swapped (~40% of a typical statement). `25/12/2025` was fine
+only because month 25 makes the native parse fail. The shipped
+`penny_template.csv` row `03/01/2025` was itself being read as 1 March.
+
+Fixed: numeric `D/M/Y`-shaped strings now always go through the explicit
+parser; the native parser is only used for other shapes (full ISO
+timestamps etc.). Regression tests added.
+
+**Follow-up needed:** existing `Transaction.date` values imported before
+this fix may have day/month swapped wherever day ≤ 12. No automatic
+backfill is possible (the swap is not reversible without the source CSV).
+Options: re-import affected statements (dedupe will now treat the corrected
+dates as new rows, so the old wrong ones must be deleted first), or accept
+historical drift. Decide before relying on month-level charts for past data.
+
+### Known latent inconsistency (not fixed, low risk for a UK user)
+
+`parseDate` returns **local** midnight for D/M/Y input but the native parser
+returns **UTC** midnight for ISO input. The fingerprint uses the UTC calendar
+day, so the same logical date could fingerprint differently if a user
+switches CSV date formats between exports (e.g. during BST). Consistent
+within a single format, so dedupe works today. Cleanest fix later: make
+`parseDate` always return `Date.UTC(y, m-1, d)`.
+
+Pre-existing failing skeleton specs (`app.controller`, `auth.*`,
+`users.service`) are unrelated to this work — they fail because they don't
+provide the dependencies those classes inject. Worth fixing or deleting.
+
 ## Already resolved / no work needed
 
 - **JWT expiry**: already `24h` in both `auth.module.ts` (`signOptions.expiresIn`)
