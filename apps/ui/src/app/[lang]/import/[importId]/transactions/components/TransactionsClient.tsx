@@ -64,7 +64,8 @@ export default function TransactionsClient({
 
   // Unassigned rows first so users see what still needs attention
   const sortedRows = useMemo(
-    () => [...rows].sort((a, b) => Number(a.autoAssigned) - Number(b.autoAssigned)),
+    () =>
+      [...rows].sort((a, b) => Number(a.autoAssigned) - Number(b.autoAssigned)),
     [rows],
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
