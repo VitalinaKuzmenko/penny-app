@@ -288,11 +288,21 @@
         "AMOUNT": "Сума",
         "CATEGORY": "Категорія"
       },
-      "CUSTOM_CATEGORY_CELL_NAME": "Немає, просто дохід"
+      "CUSTOM_CATEGORY_CELL_NAME": "Немає, просто дохід",
+      "DUPLICATE_CHIP": "Дублікат",
+      "DUPLICATE_TOOLTIP": "Збігається з наявною транзакцією на цьому рахунку: {date} · {amount} · {description}",
+      "IMPORT_ANYWAY": "Імпортувати все одно"
+    },
+    "DUPLICATES_BAR": {
+      "SUMMARY": "Знайдено можливих дублікатів: {count} — за замовчуванням пропущено.",
+      "SKIP_ALL": "Пропустити всі",
+      "IMPORT_ALL": "Імпортувати всі"
     },
     "FOOTER": {
       "BACK_TO_HOME_PAGE": "Назад на головну",
-      "SAVE_BUTTON": "Зберегти та продовжити"
+      "SAVE_BUTTON": "Зберегти та продовжити",
+      "SAVE_BUTTON_WITH_COUNT": "Зберегти {count} транзакцій",
+      "SKIPPED_SUFFIX": "(пропущено: {skipped})"
     },
     "ERRORS": {
       "IMPORT_NOT_FOUND": {

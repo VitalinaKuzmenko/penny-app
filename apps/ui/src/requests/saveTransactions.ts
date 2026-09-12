@@ -1,11 +1,11 @@
 import { clientApiFetch } from '@/utils/clientApiFetch';
-import type { ConfirmImportInput } from 'schemas';
+import type { ConfirmImportInput, ConfirmImportResponse } from 'schemas';
 
 export const saveTransactions = (
   importId: string,
   payload: ConfirmImportInput,
 ) => {
-  return clientApiFetch<{ success: true }, ConfirmImportInput>(
+  return clientApiFetch<ConfirmImportResponse, ConfirmImportInput>(
     `/import/${importId}/confirm`,
     {
       method: 'POST',

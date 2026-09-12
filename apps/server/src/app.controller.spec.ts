@@ -13,7 +13,9 @@ describe('AppController', () => {
     }).compile();
 
     appController = app.get<AppController>(AppController);
+  });
 
-    console.log('appController', appController);
+  it('responds OK on the health check', () => {
+    expect(appController.healthCheck()).toBe('OK');
   });
 });

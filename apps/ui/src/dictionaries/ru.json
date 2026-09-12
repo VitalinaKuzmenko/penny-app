@@ -288,11 +288,21 @@
         "AMOUNT": "Сумма",
         "CATEGORY": "Категория"
       },
-      "CUSTOM_CATEGORY_CELL_NAME": "Нет, просто доход"
+      "CUSTOM_CATEGORY_CELL_NAME": "Нет, просто доход",
+      "DUPLICATE_CHIP": "Дубликат",
+      "DUPLICATE_TOOLTIP": "Совпадает с существующей транзакцией на этом счёте: {date} · {amount} · {description}",
+      "IMPORT_ANYWAY": "Импортировать всё равно"
+    },
+    "DUPLICATES_BAR": {
+      "SUMMARY": "Найдено возможных дубликатов: {count} — по умолчанию пропущены.",
+      "SKIP_ALL": "Пропустить все",
+      "IMPORT_ALL": "Импортировать все"
     },
     "FOOTER": {
       "BACK_TO_HOME_PAGE": "Назад на главную",
-      "SAVE_BUTTON": "Сохранить и продолжить"
+      "SAVE_BUTTON": "Сохранить и продолжить",
+      "SAVE_BUTTON_WITH_COUNT": "Сохранить {count} транзакций",
+      "SKIPPED_SUFFIX": "(пропущено: {skipped})"
     },
     "ERRORS": {
       "IMPORT_NOT_FOUND": {

@@ -1,10 +1,16 @@
 export const parseDate = (value: string): Date | null => {
   if (!value) return null;
 
-  // Try native parsing first (covers real ISO strings etc.)
-  const iso = new Date(value);
-  if (!isNaN(iso.getTime())) {
-    return iso;
+  // Numeric D/M/Y-shaped strings must NOT go through the native parser:
+  // V8 reads "07/03/2025" as US July 3, but UK bank exports mean 7 March.
+  const isNumericTriple = /^\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4}$/.test(
+    value.trim(),
+  );
+
+  if (!isNumericTriple) {
+    // Anything else (ISO timestamps, "15 Jan 2025", …) — let the runtime try
+    const native = new Date(value);
+    return isNaN(native.getTime()) ? null : native;
   }
 
   // Detect separator

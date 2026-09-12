@@ -3,7 +3,17 @@
 
 import * as React from 'react';
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid';
-import { Paper, FormControl, Select, MenuItem, Chip } from '@mui/material';
+import {
+  Paper,
+  FormControl,
+  Select,
+  MenuItem,
+  Chip,
+  Tooltip,
+  Checkbox,
+  FormControlLabel,
+  Stack,
+} from '@mui/material';
 import { CsvImportResponse, Category } from 'schemas';
 
 interface TransactionsTableProps {
@@ -16,6 +26,8 @@ interface TransactionsTableProps {
   onChangeCategory: (rowId: string, categoryId: string) => void;
   rowDescriptions: Record<string, string>;
   onChangeDescription: (rowId: string, value: string) => void;
+  forceImportRows: Record<string, boolean>;
+  onToggleForceImport: (rowId: string, value: boolean) => void;
 }
 
 export default function TransactionsTable({
@@ -28,9 +40,70 @@ export default function TransactionsTable({
   onChangeCategory,
   rowDescriptions,
   onChangeDescription,
+  forceImportRows,
+  onToggleForceImport,
 }: TransactionsTableProps) {
+  const hasDuplicates = React.useMemo(
+    () => rows.some((r) => r.duplicate),
+    [rows],
+  );
+
   const columns = React.useMemo<GridColDef<CsvImportResponse>[]>(
     () => [
+      ...(hasDuplicates
+        ? ([
+            {
+              field: 'duplicate',
+              headerName: '',
+              width: 200,
+              sortable: true,
+              filterable: false,
+              renderCell: (params) => {
+                if (!params.row.duplicate) return null;
+                const match = params.row.duplicateOf;
+                const tooltip = match
+                  ? String(pageText.DUPLICATE_TOOLTIP)
+                      .replace('{date}', match.date)
+                      .replace('{amount}', String(match.amount))
+                      .replace('{description}', match.description)
+                  : '';
+                return (
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    alignItems="center"
+                    sx={{ height: '100%' }}
+                  >
+                    <Tooltip title={tooltip} arrow>
+                      <Chip
+                        label={pageText.DUPLICATE_CHIP}
+                        size="small"
+                        color="warning"
+                        variant="outlined"
+                      />
+                    </Tooltip>
+                    <FormControlLabel
+                      sx={{
+                        m: 0,
+                        '.MuiFormControlLabel-label': { fontSize: 12 },
+                      }}
+                      control={
+                        <Checkbox
+                          size="small"
+                          checked={Boolean(forceImportRows[params.row.id])}
+                          onChange={(e) =>
+                            onToggleForceImport(params.row.id, e.target.checked)
+                          }
+                        />
+                      }
+                      label={pageText.IMPORT_ANYWAY}
+                    />
+                  </Stack>
+                );
+              },
+            },
+          ] as GridColDef<CsvImportResponse>[])
+        : []),
       {
         field: 'date',
         headerName: `${pageText.COLUMNS.DATE}`,
@@ -154,6 +227,9 @@ export default function TransactionsTable({
       rowDescriptions,
       onChangeDescription,
       pageText,
+      hasDuplicates,
+      forceImportRows,
+      onToggleForceImport,
     ],
   );
 
@@ -165,6 +241,11 @@ export default function TransactionsTable({
         getRowId={(row) => row.id}
         checkboxSelection
         disableRowSelectionOnClick
+        getRowClassName={(params) =>
+          params.row.duplicate && !forceImportRows[params.row.id]
+            ? 'penny-row-skipped'
+            : ''
+        }
         rowSelectionModel={{
           type: 'include',
           ids: new Set<GridRowId>(selectedRows),
@@ -178,6 +259,14 @@ export default function TransactionsTable({
           '.MuiDataGrid-columnHeaderTitle': {
             fontWeight: 'bold',
           },
+          // Skipped duplicates read as "won't be imported" without hiding them
+          '.penny-row-skipped': {
+            opacity: 0.55,
+          },
+          '.penny-row-skipped .MuiDataGrid-cell[data-field="description"], .penny-row-skipped .MuiDataGrid-cell[data-field="amount"], .penny-row-skipped .MuiDataGrid-cell[data-field="date"]':
+            {
+              textDecoration: 'line-through',
+            },
           // Remove cell focus highlight
           '.MuiDataGrid-cell:focus, .MuiDataGrid-columnHeader:focus': {
             outline: 'none',

@@ -74,7 +74,10 @@ export class AuthService {
 
     if (!user.passwordHash) {
       // OAuth-only account — no password was ever set
-      this.logger.warn('Login failed: OAuth-only account', { userId: user.id, email });
+      this.logger.warn('Login failed: OAuth-only account', {
+        userId: user.id,
+        email,
+      });
       throw new UnauthorizedException({
         field: 'email',
         code: 'auth.oauth_only_account',
@@ -164,10 +167,13 @@ export class AuthService {
       // Check if this email is already registered as a local (password) account
       const existing = await this.usersService.findByEmail(email);
       if (existing) {
-        this.logger.warn('OAuth login failed: email already has a local account', {
-          email,
-          provider,
-        });
+        this.logger.warn(
+          'OAuth login failed: email already has a local account',
+          {
+            email,
+            provider,
+          },
+        );
         throw new ConflictException({
           code: 'auth.email_registered_locally',
         });
