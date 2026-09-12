@@ -122,16 +122,18 @@ export default function TransactionsTable({
             );
             if (!internalTransferCategory) return null;
 
-            return selectEl(
-              <>
-                <MenuItem value={internalTransferCategory.id}>
-                  {internalTransferCategory.name}
-                </MenuItem>
-                <MenuItem value={undefined}>
-                  {pageText.CUSTOM_CATEGORY_CELL_NAME}
-                </MenuItem>
-              </>,
-            );
+            // MUI Select needs MenuItems as direct children — no Fragment wrapper
+            return selectEl([
+              <MenuItem
+                key={internalTransferCategory.id}
+                value={internalTransferCategory.id}
+              >
+                {internalTransferCategory.name}
+              </MenuItem>,
+              <MenuItem key="none" value="">
+                {pageText.CUSTOM_CATEGORY_CELL_NAME}
+              </MenuItem>,
+            ]);
           }
 
           // Options for normal rows

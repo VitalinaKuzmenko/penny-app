@@ -106,7 +106,7 @@ export default function TransactionsClient({
     try {
       const payloadRows: ConfirmImportInput['rows'] = rows.map((row) => ({
         id: row.id,
-        categoryId: rowCategories[row.id],
+        categoryId: rowCategories[row.id] || undefined,
         description: rowDescriptions[row.id],
       }));
 
