@@ -92,14 +92,13 @@ Implemented:
   and inserts with `skipDuplicates: true` as a final safety net. Returns
   `{ skippedDuplicates }`.
 - `GET /import/:importId/rows` accepts an optional `?accountId=` query param
-  and flags each row's `duplicate: boolean` once an account is known.
-- Frontend: `saveTransactions` surfaces `skippedDuplicates`; if > 0,
-  `TransactionsClient` shows an info banner ("N transaction(s) already
-  existed on this account and were skipped") before redirecting.
-- Not yet wired: the review table doesn't call `GET /rows` again with
-  `accountId` when the user picks an account (so duplicates aren't flagged
-  pre-save today) — the guarantee "no duplicate data will ever be created"
-  holds regardless, enforced server-side at confirm time.
+  and, once an account is known, flags each row with `duplicate: boolean`
+  plus `duplicateOf: { date, amount, description }` — the existing
+  transaction it matched, so the user can judge whether it's a real
+  re-import or a legitimate repeat.
+- Confirm rows accept `forceImport?: boolean`; the server skips a row only
+  when `duplicate && !forceImport`. `skippedDuplicates` is still returned
+  (useful for logging) but the UI no longer relies on it.
 
 ### Correction (2026-09-12): false-positive risk found and fixed
 
@@ -124,12 +123,38 @@ Fixed by:
   first 2 are skipped as duplicates, the 3rd is inserted as genuinely new.
 - Frontend: the post-save duplicate notice no longer auto-redirects after
   2s (easy to miss) — it now stays visible with an explicit "Continue"
-  button.
+  button. (Superseded the same day by the pre-save review below.)
 
-Still open: no pre-save duplicate indicator in the review table (only a
-post-save summary count). Worth adding later — a "possible duplicate" flag
-per row, with an explicit "import anyway" override, rather than only a
-silent skip.
+### Pre-save duplicate review (2026-09-12) — replaces the post-save banner
+
+Agreed principle: the user must be able to see *which* rows are duplicates,
+*why* (what they matched), and decide per row — before anything is saved.
+A "4 were skipped, trust us" summary after the fact is not acceptable.
+
+Flow as implemented in `TransactionsClient` / `TransactionsTable` /
+`DuplicatesBar`:
+
+- Duplicates are computed per account, so nothing is flagged until an
+  account is chosen. On `accountId` change the client re-fetches
+  `GET /import/:id/rows?accountId=` and swaps in the flagged rows; any
+  previous force-import choices are reset.
+- Each duplicate row shows a "Duplicate" chip with a tooltip of the matched
+  existing transaction (date · amount · description), an **Import anyway**
+  checkbox (off by default), and is rendered muted + struck-through while
+  skipped so it reads as "won't be imported" without hiding it.
+- A warning bar above the table summarises "N possible duplicate(s) found —
+  skipped by default" with **Skip all** / **Import all anyway** bulk actions.
+- Skipped rows don't need a category and don't block Save. Opting a row back
+  in makes it a normal row again (category rule applies).
+- Save button is honest: "Save 12 transaction(s) (4 skipped)". After save
+  the user goes straight to the dashboard — no post-save banner.
+- Default is **skip**, not import: the primary case is overlapping exports
+  (HSBC window), and a wrong skip (one missing coffee) costs less than a
+  wrong import (double-counted rent). The user overrides per row when they
+  know better.
+- Honest limit: same-day identical items are inherently ambiguous. The app
+  shows the evidence (the matched transaction) and lets the human decide; it
+  does not pretend to know.
 
 ## 3. Habit nudges — nice to have, low effort
 

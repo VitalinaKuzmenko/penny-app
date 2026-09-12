@@ -293,11 +293,21 @@
         "AMOUNT": "Amount",
         "CATEGORY": "Category"
       },
-      "CUSTOM_CATEGORY_CELL_NAME": "None, just income"
+      "CUSTOM_CATEGORY_CELL_NAME": "None, just income",
+      "DUPLICATE_CHIP": "Duplicate",
+      "DUPLICATE_TOOLTIP": "Matches an existing transaction on this account: {date} · {amount} · {description}",
+      "IMPORT_ANYWAY": "Import anyway"
+    },
+    "DUPLICATES_BAR": {
+      "SUMMARY": "{count} possible duplicate(s) found — skipped by default.",
+      "SKIP_ALL": "Skip all",
+      "IMPORT_ALL": "Import all anyway"
     },
     "FOOTER": {
       "BACK_TO_HOME_PAGE": "Back to home",
-      "SAVE_BUTTON": "Save & continue"
+      "SAVE_BUTTON": "Save & continue",
+      "SAVE_BUTTON_WITH_COUNT": "Save {count} transaction(s)",
+      "SKIPPED_SUFFIX": "({skipped} skipped)"
     },
     "ERRORS": {
       "IMPORT_NOT_FOUND": {

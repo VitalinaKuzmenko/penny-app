@@ -1,11 +1,12 @@
 import { z } from 'zod';
-import { CurrencySchema, TransactionTypeSchema } from '../types';
-import { de } from 'zod/v4/locales';
+import { CurrencySchema } from '../types';
 
 export const ConfirmImportRowSchema = z.object({
   id: z.string().uuid(),
   categoryId: z.string().uuid().optional(),
   description: z.string().trim().min(1),
+  // user explicitly chose to import this row even though it was flagged as a duplicate
+  forceImport: z.boolean().optional(),
 });
 
 export const ConfirmImportSchema = z.object({

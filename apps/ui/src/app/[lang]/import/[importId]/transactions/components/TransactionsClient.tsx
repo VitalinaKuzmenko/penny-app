@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { Box, Typography, Stack, Container, Alert } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { Box, Typography, Stack, Container } from '@mui/material';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import z from 'zod';
 import TransactionsTable from './TransactionsTable';
 import BulkCategoryBar from './BulkCategoryBar';
+import DuplicatesBar from './DuplicatesBar';
 import {
   Account,
   Category,
@@ -25,6 +26,7 @@ import { saveTransactions } from '@/requests/saveTransactions';
 import { mapConfirmImportErrorToUiError } from '@/utils/mapConfirmImportErrorToUiError';
 import CreateAccountModal from './CreateAccountModal';
 import { getAccounts } from '@/requests/getAccounts';
+import { getImportRows } from '@/requests/getImportRows';
 
 interface TransactionsClientProps {
   transactionsPageText: Record<string, any>;
@@ -41,26 +43,34 @@ export type Currency = z.infer<typeof CurrencySchema>;
 export default function TransactionsClient({
   transactionsPageText,
   importId,
-  rows,
+  rows: initialRows,
   accounts,
   categories,
   currencies,
   serverErrors,
 }: TransactionsClientProps) {
+  // Rows are re-fetched once an account is chosen so duplicate flags can be computed per account
+  const [rows, setRows] = useState<CsvImportResponse[]>(initialRows);
   const [currency, setCurrency] = useState<Currency | null>(null);
   const [accountId, setAccountId] = useState<string | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [rowCategories, setRowCategories] = useState<Record<string, string>>(
     () =>
       Object.fromEntries(
-        rows
+        initialRows
           .filter((r) => r.suggestedCategoryId)
           .map((r) => [r.id, r.suggestedCategoryId as string]),
       ),
   );
   const [rowDescriptions, setRowDescriptions] = useState<
     Record<string, string>
-  >(() => Object.fromEntries(rows.map((r) => [r.id, r.description ?? ''])));
+  >(() =>
+    Object.fromEntries(initialRows.map((r) => [r.id, r.description ?? ''])),
+  );
+  // Duplicates are skipped unless the user explicitly opts a row back in
+  const [forceImportRows, setForceImportRows] = useState<
+    Record<string, boolean>
+  >({});
 
   // Unassigned rows first so users see what still needs attention
   const sortedRows = useMemo(
@@ -72,23 +82,51 @@ export default function TransactionsClient({
   const [apiError, setApiError] = useState<UiError | null>(null);
   const [accountsState, setAccountsState] = useState<Account[]>(accounts);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [skippedDuplicates, setSkippedDuplicates] = useState<number>(0);
 
   const router = useRouter();
-  // const [areButtonsEnabled, setAreButtonsEnabled] = useState<boolean>(false);
+
+  const duplicateRows = useMemo(() => rows.filter((r) => r.duplicate), [rows]);
+
+  const isRowSkipped = useCallback(
+    (row: CsvImportResponse) => row.duplicate && !forceImportRows[row.id],
+    [forceImportRows],
+  );
+
+  const rowsToImport = useMemo(
+    () => rows.filter((r) => !isRowSkipped(r)),
+    [rows, isRowSkipped],
+  );
+  const skippedCount = rows.length - rowsToImport.length;
+
+  useEffect(() => {
+    if (!accountId) return;
+    let cancelled = false;
+    getImportRows(importId, accountId)
+      .then((fresh) => {
+        if (cancelled) return;
+        setRows(fresh);
+        setForceImportRows({});
+      })
+      .catch((err) => console.error('Failed to refresh import rows', err));
+    return () => {
+      cancelled = true;
+    };
+  }, [accountId, importId]);
+
   const areButtonsEnabled = useMemo(() => {
-    const rowsToCheck = rows.filter((row) => Number(row.amount) <= 0); // only rows where amount <= 0
-    const assignedCategoriesCount = Object.entries(rowCategories).filter(
-      ([rowId, categoryId]) => {
-        const row = rows.find((r) => r.id === rowId);
-        return row && Number(row.amount) <= 0 && categoryId; // only count relevant rows
-      },
+    // Skipped duplicates don't need a category since they won't be saved
+    const rowsToCheck = rowsToImport.filter((row) => Number(row.amount) <= 0);
+    const assignedCategoriesCount = rowsToCheck.filter(
+      (row) => Boolean(rowCategories[row.id]),
     ).length;
 
     return Boolean(
-      accountId && currency && rowsToCheck.length === assignedCategoriesCount,
+      accountId &&
+        currency &&
+        rowsToImport.length > 0 &&
+        rowsToCheck.length === assignedCategoriesCount,
     );
-  }, [accountId, currency, rowCategories, rows]);
+  }, [accountId, currency, rowCategories, rowsToImport]);
 
   const refetchAccounts = async () => {
     const freshAccounts = await getAccounts();
@@ -110,6 +148,7 @@ export default function TransactionsClient({
         id: row.id,
         categoryId: rowCategories[row.id] || undefined,
         description: rowDescriptions[row.id],
+        forceImport: row.duplicate ? Boolean(forceImportRows[row.id]) : undefined,
       }));
 
       const payload: ConfirmImportInput = {
@@ -120,14 +159,9 @@ export default function TransactionsClient({
 
       ConfirmImportSchema.parse(payload);
 
-      const result = await saveTransactions(importId, payload);
+      await saveTransactions(importId, payload);
 
-      if (result.skippedDuplicates > 0) {
-        // Let the user actually see the notice instead of navigating away immediately
-        setSkippedDuplicates(result.skippedDuplicates);
-      } else {
-        router.push('/pennys-view');
-      }
+      router.push('/pennys-view');
     } catch (error: any) {
       console.error('Confirm import failed:', error.data);
 
@@ -169,23 +203,6 @@ export default function TransactionsClient({
       </Box>
 
       {/* Error display */}
-      {skippedDuplicates > 0 && (
-        <Alert
-          severity="info"
-          sx={{ mb: 2 }}
-          action={
-            <CustomButton
-              size="small"
-              onClick={() => router.push('/pennys-view')}
-            >
-              Continue
-            </CustomButton>
-          }
-        >
-          {skippedDuplicates} transaction(s) already existed on this account and
-          were skipped.
-        </Alert>
-      )}
       {serverErrors &&
         serverErrors.length > 0 &&
         serverErrors.map((error) => (
@@ -216,6 +233,18 @@ export default function TransactionsClient({
           onCreate={() => setIsCreateModalOpen(true)}
         />
       </Stack>
+
+      {/* Duplicates summary */}
+      <DuplicatesBar
+        pageText={transactionsPageText.DUPLICATES_BAR}
+        duplicateCount={duplicateRows.length}
+        onSkipAll={() => setForceImportRows({})}
+        onImportAll={() =>
+          setForceImportRows(
+            Object.fromEntries(duplicateRows.map((r) => [r.id, true])),
+          )
+        }
+      />
 
       {/* Bulk category */}
       <BulkCategoryBar
@@ -254,6 +283,10 @@ export default function TransactionsClient({
             [rowId]: value,
           }))
         }
+        forceImportRows={forceImportRows}
+        onToggleForceImport={(rowId: string, value: boolean) =>
+          setForceImportRows((prev) => ({ ...prev, [rowId]: value }))
+        }
       />
       {apiError && (
         <Box sx={{ mt: 3 }}>
@@ -276,7 +309,17 @@ export default function TransactionsClient({
           disabledStyling={!areButtonsEnabled || isSaving}
           onClick={handleTransactionSave}
         >
-          {transactionsPageText.FOOTER.SAVE_BUTTON}
+          {duplicateRows.length
+            ? `${String(
+                transactionsPageText.FOOTER.SAVE_BUTTON_WITH_COUNT,
+              ).replace('{count}', String(rowsToImport.length))}${
+                skippedCount
+                  ? ` ${String(
+                      transactionsPageText.FOOTER.SKIPPED_SUFFIX,
+                    ).replace('{skipped}', String(skippedCount))}`
+                  : ''
+              }`
+            : transactionsPageText.FOOTER.SAVE_BUTTON}
         </CustomButton>
       </Stack>
 

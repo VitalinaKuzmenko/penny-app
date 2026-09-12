@@ -169,18 +169,36 @@ export class ImportService {
     );
 
     // Only known once an account is chosen, since dedupe is scoped per account.
-    // Counted (not just existence) so genuinely repeated transactions (e.g. two
-    // identical coffees on the same day) aren't all flagged as duplicates.
-    let existingCounts = new Map<string, number>();
+    // Keep every match (not just a count) so genuinely repeated transactions
+    // (e.g. two identical coffees on the same day) aren't all flagged, and so
+    // we can show the user exactly which existing transaction each row matched.
+    const existingByFingerprint = new Map<
+      string,
+      { date: Date; description: string | null; amount: number }[]
+    >();
     if (accountId) {
       const existing = await this.prisma.transaction.findMany({
         where: { accountId, userId, fingerprint: { not: null } },
-        select: { fingerprint: true },
+        select: {
+          fingerprint: true,
+          date: true,
+          description: true,
+          amount: true,
+          type: true,
+        },
       });
-      existingCounts = new Map<string, number>();
       for (const t of existing) {
         const fp = t.fingerprint as string;
-        existingCounts.set(fp, (existingCounts.get(fp) ?? 0) + 1);
+        const list = existingByFingerprint.get(fp) ?? [];
+        list.push({
+          date: t.date,
+          description: t.description,
+          amount:
+            t.type === TransactionType.EXPENSE
+              ? -Number(t.amount)
+              : Number(t.amount),
+        });
+        existingByFingerprint.set(fp, list);
       }
     }
 
@@ -200,9 +218,9 @@ export class ImportService {
         Number(row.amount),
         row.description,
       );
+      const matches = existingByFingerprint.get(fingerprint) ?? [];
       const alreadyConsumed = consumedInPreview.get(fingerprint) ?? 0;
-      const isDuplicate =
-        alreadyConsumed < (existingCounts.get(fingerprint) ?? 0);
+      const match = matches[alreadyConsumed] ?? null;
       consumedInPreview.set(fingerprint, alreadyConsumed + 1);
       return {
         id: row.id,
@@ -211,7 +229,14 @@ export class ImportService {
         amount: Number(row.amount),
         suggestedCategoryId,
         autoAssigned: suggestedCategoryId !== null,
-        duplicate: isDuplicate,
+        duplicate: match !== null,
+        duplicateOf: match
+          ? {
+              date: formatDateToString(match.date),
+              description: match.description ?? '',
+              amount: match.amount,
+            }
+          : null,
       };
     });
   }
@@ -289,7 +314,8 @@ export class ImportService {
         alreadyConsumed < (existingCounts.get(fingerprint) ?? 0);
       consumedInBatch.set(fingerprint, alreadyConsumed + 1);
 
-      if (isDuplicate) {
+      // the user saw the duplicate warning and explicitly chose to import anyway
+      if (isDuplicate && !input.forceImport) {
         skippedDuplicates += 1;
         return [];
       }
