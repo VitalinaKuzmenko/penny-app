@@ -45,9 +45,10 @@ model User {
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @updatedAt @map("updated_at")
 
-  accounts    Account[]
-  categories  Category[]
-  transactions Transaction[]
+  accounts          Account[]
+  categories        Category[]
+  transactions      Transaction[]
+  categoryMappings  CategoryMapping[]
 
   @@unique([provider, providerId])
 }
@@ -76,7 +77,8 @@ model Category {
   userId    String      @map("user_id")
   user      User        @relation(fields: [userId], references: [id])
 
-  transactions Transaction[]
+  transactions     Transaction[]
+  categoryMappings CategoryMapping[]
 
   @@unique([userId, name])
 }
@@ -126,6 +128,21 @@ model TransactionImport {
   status    ImportStatus @default(PENDING)
 
   rows      TransactionImportRow[]
+}
+
+// Remembers which category a user last assigned to a given transaction description.
+model CategoryMapping {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  description String   // normalised: lowercased + trimmed
+  categoryId  String   @map("category_id")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, description])
+  @@index([userId])
 }
 
 

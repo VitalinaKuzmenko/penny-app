@@ -15,6 +15,7 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import {
   Request as ExpressRequest,
   Response as ExpressResponse,
@@ -28,7 +29,9 @@ import {
 
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { Throttle } from '@nestjs/throttler';
+
+// Stricter limit for credential endpoints (brute-force / signup spam)
+const AUTH_THROTTLE = { default: { ttl: 60_000, limit: 10 } };
 
 // Stricter limit for credential endpoints (brute-force / signup spam)
 const AUTH_THROTTLE = { default: { ttl: 60_000, limit: 10 } };

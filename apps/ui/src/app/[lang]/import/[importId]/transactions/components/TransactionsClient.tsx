@@ -51,11 +51,23 @@ export default function TransactionsClient({
   const [accountId, setAccountId] = useState<string | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [rowCategories, setRowCategories] = useState<Record<string, string>>(
-    {},
+    () =>
+      Object.fromEntries(
+        rows
+          .filter((r) => r.suggestedCategoryId)
+          .map((r) => [r.id, r.suggestedCategoryId as string]),
+      ),
   );
   const [rowDescriptions, setRowDescriptions] = useState<
     Record<string, string>
   >(() => Object.fromEntries(rows.map((r) => [r.id, r.description ?? ''])));
+
+  // Unassigned rows first so users see what still needs attention
+  const sortedRows = useMemo(
+    () =>
+      [...rows].sort((a, b) => Number(a.autoAssigned) - Number(b.autoAssigned)),
+    [rows],
+  );
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [apiError, setApiError] = useState<UiError | null>(null);
   const [accountsState, setAccountsState] = useState<Account[]>(accounts);
@@ -95,7 +107,7 @@ export default function TransactionsClient({
     try {
       const payloadRows: ConfirmImportInput['rows'] = rows.map((row) => ({
         id: row.id,
-        categoryId: rowCategories[row.id],
+        categoryId: rowCategories[row.id] || undefined,
         description: rowDescriptions[row.id],
       }));
 
@@ -201,7 +213,7 @@ export default function TransactionsClient({
       {/* Table */}
       <TransactionsTable
         pageText={transactionsPageText.TABLE}
-        rows={rows}
+        rows={sortedRows}
         categories={categories}
         selectedRows={selectedRows}
         onSelectRows={setSelectedRows}

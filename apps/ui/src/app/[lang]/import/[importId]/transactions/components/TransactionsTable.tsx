@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid';
-import { Paper, FormControl, Select, MenuItem } from '@mui/material';
+import { Paper, FormControl, Select, MenuItem, Chip } from '@mui/material';
 import { CsvImportResponse, Category } from 'schemas';
 
 interface TransactionsTableProps {
@@ -83,46 +83,11 @@ export default function TransactionsTable({
         },
         renderCell: (params) => {
           const amount = Number(params.row.amount);
+          const isAutoAssigned =
+            params.row.autoAssigned &&
+            rowCategories[params.row.id] === params.row.suggestedCategoryId;
 
-          // Early exit: hide selector for positive amounts without internal transfer
-          if (amount > 0) {
-            const internalTransferCategory = categories.find(
-              (cat) => cat.name === 'Internal Transfer',
-            );
-            if (!internalTransferCategory) return null;
-
-            return (
-              <FormControl
-                size="small"
-                fullWidth
-                sx={{ height: '100%', display: 'flex', alignItems: 'center' }}
-              >
-                <Select
-                  value={rowCategories[params.row.id] ?? ''}
-                  onChange={(e) =>
-                    onChangeCategory(params.row.id, e.target.value)
-                  }
-                  sx={{ width: '100%' }}
-                >
-                  <MenuItem value={internalTransferCategory.id}>
-                    {internalTransferCategory.name}
-                  </MenuItem>
-                  <MenuItem value={undefined}>
-                    {pageText.CUSTOM_CATEGORY_CELL_NAME}
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            );
-          }
-
-          // Options for normal rows
-          const options = categories.map((cat) => (
-            <MenuItem key={cat.id} value={cat.id}>
-              {cat.name}
-            </MenuItem>
-          ));
-
-          return (
+          const selectEl = (options: React.ReactNode) => (
             <FormControl
               size="small"
               fullWidth
@@ -134,10 +99,50 @@ export default function TransactionsTable({
                   onChangeCategory(params.row.id, e.target.value)
                 }
                 sx={{ width: '100%' }}
+                startAdornment={
+                  isAutoAssigned ? (
+                    <Chip
+                      label="auto"
+                      size="small"
+                      color="info"
+                      variant="outlined"
+                      sx={{ mr: 0.5, height: 18, fontSize: 10 }}
+                    />
+                  ) : undefined
+                }
               >
                 {options}
               </Select>
             </FormControl>
+          );
+          // Early exit: hide selector for positive amounts without internal transfer
+          if (amount > 0) {
+            const internalTransferCategory = categories.find(
+              (cat) => cat.name === 'Internal Transfer',
+            );
+            if (!internalTransferCategory) return null;
+
+            // MUI Select needs MenuItems as direct children — no Fragment wrapper
+            return selectEl([
+              <MenuItem
+                key={internalTransferCategory.id}
+                value={internalTransferCategory.id}
+              >
+                {internalTransferCategory.name}
+              </MenuItem>,
+              <MenuItem key="none" value="">
+                {pageText.CUSTOM_CATEGORY_CELL_NAME}
+              </MenuItem>,
+            ]);
+          }
+
+          // Options for normal rows
+          return selectEl(
+            categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>
+                {cat.name}
+              </MenuItem>
+            )),
           );
         },
       },
