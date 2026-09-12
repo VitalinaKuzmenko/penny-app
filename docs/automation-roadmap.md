@@ -127,8 +127,8 @@ Fixed by:
 
 ### Pre-save duplicate review (2026-09-12) — replaces the post-save banner
 
-Agreed principle: the user must be able to see *which* rows are duplicates,
-*why* (what they matched), and decide per row — before anything is saved.
+Agreed principle: the user must be able to see _which_ rows are duplicates,
+_why_ (what they matched), and decide per row — before anything is saved.
 A "4 were skipped, trust us" summary after the fact is not acceptable.
 
 Flow as implemented in `TransactionsClient` / `TransactionsTable` /

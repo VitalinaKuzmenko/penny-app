@@ -9,9 +9,7 @@ export const getImportRows = async (
 ): Promise<CsvImportResponse[]> => {
   if (!importId) throw new Error('importId is required');
 
-  const query = accountId
-    ? `?accountId=${encodeURIComponent(accountId)}`
-    : '';
+  const query = accountId ? `?accountId=${encodeURIComponent(accountId)}` : '';
 
   return await serverApiFetch<CsvImportResponse[]>(
     `/import/${importId}/rows${query}`,

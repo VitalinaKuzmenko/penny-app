@@ -116,15 +116,15 @@ export default function TransactionsClient({
   const areButtonsEnabled = useMemo(() => {
     // Skipped duplicates don't need a category since they won't be saved
     const rowsToCheck = rowsToImport.filter((row) => Number(row.amount) <= 0);
-    const assignedCategoriesCount = rowsToCheck.filter(
-      (row) => Boolean(rowCategories[row.id]),
+    const assignedCategoriesCount = rowsToCheck.filter((row) =>
+      Boolean(rowCategories[row.id]),
     ).length;
 
     return Boolean(
       accountId &&
-        currency &&
-        rowsToImport.length > 0 &&
-        rowsToCheck.length === assignedCategoriesCount,
+      currency &&
+      rowsToImport.length > 0 &&
+      rowsToCheck.length === assignedCategoriesCount,
     );
   }, [accountId, currency, rowCategories, rowsToImport]);
 
@@ -148,7 +148,9 @@ export default function TransactionsClient({
         id: row.id,
         categoryId: rowCategories[row.id] || undefined,
         description: rowDescriptions[row.id],
-        forceImport: row.duplicate ? Boolean(forceImportRows[row.id]) : undefined,
+        forceImport: row.duplicate
+          ? Boolean(forceImportRows[row.id])
+          : undefined,
       }));
 
       const payload: ConfirmImportInput = {

@@ -83,7 +83,10 @@ export default function TransactionsTable({
                       />
                     </Tooltip>
                     <FormControlLabel
-                      sx={{ m: 0, '.MuiFormControlLabel-label': { fontSize: 12 } }}
+                      sx={{
+                        m: 0,
+                        '.MuiFormControlLabel-label': { fontSize: 12 },
+                      }}
                       control={
                         <Checkbox
                           size="small"
