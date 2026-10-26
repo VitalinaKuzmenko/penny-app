@@ -8,7 +8,11 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
-import { AccountDto, CreateAccountDto } from 'schemas-nest';
+import {
+  AccountDto,
+  AccountWithActivityDto,
+  CreateAccountDto,
+} from 'schemas-nest';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { isUniqueConstraintError } from '../utils/isPrismaUniqueError';
@@ -21,9 +25,9 @@ export class AccountsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all user accounts' })
-  @ApiOkResponse({ type: AccountDto, isArray: true })
+  @ApiOkResponse({ type: AccountWithActivityDto, isArray: true })
   @UseGuards(JwtAuthGuard)
-  async getAccounts(@Req() req): Promise<AccountDto[]> {
+  async getAccounts(@Req() req): Promise<AccountWithActivityDto[]> {
     const userId = req.user?.userId;
 
     return this.accountsService.getUserAccounts(userId);

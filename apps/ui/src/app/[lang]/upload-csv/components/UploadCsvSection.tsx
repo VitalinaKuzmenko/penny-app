@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Container, Typography, Tooltip } from '@mui/material';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import UploadFileContainer from './UploadFileContainer';
@@ -16,10 +16,12 @@ import { mapUploadCsvErrorToUiError } from '@/utils/mapUploadCsvErrorToUiError';
 interface UploadCsvSectionProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   uploadCsvPageText: Record<string, any>;
+  accountsSummary?: ReactNode;
 }
 
 export default function UploadCsvSection({
   uploadCsvPageText,
+  accountsSummary,
 }: UploadCsvSectionProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -60,6 +62,8 @@ export default function UploadCsvSection({
           {uploadCsvPageText.SUBTITLE}
         </Typography>
       </Box>
+
+      {accountsSummary}
 
       <UploadCsvFormatOverview
         formatOverviewText={uploadCsvPageText.CSV_FORMAT_OVERVIEW}
