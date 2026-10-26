@@ -41,6 +41,19 @@ export default function AccountSelect({
     onCreate();
   };
 
+  const describeLastDate = (acc: AccountWithActivity) =>
+    acc.lastTransactionDate
+      ? pageText.DATA_UP_TO.replace(
+          '{date}',
+          formatDay(acc.lastTransactionDate, lang),
+        )
+      : pageText.NO_TRANSACTIONS;
+
+  const renderSelected = (id: string) => {
+    const acc = accounts.find((a) => a.id === id);
+    return acc ? `${acc.name} · ${describeLastDate(acc)}` : '';
+  };
+
   return (
     <Stack direction="row" spacing={2} flex={2}>
       <Tooltip
@@ -55,9 +68,7 @@ export default function AccountSelect({
               value={value ?? ''}
               label="Account"
               onChange={handleChange}
-              renderValue={(id) =>
-                accounts.find((acc) => acc.id === id)?.name ?? ''
-              }
+              renderValue={renderSelected}
             >
               {hasAccounts &&
                 accounts.map((acc) => (
@@ -72,14 +83,7 @@ export default function AccountSelect({
                   >
                     <ListItemText
                       primary={acc.name}
-                      secondary={
-                        acc.lastTransactionDate
-                          ? pageText.DATA_UP_TO.replace(
-                              '{date}',
-                              formatDay(acc.lastTransactionDate, lang),
-                            )
-                          : pageText.NO_TRANSACTIONS
-                      }
+                      secondary={describeLastDate(acc)}
                     />
                   </MenuItem>
                 ))}

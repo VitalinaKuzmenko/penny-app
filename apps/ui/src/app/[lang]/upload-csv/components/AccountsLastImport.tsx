@@ -44,27 +44,16 @@ export default function AccountsLastImport({
           >
             <Typography fontWeight={600}>{account.name}</Typography>
 
-            {account.lastTransactionDate && account.lastImportedAt ? (
-              <Stack
-                direction={{ xs: 'column', md: 'row' }}
-                spacing={{ xs: 0, md: 3 }}
-              >
-                <Typography variant="body2">
-                  {text.DATA_UP_TO.replace(
-                    '{date}',
-                    formatDay(account.lastTransactionDate, lang),
-                  ).replace(
-                    '{relative}',
-                    formatDaysAgo(account.lastTransactionDate, lang),
-                  )}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {text.LAST_IMPORTED.replace(
-                    '{date}',
-                    formatDay(account.lastImportedAt, lang),
-                  )}
-                </Typography>
-              </Stack>
+            {account.lastTransactionDate ? (
+              <Typography variant="body2">
+                {text.DATA_UP_TO.replace(
+                  '{date}',
+                  formatDay(account.lastTransactionDate, lang),
+                ).replace(
+                  '{relative}',
+                  formatDaysAgo(account.lastTransactionDate, lang),
+                )}
+              </Typography>
             ) : (
               <Typography variant="body2" color="text.secondary">
                 {text.NO_TRANSACTIONS}

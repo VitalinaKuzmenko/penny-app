@@ -22,23 +22,19 @@ export class AccountsService {
       this.prisma.transaction.groupBy({
         by: ['accountId'],
         where: { userId },
-        _max: { date: true, createdAt: true },
+        _max: { date: true },
       }),
     ]);
 
-    const maxByAccount = new Map(
-      activity.map((row) => [row.accountId, row._max]),
+    const lastDateByAccount = new Map(
+      activity.map((row) => [row.accountId, row._max.date]),
     );
 
-    return accounts.map((account) => {
-      const max = maxByAccount.get(account.id);
-
-      return {
-        ...account,
-        lastTransactionDate: max?.date?.toISOString() ?? null,
-        lastImportedAt: max?.createdAt?.toISOString() ?? null,
-      };
-    });
+    return accounts.map((account) => ({
+      ...account,
+      lastTransactionDate:
+        lastDateByAccount.get(account.id)?.toISOString() ?? null,
+    }));
   }
 
   async createAccount(userId: string, name: string) {

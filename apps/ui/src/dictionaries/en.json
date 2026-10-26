@@ -197,7 +197,6 @@
       "TITLE": "Your accounts",
       "SUBTITLE": "Export from your bank starting the day after the last date. Overlaps are fine: duplicates are flagged before saving.",
       "DATA_UP_TO": "Data up to {date} ({relative})",
-      "LAST_IMPORTED": "Last imported {date}",
       "NO_TRANSACTIONS": "No transactions yet"
     },
 

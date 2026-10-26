@@ -27,7 +27,7 @@ describe('AccountsService', () => {
   });
 
   describe('getUserAccounts', () => {
-    it('adds last transaction date and last import time per account', async () => {
+    it('adds the last transaction date per account', async () => {
       prisma.account.findMany.mockResolvedValue([
         { id: HSBC_ID, name: 'HSBC' },
         { id: STARLING_ID, name: 'Starling' },
@@ -35,10 +35,7 @@ describe('AccountsService', () => {
       prisma.transaction.groupBy.mockResolvedValue([
         {
           accountId: HSBC_ID,
-          _max: {
-            date: new Date('2026-09-12T00:00:00Z'),
-            createdAt: new Date('2026-09-14T18:30:00Z'),
-          },
+          _max: { date: new Date('2026-09-12T00:00:00Z') },
         },
       ]);
 
@@ -49,13 +46,11 @@ describe('AccountsService', () => {
           id: HSBC_ID,
           name: 'HSBC',
           lastTransactionDate: '2026-09-12T00:00:00.000Z',
-          lastImportedAt: '2026-09-14T18:30:00.000Z',
         },
         {
           id: STARLING_ID,
           name: 'Starling',
           lastTransactionDate: null,
-          lastImportedAt: null,
         },
       ]);
     });
