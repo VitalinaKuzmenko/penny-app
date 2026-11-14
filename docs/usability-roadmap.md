@@ -15,7 +15,7 @@ is editing **after** import, which Step 3 covers.
 
 ## Step 1: Last import date per account
 
-Status: in review, PR #107 (branch `feature/account-last-import-date`).
+Status: done, PR #107 merged.
 
 Small change, no database migration.
 
@@ -32,6 +32,8 @@ Small change, no database migration.
     show the same info so gaps and overlaps are visible before saving.
 
 ## Step 2: Refunds reduce category spend
+
+Status: in progress (branch `feature/refunds-reduce-category-spend`).
 
 Added 2026-11-14. Example: clothes bought for £100, partly returned, £55
 refunded → the app should show £45 spent on clothes.
@@ -105,8 +107,8 @@ Transactions page (Step 3):
 | positive | `Internal Transfer` | `INCOME` (unchanged, still excluded) |
 | positive | any other category | `REFUND` |
 
-- `REFUND` always has a category; the server rejects a `REFUND` with no
-  category.
+- `REFUND` always has a category: the rule only produces `REFUND` when a
+  category is chosen.
 - An `EXPENSE` can never become a `REFUND` (or the other way round); only
   rows that were positive in the CSV (`INCOME`/`REFUND`) switch type when
   their category changes.
@@ -116,7 +118,8 @@ Transactions page (Step 3):
 ### Server
 
 - Confirm import: apply the rule above instead of `amount > 0 ? INCOME :
-  EXPENSE`.
+  EXPENSE`. It loads the submitted categories scoped by `userId` and
+  rejects IDs the user doesn't own (`import.invalid_category`, 400).
 - Duplicate detection rebuilds the signed amount as `EXPENSE` → negative,
   anything else → positive, so `REFUND` stays positive. Add a test so
   re-importing a CSV with a refund still matches it as a duplicate.
@@ -130,7 +133,8 @@ Transactions page (Step 3):
     has `INCOME`/`EXPENSE` keys, so a `REFUND` row would add to an
     undefined key; initialise it.
   - `getMonthlyCategoryChart` (chart + table): include `EXPENSE` and
-    `REFUND`; per category per month = `max(0, expense − refunds)`.
+    `REFUND`; per category per month = `max(0, expense − refunds)`;
+    categories that end at 0 for the whole year are dropped.
   - `getCategoryBreakdown` with `type=EXPENSE`: per category over the range
     = `max(0, expense − refunds)`; drop categories that end at 0; `total`
     = sum of the shown slices so percentages add up to 100. With
@@ -142,10 +146,13 @@ Transactions page (Step 3):
 ### UI
 
 - Import review table, positive rows: the category select offers
-  - "Income (no category)" (default when there's no suggestion)
+  - "None, just income" (existing label; default when there's no
+    suggestion)
   - `Internal Transfer`
   - all other categories under a "Refund for…" heading.
   Show a small "refund" chip when one is chosen.
+- The bulk category bar applies to every selected row; on a positive row
+  a spending category makes it a refund (same rule).
 - Category auto-suggestion already runs on positive rows: `CategoryMapping`
   is keyed by description only, and `TransactionsClient.tsx` pre-fills
   `suggestedCategoryId` for every row. Today the select can't show that
@@ -153,10 +160,13 @@ Transactions page (Step 3):
   income may be stored as `INCOME` with a spending category. Those rows are
   left as they are (still counted as income). With this step the
   suggestion becomes visible and pre-selects a refund (see Decisions).
-  Choosing "Income (no category)" instead doesn't update the mapping, so
+  Choosing "None, just income" instead doesn't update the mapping, so
   the same merchant will be suggested as a refund again next time.
-- Dashboard `TypeSelect`: add `Refund` if the type filter is used there.
-- New strings: see open decision 4 (i18n).
+- Dashboard `TypeSelect`: not changed. Its value is stored in
+  `FilterContext` but no chart reads it yet, so a `Refund` option would do
+  nothing.
+- New strings added to `en.json`, `ru.json` and `ua.json`. Chart tooltips
+  are unchanged.
 
 ### Alternatives considered
 
