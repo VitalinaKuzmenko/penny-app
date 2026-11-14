@@ -10,9 +10,8 @@ import {
   MonthlyCategoryQueryDto,
 } from 'schemas-nest';
 
+import { TRANSFER_CATEGORY_NAME } from '../categories/default-categories';
 import { PrismaService } from '../prisma/prisma.service';
-
-const EXCLUDED_CATEGORY_NAME = 'Internal Transfer';
 
 const utcYearRange = (year: number) => ({
   start: new Date(Date.UTC(year, 0, 1)),
@@ -50,7 +49,7 @@ const excludeInternalTransfers = {
     {
       category: {
         name: {
-          not: EXCLUDED_CATEGORY_NAME,
+          not: TRANSFER_CATEGORY_NAME,
         },
       },
     },
