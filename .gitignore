@@ -54,3 +54,7 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Local-only planning docs (never push)
+docs/bank-sync-plan.md
+docs/bank-sync-tickets.md
