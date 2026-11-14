@@ -193,6 +193,12 @@
     "TITLE": "Upload CSV",
     "SUBTITLE": "Import your transactions into Penny in seconds using a clean, structured CSV file downloaded from your bank account.",
 
+    "ACCOUNTS_ACTIVITY": {
+      "TITLE": "Where your data ends",
+      "SUBTITLE": "Export from this date onwards. Penny will flag any duplicates.",
+      "NO_TRANSACTIONS": "No transactions yet"
+    },
+
     "CSV_FORMAT_OVERVIEW": {
       "TITLE": "CSV Format Overview",
       "REQUIRED_COLUMNS": "Required columns:",
@@ -279,7 +285,9 @@
       "LABEL": "Account",
       "TOOLTIP_NO_ACCOUNTS": "You have no accounts. You need to create an account first.",
       "CREATE_BUTTON": "Create new account",
-      "CREATE_TOOLTIP": "Account is your bank account/card. It's a way to group transactions."
+      "CREATE_TOOLTIP": "Account is your bank account/card. It's a way to group transactions.",
+      "DATA_UP_TO": "Data up to {date}",
+      "NO_TRANSACTIONS": "No transactions yet"
     },
     "BULK_CATEGORY_BAR": {
       "LABEL": "selected",

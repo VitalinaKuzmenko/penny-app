@@ -9,7 +9,7 @@ import TransactionsTable from './TransactionsTable';
 import BulkCategoryBar from './BulkCategoryBar';
 import DuplicatesBar from './DuplicatesBar';
 import {
-  Account,
+  AccountWithActivity,
   Category,
   CsvImportResponse,
   CurrencySchema,
@@ -32,7 +32,7 @@ interface TransactionsClientProps {
   transactionsPageText: Record<string, any>;
   importId: string;
   rows: CsvImportResponse[];
-  accounts: Account[];
+  accounts: AccountWithActivity[];
   categories: Category[];
   currencies: GetCurrenciesResponse;
   serverErrors: UiError[] | null;
@@ -80,7 +80,8 @@ export default function TransactionsClient({
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [apiError, setApiError] = useState<UiError | null>(null);
-  const [accountsState, setAccountsState] = useState<Account[]>(accounts);
+  const [accountsState, setAccountsState] =
+    useState<AccountWithActivity[]>(accounts);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const router = useRouter();

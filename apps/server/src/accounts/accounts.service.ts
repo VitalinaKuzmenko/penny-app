@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { AccountWithActivity } from 'schemas';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -6,17 +7,34 @@ import { PrismaService } from '../prisma/prisma.service';
 export class AccountsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUserAccounts(userId: string) {
-    return this.prisma.account.findMany({
-      where: { userId },
-      select: {
-        id: true,
-        name: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
+  async getUserAccounts(userId: string): Promise<AccountWithActivity[]> {
+    const [accounts, activity] = await Promise.all([
+      this.prisma.account.findMany({
+        where: { userId },
+        select: {
+          id: true,
+          name: true,
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      }),
+      this.prisma.transaction.groupBy({
+        by: ['accountId'],
+        where: { userId },
+        _max: { date: true },
+      }),
+    ]);
+
+    const lastDateByAccount = new Map(
+      activity.map((row) => [row.accountId, row._max.date]),
+    );
+
+    return accounts.map((account) => ({
+      ...account,
+      lastTransactionDate:
+        lastDateByAccount.get(account.id)?.toISOString() ?? null,
+    }));
   }
 
   async createAccount(userId: string, name: string) {

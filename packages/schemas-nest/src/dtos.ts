@@ -8,6 +8,7 @@ import {
   ConfirmImportResponseSchema,
   ConfirmImportSchema,
   AccountSchema,
+  AccountWithActivitySchema,
   CreateAccountSchema,
   GetCurrenciesResponseSchema,
   CategorySchema,
@@ -50,6 +51,9 @@ export class ConfirmImportResponseDto extends createZodDto(
 
 // ACCOUNTS
 export class AccountDto extends createZodDto(AccountSchema) {}
+export class AccountWithActivityDto extends createZodDto(
+  AccountWithActivitySchema,
+) {}
 export class CreateAccountDto extends createZodDto(CreateAccountSchema) {}
 
 // CURRENCY

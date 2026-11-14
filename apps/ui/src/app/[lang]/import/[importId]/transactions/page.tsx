@@ -4,7 +4,7 @@ import { getCategories } from '@/requests/getCategories';
 import { getCurrencies } from '@/requests/getCurrencies';
 import { getImportRows } from '@/requests/getImportRows';
 import {
-  Account,
+  AccountWithActivity,
   Category,
   CsvImportResponse,
   GetCurrenciesResponse,
@@ -32,7 +32,7 @@ export default async function TransactionsPage({
   ]);
 
   let rows: CsvImportResponse[] = [];
-  let accounts: Account[] = [];
+  let accounts: AccountWithActivity[] = [];
   let categories: Category[] = [];
   let currencies: GetCurrenciesResponse = {
     currencies: [
@@ -51,7 +51,7 @@ export default async function TransactionsPage({
           rows = result.value as CsvImportResponse[];
           break;
         case 1:
-          accounts = result.value as Account[];
+          accounts = result.value as AccountWithActivity[];
           break;
         case 2:
           categories = result.value as Category[];

@@ -5,17 +5,21 @@ import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import {
   FormControl,
   InputLabel,
+  ListItemText,
   MenuItem,
   Select,
   SelectChangeEvent,
   Tooltip,
   Stack,
 } from '@mui/material';
-import { Account } from 'schemas';
+import { useParams } from 'next/navigation';
+import { AccountWithActivity } from 'schemas';
+
+import { formatDay } from '@/utils/formatAccountDates';
 
 interface AccountSelectProps {
   pageText: Record<string, any>;
-  accounts: Account[];
+  accounts: AccountWithActivity[];
   value: string | null;
   onChange: (val: string) => void;
   onCreate: () => void;
@@ -29,11 +33,25 @@ export default function AccountSelect({
   onCreate,
 }: AccountSelectProps) {
   const hasAccounts = accounts.length > 0;
+  const { lang } = useParams<{ lang: string }>();
   const handleChange = (event: SelectChangeEvent) =>
     onChange(event.target.value);
 
   const handleCreateNew = () => {
     onCreate();
+  };
+
+  const describeLastDate = (acc: AccountWithActivity) =>
+    acc.lastTransactionDate
+      ? pageText.DATA_UP_TO.replace(
+          '{date}',
+          formatDay(acc.lastTransactionDate, lang),
+        )
+      : pageText.NO_TRANSACTIONS;
+
+  const renderSelected = (id: string) => {
+    const acc = accounts.find((a) => a.id === id);
+    return acc ? `${acc.name} · ${describeLastDate(acc)}` : '';
   };
 
   return (
@@ -46,7 +64,12 @@ export default function AccountSelect({
         <span style={{ width: '100%' }}>
           <FormControl fullWidth disabled={!hasAccounts}>
             <InputLabel>{pageText.LABEL}</InputLabel>
-            <Select value={value ?? ''} label="Account" onChange={handleChange}>
+            <Select
+              value={value ?? ''}
+              label="Account"
+              onChange={handleChange}
+              renderValue={renderSelected}
+            >
               {hasAccounts &&
                 accounts.map((acc) => (
                   <MenuItem
@@ -58,7 +81,10 @@ export default function AccountSelect({
                       },
                     }}
                   >
-                    {acc.name}
+                    <ListItemText
+                      primary={acc.name}
+                      secondary={describeLastDate(acc)}
+                    />
                   </MenuItem>
                 ))}
             </Select>
