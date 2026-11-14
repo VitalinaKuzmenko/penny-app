@@ -22,7 +22,6 @@ export default function AccountsLastImport({
   return (
     <Box
       sx={{
-        mx: { xs: 3, md: 3 },
         mb: 4,
         p: { xs: 2, md: 3 },
         borderRadius: 3,

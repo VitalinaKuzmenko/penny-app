@@ -30,7 +30,7 @@ export default async function UploadCsvPage({
     <Container
       maxWidth="xl"
       sx={{
-        px: { xs: 0, md: 3 },
+        px: { xs: 2, md: 3 },
         maxWidth: { xs: '100%', md: 'xl' },
       }}
     >

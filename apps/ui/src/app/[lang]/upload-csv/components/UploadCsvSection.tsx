@@ -53,7 +53,7 @@ export default function UploadCsvSection({
   return (
     <Container maxWidth="xl" disableGutters>
       {/* Hero */}
-      <Box sx={{ p: { xs: 3, md: 3 } }}>
+      <Box sx={{ py: 3 }}>
         <Typography variant="h4" fontWeight={600} gutterBottom>
           {uploadCsvPageText.TITLE}
         </Typography>
