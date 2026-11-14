@@ -20,6 +20,7 @@ import { formatDateToString } from '../utils/formatDateToString';
 import { WinstonLogger } from '../utils/logger/logger';
 import { parseDate } from '../utils/parse-date';
 import { buildTransactionFingerprint } from '../utils/transaction-fingerprint';
+import { resolveTransactionType } from '../utils/transaction-type';
 
 @Injectable()
 export class ImportService {
@@ -272,6 +273,36 @@ export class ImportService {
       });
     }
 
+    // The type of a positive row depends on its category, and only the user's own categories are allowed
+    const categoryIds = [
+      ...new Set(
+        dto.rows
+          .map((r) => r.categoryId)
+          .filter((id): id is string => Boolean(id)),
+      ),
+    ];
+    const categories = categoryIds.length
+      ? await this.prisma.category.findMany({
+          where: { userId, id: { in: categoryIds } },
+          select: { id: true, name: true },
+        })
+      : [];
+    const categoryById = new Map(categories.map((c) => [c.id, c]));
+    const unknownCategoryIds = categoryIds.filter(
+      (id) => !categoryById.has(id),
+    );
+    if (unknownCategoryIds.length) {
+      this.logger.warn('Unknown categories in import', {
+        importId,
+        userId,
+        unknownCategoryIds,
+      });
+      throw new BadRequestException({
+        code: 'import.invalid_category',
+        meta: { categoryIds: unknownCategoryIds },
+      });
+    }
+
     const rowInputMap = new Map<string, ConfirmImportInput['rows'][number]>(
       dto.rows.map((row) => [row.id, row]),
     );
@@ -320,6 +351,10 @@ export class ImportService {
         return [];
       }
 
+      const category = input.categoryId
+        ? categoryById.get(input.categoryId)
+        : undefined;
+
       return [
         {
           userId,
@@ -330,10 +365,7 @@ export class ImportService {
           accountId: dto.accountId,
           categoryId: input.categoryId ?? null,
           fingerprint,
-          type:
-            Number(row.amount) > 0
-              ? TransactionType.INCOME
-              : TransactionType.EXPENSE,
+          type: resolveTransactionType(Number(row.amount), category ?? null),
         },
       ];
     });

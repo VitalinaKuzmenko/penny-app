@@ -11,6 +11,15 @@ const USER_ID = '11111111-1111-4111-8111-111111111111';
 const IMPORT_ID = '22222222-2222-4222-8222-222222222222';
 const ACCOUNT_ID = '33333333-3333-4333-8333-333333333333';
 const CATEGORY_ID = '44444444-4444-4444-8444-444444444444';
+const OVERRIDE_CATEGORY_ID = '55555555-5555-4555-8555-555555555555';
+const TRANSFER_CATEGORY_ID = '66666666-6666-4666-8666-666666666666';
+
+// The user's own categories; anything else is "not owned"
+const userCategories = [
+  { id: CATEGORY_ID, name: 'Clothes, cosmetics' },
+  { id: OVERRIDE_CATEGORY_ID, name: 'Others' },
+  { id: TRANSFER_CATEGORY_ID, name: 'Internal Transfer' },
+];
 
 type Row = {
   id: string;
@@ -36,7 +45,12 @@ const row = (
 });
 
 // An existing Transaction as the service reads it back; amount is stored absolute
-const existing = (date: string, amount: number, description: string) => ({
+const existing = (
+  date: string,
+  amount: number,
+  description: string,
+  type: 'INCOME' | 'EXPENSE' | 'REFUND' = amount < 0 ? 'EXPENSE' : 'INCOME',
+) => ({
   fingerprint: buildTransactionFingerprint(
     new Date(`${date}T00:00:00Z`),
     amount,
@@ -45,7 +59,7 @@ const existing = (date: string, amount: number, description: string) => ({
   date: new Date(`${date}T00:00:00Z`),
   description,
   amount: Math.abs(amount),
-  type: amount < 0 ? 'EXPENSE' : 'INCOME',
+  type,
 });
 
 function createPrismaMock() {
@@ -59,6 +73,12 @@ function createPrismaMock() {
     transactionImport: { findFirst: jest.fn() },
     transaction: { findMany: jest.fn().mockResolvedValue([]) },
     categoryMapping: { findMany: jest.fn().mockResolvedValue([]) },
+    category: {
+      findMany: jest.fn(
+        async ({ where }: { where: { id: { in: string[] } } }) =>
+          userCategories.filter((c) => where.id.in.includes(c.id)),
+      ),
+    },
     $transaction: jest.fn(async (fn: (t: typeof tx) => Promise<void>) =>
       fn(tx),
     ),
@@ -448,7 +468,7 @@ describe('ImportService', () => {
     // whether they keep the auto-suggestion, replace it, or clear it.
     describe("auto-suggested category vs the user's final choice", () => {
       const SUGGESTED = CATEGORY_ID;
-      const OVERRIDE = '55555555-5555-4555-8555-555555555555';
+      const OVERRIDE = OVERRIDE_CATEGORY_ID;
 
       const savedRow = () =>
         prisma.tx.transaction.createMany.mock.calls[0][0].data[0];
@@ -548,6 +568,98 @@ describe('ImportService', () => {
         expect(learnedMappings()).toEqual([
           { description: 'sumup *bluebird', categoryId: OVERRIDE },
         ]);
+      });
+    });
+
+    describe('refunds', () => {
+      const savedTypes = () =>
+        prisma.tx.transaction.createMany.mock.calls[0][0].data.map(
+          (d: { type: string }) => d.type,
+        );
+
+      it('saves a positive row with a spending category as REFUND', async () => {
+        stubImport('PENDING', [
+          row('r1', '2026-10-01', -100, 'ZARA'),
+          row('r2', '2026-10-20', 55, 'ZARA'),
+        ]);
+
+        await service.confirmImport(
+          USER_ID,
+          IMPORT_ID,
+          dto([
+            { id: 'r1', categoryId: CATEGORY_ID },
+            { id: 'r2', categoryId: CATEGORY_ID },
+          ]),
+        );
+
+        const { data } = prisma.tx.transaction.createMany.mock.calls[0][0];
+        expect(data[0]).toMatchObject({ amount: 100, type: 'EXPENSE' });
+        expect(data[1]).toMatchObject({
+          amount: 55,
+          type: 'REFUND',
+          categoryId: CATEGORY_ID,
+        });
+      });
+
+      it('keeps positive rows without a category or in Internal Transfer as INCOME', async () => {
+        stubImport('PENDING', [
+          row('r1', '2026-10-01', 2500, 'SALARY'),
+          row('r2', '2026-10-02', 300, 'FROM SAVINGS'),
+        ]);
+
+        await service.confirmImport(
+          USER_ID,
+          IMPORT_ID,
+          dto([{ id: 'r1' }, { id: 'r2', categoryId: TRANSFER_CATEGORY_ID }]),
+        );
+
+        expect(savedTypes()).toEqual(['INCOME', 'INCOME']);
+      });
+
+      it('rejects category IDs that are not the user’s and saves nothing', async () => {
+        const FOREIGN = '77777777-7777-4777-8777-777777777777';
+        stubImport('PENDING', [row('r1', '2026-10-01', -10, 'TESCO')]);
+
+        const call = service.confirmImport(
+          USER_ID,
+          IMPORT_ID,
+          dto([{ id: 'r1', categoryId: FOREIGN }]),
+        );
+
+        await expect(call).rejects.toBeInstanceOf(BadRequestException);
+        await expect(call).rejects.toMatchObject({
+          response: {
+            code: 'import.invalid_category',
+            meta: { categoryIds: [FOREIGN] },
+          },
+        });
+        expect(prisma.category.findMany).toHaveBeenCalledWith(
+          expect.objectContaining({
+            where: { userId: USER_ID, id: { in: [FOREIGN] } },
+          }),
+        );
+        expect(prisma.$transaction).not.toHaveBeenCalled();
+      });
+
+      it('flags a re-imported refund as a duplicate of the saved REFUND', async () => {
+        prisma.transaction.findMany.mockResolvedValue([
+          existing('2026-10-20', 55, 'ZARA', 'REFUND'),
+        ]);
+        prisma.transactionImport.findFirst.mockResolvedValue({
+          id: IMPORT_ID,
+          rows: [row('r1', '2026-10-20', 55, 'ZARA')],
+        });
+
+        const result = await service.getImportRows(
+          USER_ID,
+          IMPORT_ID,
+          ACCOUNT_ID,
+        );
+
+        expect(result?.[0]).toMatchObject({
+          duplicate: true,
+          duplicateOf: { amount: 55 },
+        });
       });
     });
   });
