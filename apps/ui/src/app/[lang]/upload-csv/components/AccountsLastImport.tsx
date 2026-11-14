@@ -3,6 +3,8 @@ import { AccountWithActivity } from 'schemas';
 
 import { formatDay, formatDaysAgo } from '@/utils/formatAccountDates';
 
+import AccountDateCard from './AccountDateCard';
+
 interface AccountsLastImportProps {
   accounts: AccountWithActivity[];
   lang: string;
@@ -42,35 +44,21 @@ export default function AccountsLastImport({
         }}
       >
         {accounts.map((account) => (
-          <Box
+          <AccountDateCard
             key={account.id}
-            sx={{
-              p: 2,
-              borderRadius: 2,
-              bgcolor: 'background.paper',
-              border: 1,
-              borderColor: 'grey.200',
-            }}
-          >
-            <Typography variant="body2" color="text.secondary" noWrap>
-              {account.name}
-            </Typography>
-
-            {account.lastTransactionDate ? (
-              <>
-                <Typography variant="h6" fontWeight={700}>
-                  {formatDay(account.lastTransactionDate, lang)}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {formatDaysAgo(account.lastTransactionDate, lang)}
-                </Typography>
-              </>
-            ) : (
-              <Typography variant="body1" color="text.secondary" mt={0.5}>
-                {text.NO_TRANSACTIONS}
-              </Typography>
-            )}
-          </Box>
+            name={account.name}
+            date={
+              account.lastTransactionDate
+                ? formatDay(account.lastTransactionDate, lang)
+                : null
+            }
+            relative={
+              account.lastTransactionDate
+                ? formatDaysAgo(account.lastTransactionDate, lang)
+                : null
+            }
+            emptyText={text.NO_TRANSACTIONS}
+          />
         ))}
       </Box>
     </Box>
