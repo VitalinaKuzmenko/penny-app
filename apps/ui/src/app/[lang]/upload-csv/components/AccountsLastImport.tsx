@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { AccountWithActivity } from 'schemas';
 
 import { formatDay, formatDaysAgo } from '@/utils/formatAccountDates';
@@ -34,34 +34,45 @@ export default function AccountsLastImport({
         {text.SUBTITLE}
       </Typography>
 
-      <Stack spacing={1.5}>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 2,
+          gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+        }}
+      >
         {accounts.map((account) => (
-          <Stack
+          <Box
             key={account.id}
-            direction={{ xs: 'column', md: 'row' }}
-            spacing={{ xs: 0.5, md: 2 }}
-            justifyContent="space-between"
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              bgcolor: 'background.paper',
+              border: 1,
+              borderColor: 'grey.200',
+            }}
           >
-            <Typography fontWeight={600}>{account.name}</Typography>
+            <Typography variant="body2" color="text.secondary" noWrap>
+              {account.name}
+            </Typography>
 
             {account.lastTransactionDate ? (
-              <Typography variant="body2">
-                {text.DATA_UP_TO.replace(
-                  '{date}',
-                  formatDay(account.lastTransactionDate, lang),
-                ).replace(
-                  '{relative}',
-                  formatDaysAgo(account.lastTransactionDate, lang),
-                )}
-              </Typography>
+              <>
+                <Typography variant="h6" fontWeight={700}>
+                  {formatDay(account.lastTransactionDate, lang)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {formatDaysAgo(account.lastTransactionDate, lang)}
+                </Typography>
+              </>
             ) : (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" color="text.secondary" mt={0.5}>
                 {text.NO_TRANSACTIONS}
               </Typography>
             )}
-          </Stack>
+          </Box>
         ))}
-      </Stack>
+      </Box>
     </Box>
   );
 }
