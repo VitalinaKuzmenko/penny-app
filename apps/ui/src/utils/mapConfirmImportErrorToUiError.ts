@@ -35,6 +35,13 @@ export const mapConfirmImportErrorToUiError = (
           }),
         };
 
+      case 'import.invalid_category':
+        return {
+          severity: 'error',
+          title: errorsText.IMPORT_INVALID_CATEGORY.TITLE,
+          message: errorsText.IMPORT_INVALID_CATEGORY.MESSAGE,
+        };
+
       default:
         return {
           severity: 'error',
