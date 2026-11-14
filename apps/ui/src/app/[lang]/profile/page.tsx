@@ -14,6 +14,7 @@ export default async function ProfilePage({
   const dict = await getDictionary(lang);
   const profilePageText = dict.PROFILE_PAGE;
 
+  //i need to redeploy
   return (
     <Container maxWidth="sm">
       <ProfileClientSection profilePageText={profilePageText} />
