@@ -48,13 +48,13 @@ refunded → the app should show £45 spent on clothes.
 - Charts (`charts.service.ts`) only sum `EXPENSE` per category and treat
   every non-transfer `INCOME` as income. Result for the example:
 
-  | | Shown now | Correct |
-  |---|---|---|
-  | Clothes | £100 | £45 |
-  | Total expense | +£100 | +£45 |
-  | Total income | +£55 | +£0 |
-  | Savings (income − expense) | correct | correct |
-  | Gauge (expense / income %) | wrong | — |
+  |                            | Shown now | Correct |
+  | -------------------------- | --------- | ------- |
+  | Clothes                    | £100      | £45     |
+  | Total expense              | +£100     | +£45    |
+  | Total income               | +£55      | +£0     |
+  | Savings (income − expense) | correct   | correct |
+  | Gauge (expense / income %) | wrong     | —       |
 
 ### Decisions (agreed 2026-11-14)
 
@@ -100,12 +100,12 @@ enum TransactionType {
 One rule, used on import now and reused by category edits on the
 Transactions page (Step 3):
 
-| CSV amount | Category chosen | Saved `type` |
-|---|---|---|
-| negative / 0 | any or none | `EXPENSE` (unchanged) |
-| positive | none | `INCOME` |
-| positive | `Internal Transfer` | `INCOME` (unchanged, still excluded) |
-| positive | any other category | `REFUND` |
+| CSV amount   | Category chosen     | Saved `type`                         |
+| ------------ | ------------------- | ------------------------------------ |
+| negative / 0 | any or none         | `EXPENSE` (unchanged)                |
+| positive     | none                | `INCOME`                             |
+| positive     | `Internal Transfer` | `INCOME` (unchanged, still excluded) |
+| positive     | any other category  | `REFUND`                             |
 
 - `REFUND` always has a category: the rule only produces `REFUND` when a
   category is chosen.
@@ -118,7 +118,7 @@ Transactions page (Step 3):
 ### Server
 
 - Confirm import: apply the rule above instead of `amount > 0 ? INCOME :
-  EXPENSE`. It loads the submitted categories scoped by `userId` and
+EXPENSE`. It loads the submitted categories scoped by `userId` and
   rejects IDs the user doesn't own (`import.invalid_category`, 400).
 - Duplicate detection rebuilds the signed amount as `EXPENSE` → negative,
   anything else → positive, so `REFUND` stays positive. Add a test so
@@ -150,7 +150,7 @@ Transactions page (Step 3):
     suggestion)
   - `Internal Transfer`
   - all other categories under a "Refund for…" heading.
-  Show a small "refund" chip when one is chosen.
+    Show a small "refund" chip when one is chosen.
 - The bulk category bar applies to every selected row; on a positive row
   a spending category makes it a refund (same rule).
 - Category auto-suggestion already runs on positive rows: `CategoryMapping`
