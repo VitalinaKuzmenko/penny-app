@@ -212,4 +212,28 @@ describe('ChartsService — refunds', () => {
       );
     });
   });
+
+  it('leaves soft-deleted transactions out of every chart', async () => {
+    prisma.transaction.groupBy.mockResolvedValue([]);
+    prisma.transaction.findMany.mockResolvedValue([]);
+    prisma.category.findMany.mockResolvedValue([]);
+
+    await service.getIncomeExpenseByYear(USER_ID, { year: 2026 });
+    await service.getIncomeExpenseRatio(USER_ID, {
+      startDate: '2026-01-01',
+      endDate: '2026-12-31',
+    });
+    await service.getIncomeExpenseStacked(USER_ID, {});
+    await service.getMonthlyCategoryChart(USER_ID, { year: 2026 });
+    await service.getCategoryBreakdown(USER_ID, { type: 'EXPENSE' });
+
+    const calls = [
+      ...prisma.transaction.groupBy.mock.calls,
+      ...prisma.transaction.findMany.mock.calls,
+    ];
+    expect(calls).toHaveLength(5);
+    for (const [args] of calls) {
+      expect(args.where).toMatchObject({ userId: USER_ID, deletedAt: null });
+    }
+  });
 });

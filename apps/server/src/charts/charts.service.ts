@@ -13,6 +13,7 @@ import {
 import { TRANSFER_CATEGORY_NAME } from '../categories/default-categories';
 import { TransactionType } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { notDeleted } from '../utils/not-deleted';
 
 import {
   emptyTypeTotals,
@@ -90,6 +91,7 @@ export class ChartsService {
       by: ['type'],
       where: {
         userId,
+        ...notDeleted,
         date: {
           gte: start,
           lt: end,
@@ -124,6 +126,7 @@ export class ChartsService {
     const rows = await this.prisma.transaction.findMany({
       where: {
         userId,
+        ...notDeleted,
         type: SPEND_TYPES,
         date: {
           gte: start,
@@ -215,6 +218,7 @@ export class ChartsService {
       by: ['categoryId', 'type'],
       where: {
         userId,
+        ...notDeleted,
         type: type === 'EXPENSE' ? SPEND_TYPES : type,
         date: {
           gte: start,
@@ -285,6 +289,7 @@ export class ChartsService {
       by: ['type', 'date'],
       where: {
         userId,
+        ...notDeleted,
         date: {
           gte: start,
           lte: end,
@@ -363,6 +368,7 @@ export class ChartsService {
       by: ['type'],
       where: {
         userId,
+        ...notDeleted,
         date: {
           gte: start,
           lte: end,

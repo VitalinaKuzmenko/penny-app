@@ -15,9 +15,9 @@ import { CurrenciesModule } from './currencies/currencies.module';
 import { ImportModule } from './import/import.module';
 import { AccountModule } from './modules/account/account.module';
 import { CategoryModule } from './modules/category/category.module';
-import { TransactionModule } from './modules/transaction/transaction.module';
 import { UserModule } from './modules/user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { TransactionsModule } from './transactions/transactions.module';
 import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
 import { LoggerModule } from './utils/logger/logger.module';
@@ -31,7 +31,6 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
     UserModule,
     AccountModule,
     CategoryModule,
-    TransactionModule,
     AuthModule,
     UsersModule,
     ConfigModule.forRoot({
@@ -52,6 +51,7 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
     CurrenciesModule,
     CategoriesModule,
     ChartsModule,
+    TransactionsModule,
   ],
 
   controllers: [AppController],

@@ -55,7 +55,7 @@ describe('AccountsService', () => {
       ]);
     });
 
-    it('scopes both queries to the user', async () => {
+    it('scopes both queries to the user and skips deleted transactions', async () => {
       prisma.account.findMany.mockResolvedValue([]);
       prisma.transaction.groupBy.mockResolvedValue([]);
 
@@ -67,7 +67,7 @@ describe('AccountsService', () => {
       expect(prisma.transaction.groupBy).toHaveBeenCalledWith(
         expect.objectContaining({
           by: ['accountId'],
-          where: { userId: USER_ID },
+          where: { userId: USER_ID, deletedAt: null },
         }),
       );
     });

@@ -4,6 +4,8 @@ export const DuplicateMatchSchema = z.object({
   date: z.string(),
   description: z.string(),
   amount: z.number(),
+  // the matched transaction was soft-deleted in the Money Journal
+  deleted: z.boolean().default(false),
 });
 
 export const CsvImportResponseSchema = z.object({

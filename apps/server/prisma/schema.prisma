@@ -96,6 +96,8 @@ model Transaction {
   date         DateTime
   // hash of (date, |amount|, normalised description); used to skip re-importing the same row
   fingerprint  String?  @map("fingerprint")
+  // soft delete: hidden everywhere, but kept so re-imports still see it as a duplicate
+  deletedAt    DateTime? @map("deleted_at")
 
   userId       String    @map("user_id")
   user         User      @relation(fields: [userId], references: [id])
