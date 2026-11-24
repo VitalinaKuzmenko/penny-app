@@ -15,6 +15,8 @@ export const mapUpdateTransactionsErrorToUiError = (
       return fromText(errorsText.NOT_FOUND);
     case 'transactions.invalid_category':
       return fromText(errorsText.INVALID_CATEGORY);
+    case 'transactions.invalid_tag':
+      return fromText(errorsText.INVALID_TAG);
     case 'transactions.deleted_not_editable':
       return fromText(errorsText.DELETED_NOT_EDITABLE);
   }

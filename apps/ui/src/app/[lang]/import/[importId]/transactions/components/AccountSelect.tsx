@@ -10,7 +10,6 @@ import {
   Select,
   SelectChangeEvent,
   Tooltip,
-  Stack,
 } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { AccountWithActivity } from 'schemas';
@@ -54,19 +53,20 @@ export default function AccountSelect({
     return acc ? `${acc.name} · ${describeLastDate(acc)}` : '';
   };
 
+  // Two grid items (select, button) so the parent grid can line them up
   return (
-    <Stack direction="row" spacing={2} flex={2}>
+    <>
       <Tooltip
         title={hasAccounts ? '' : `${pageText.TOOLTIP_NO_ACCOUNTS}`}
         placement="top"
       >
         {/* Tooltip requires a non-disabled wrapper */}
-        <span style={{ width: '100%' }}>
+        <span style={{ width: '100%', minWidth: 0 }}>
           <FormControl fullWidth disabled={!hasAccounts}>
             <InputLabel>{pageText.LABEL}</InputLabel>
             <Select
               value={value ?? ''}
-              label="Account"
+              label={pageText.LABEL}
               onChange={handleChange}
               renderValue={renderSelected}
             >
@@ -96,11 +96,12 @@ export default function AccountSelect({
         <CustomButton
           variantType="secondary"
           onClick={handleCreateNew}
-          sx={{ width: '220px', maxWidth: '220px', minWidth: '220px' }}
+          // same height as the selects next to it
+          sx={{ height: 56, minWidth: { md: 200 }, width: { xs: '100%' } }}
         >
           {pageText.CREATE_BUTTON}
         </CustomButton>
       </Tooltip>
-    </Stack>
+    </>
   );
 }

@@ -33,6 +33,10 @@ export const ListTransactionsQuerySchema = z.object({
   // when neither is given, rows are not filtered by category
   categoryIds: stringArray,
   includeUncategorised: booleanString,
+  // tagIds and includeUntagged together form the tag filter (any of them);
+  // when neither is given, rows are not filtered by tag
+  tagIds: stringArray,
+  includeUntagged: booleanString,
   type: TransactionTypeSchema.optional(),
   search: z.string().trim().max(200).optional(),
   // deleted rows are listed (greyed out) but never counted in the totals
@@ -56,6 +60,8 @@ export type ListTransactionsParams = {
   accountIds?: string[];
   categoryIds?: string[];
   includeUncategorised?: boolean;
+  tagIds?: string[];
+  includeUntagged?: boolean;
   type?: z.infer<typeof TransactionTypeSchema>;
   search?: string;
   includeDeleted?: boolean;

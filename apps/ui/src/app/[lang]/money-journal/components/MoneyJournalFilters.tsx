@@ -10,12 +10,13 @@ import {
   TextField,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { Account, Category } from 'schemas';
+import { Account, Category, Tag } from 'schemas';
 import FilterMultiSelect from '@/components/FilterMultiSelect/FilterMultiSelect';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import {
   MoneyJournalTypeFilter,
   UNCATEGORISED_ID,
+  UNTAGGED_ID,
   useMoneyJournalFilters,
 } from '@/providers/MoneyJournalFilterContext';
 
@@ -24,6 +25,7 @@ const types: MoneyJournalTypeFilter[] = ['ALL', 'INCOME', 'EXPENSE', 'REFUND'];
 interface MoneyJournalFiltersProps {
   accounts: Account[];
   categories: Category[];
+  tags: Tag[];
   pageText: Record<string, any>;
   // Apply goes through the page so unsaved edits can be confirmed first
   onApply: () => void;
@@ -32,6 +34,7 @@ interface MoneyJournalFiltersProps {
 export default function MoneyJournalFilters({
   accounts,
   categories,
+  tags,
   pageText,
   onApply,
 }: MoneyJournalFiltersProps) {
@@ -51,6 +54,13 @@ export default function MoneyJournalFilters({
   const accountItems = useMemo(
     () => accounts.map((a) => ({ id: a.id, label: a.name })),
     [accounts],
+  );
+  const tagItems = useMemo(
+    () => [
+      ...tags.map((t) => ({ id: t.id, label: t.name })),
+      { id: UNTAGGED_ID, label: text.TAG_FILTER.UNTAGGED },
+    ],
+    [tags, text],
   );
 
   return (
@@ -121,6 +131,21 @@ export default function MoneyJournalFilters({
         items={accountItems}
         value={filters.accountIds}
         onChange={(accountIds) => setFilters({ accountIds })}
+        minWidth={0}
+      />
+
+      <FilterMultiSelect
+        label={text.TAG_FILTER.LABEL}
+        items={tagItems}
+        value={filters.tagIds}
+        clearAllLabel={text.TAG_FILTER.CLEAR_ALL}
+        // every tag plus Untagged is the same as no filter; stored as [] so a tag
+        // created later doesn't turn "everything" into a real filter
+        onChange={(tagIds) =>
+          setFilters({
+            tagIds: tagIds.length === tagItems.length ? [] : tagIds,
+          })
+        }
         minWidth={0}
       />
 

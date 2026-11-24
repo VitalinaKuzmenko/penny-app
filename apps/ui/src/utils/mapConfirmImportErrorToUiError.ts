@@ -42,6 +42,13 @@ export const mapConfirmImportErrorToUiError = (
           message: errorsText.IMPORT_INVALID_CATEGORY.MESSAGE,
         };
 
+      case 'import.invalid_tag':
+        return {
+          severity: 'error',
+          title: errorsText.IMPORT_INVALID_TAG.TITLE,
+          message: errorsText.IMPORT_INVALID_TAG.MESSAGE,
+        };
+
       default:
         return {
           severity: 'error',

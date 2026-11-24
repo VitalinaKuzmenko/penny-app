@@ -11,6 +11,8 @@ import {
   IncomeExpenseStackedResponseDto,
   MonthlyCategoryQueryDto,
   MonthlyCategoryResponseDto,
+  TagSpendQueryDto,
+  TagSpendResponseDto,
 } from 'schemas-nest';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -86,5 +88,13 @@ export class ChartsController {
     @Req() req,
   ) {
     return this.chartsService.getIncomeExpenseRatio(req.user.userId, dto);
+  }
+
+  @Get('tag-spend')
+  @ApiOperation({ summary: 'Spend per tag (expenses minus refunds)' })
+  @ApiOkResponse({ type: [TagSpendResponseDto] })
+  @UseGuards(JwtAuthGuard)
+  async getTagSpend(@Query() dto: TagSpendQueryDto, @Req() req) {
+    return this.chartsService.getTagSpend(req.user.userId, dto);
   }
 }

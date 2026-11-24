@@ -51,6 +51,7 @@ model User {
   categories        Category[]
   transactions      Transaction[]
   categoryMappings  CategoryMapping[]
+  tags              Tag[]
 
   @@unique([provider, providerId])
 }
@@ -108,6 +109,8 @@ model Transaction {
   accountId    String     @map("account_id")
   account      Account    @relation(fields: [accountId], references: [id])
 
+  tags         TransactionTag[]
+
   @@index([accountId, fingerprint])
   @@index([userId, date])
   @@index([accountId, date])
@@ -135,6 +138,31 @@ model TransactionImport {
   status    ImportStatus @default(PENDING)
 
   rows      TransactionImportRow[]
+}
+
+// Groups transactions across categories, e.g. "Spain trip 2026"
+model Tag {
+  id        String   @id @default(uuid())
+  // unique per user ignoring case; the service enforces that, the index only blocks exact duplicates
+  name      String
+  color     String?
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  transactions TransactionTag[]
+
+  @@unique([userId, name])
+}
+
+model TransactionTag {
+  transactionId String      @map("transaction_id")
+  tagId         String      @map("tag_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  tag           Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([transactionId, tagId])
+  @@index([tagId])
 }
 
 // Remembers which category a user last assigned to a given transaction description.

@@ -1,4 +1,5 @@
 // src/import/import.service.ts
+import { randomUUID } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
@@ -8,7 +9,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { parse } from 'csv-parse/sync';
-import { ConfirmImportInput, CsvRowSchema } from 'schemas';
+import { ConfirmImportInput, CsvRowSchema, TagRef } from 'schemas';
 import { CsvImportResponseDTO, ImportCsvResponseDto } from 'schemas-nest';
 
 import {
@@ -16,6 +17,7 @@ import {
   TransactionType,
 } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { TagsService } from '../tags/tags.service';
 import { formatDateToString } from '../utils/formatDateToString';
 import { WinstonLogger } from '../utils/logger/logger';
 import { parseDate } from '../utils/parse-date';
@@ -27,6 +29,7 @@ export class ImportService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly logger: WinstonLogger,
+    private readonly tagsService: TagsService,
   ) {}
 
   async importCsv(
@@ -333,6 +336,8 @@ export class ImportService {
     // how many rows in this batch already matched an existing transaction,
     // so a 3rd identical row isn't wrongly skipped when only 2 already exist
     const consumedInBatch = new Map<string, number>();
+    // tags of the rows that are actually inserted, keyed by their new transaction id
+    const tagsByTransactionId = new Map<string, TagRef[]>();
 
     const rowsToInsert = importEntity.rows.flatMap((row) => {
       const input = rowInputMap.get(row.id);
@@ -367,8 +372,15 @@ export class ImportService {
         ? categoryById.get(input.categoryId)
         : undefined;
 
+      // generated here so tag links can be created right after createMany
+      const id = randomUUID();
+      if (input.tags?.length) {
+        tagsByTransactionId.set(id, input.tags);
+      }
+
       return [
         {
+          id,
           userId,
           date: row.date,
           description,
@@ -421,7 +433,25 @@ export class ImportService {
         });
       }
 
-      // 3️⃣ Mark import as confirmed
+      // 3️⃣ Tag the inserted rows, creating new tags on the way
+      if (tagsByTransactionId.size) {
+        const resolve = await this.tagsService.resolveRefs(
+          tx,
+          userId,
+          [...tagsByTransactionId.values()].flat(),
+          'import.invalid_tag',
+        );
+        await tx.transactionTag.createMany({
+          data: [...tagsByTransactionId].flatMap(([transactionId, refs]) =>
+            [...new Set(refs.map(resolve))].map((tagId) => ({
+              transactionId,
+              tagId,
+            })),
+          ),
+        });
+      }
+
+      // 4️⃣ Mark import as confirmed
       await tx.transactionImport.update({
         where: { id: importId },
         data: { status: ImportStatus.CONFIRMED },

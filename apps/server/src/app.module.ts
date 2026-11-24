@@ -17,6 +17,7 @@ import { AccountModule } from './modules/account/account.module';
 import { CategoryModule } from './modules/category/category.module';
 import { UserModule } from './modules/user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { TagsModule } from './tags/tags.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
@@ -52,6 +53,7 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
     CategoriesModule,
     ChartsModule,
     TransactionsModule,
+    TagsModule,
   ],
 
   controllers: [AppController],

@@ -28,7 +28,7 @@ export default function CurrencySelect({
     onChange(event.target.value as Currency);
 
   return (
-    <FormControl fullWidth sx={{ flex: 1 }}>
+    <FormControl fullWidth>
       <InputLabel id="currency-label">{pageText.LABEL}</InputLabel>
       <Select value={value ?? ''} label="Currency" onChange={handleChange}>
         <MenuItem value="" disabled>

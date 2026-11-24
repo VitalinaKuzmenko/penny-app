@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { TagSchema } from '../tags/tag.schema';
 import { CurrencySchema, TransactionTypeSchema } from '../types';
 
 export const TransactionListItemSchema = z.object({
@@ -12,6 +13,8 @@ export const TransactionListItemSchema = z.object({
   currency: CurrencySchema,
   category: z.object({ id: z.string().uuid(), name: z.string() }).nullable(),
   account: z.object({ id: z.string().uuid(), name: z.string() }),
+  // sorted by name
+  tags: z.array(TagSchema),
   deleted: z.boolean(),
 });
 

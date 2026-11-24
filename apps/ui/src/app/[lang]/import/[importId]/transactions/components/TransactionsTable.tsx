@@ -13,11 +13,16 @@ import {
 } from '@mui/material';
 import { CsvImportResponse, Category } from 'schemas';
 import CategoryCellSelect from '@/components/CategoryCellSelect/CategoryCellSelect';
+import TagCell from '@/components/TagCell/TagCell';
+import { TagValue } from '@/utils/tags';
 
 interface TransactionsTableProps {
   pageText: Record<string, any>;
   rows: CsvImportResponse[];
   categories: Category[];
+  tagOptions: TagValue[];
+  rowTags: Record<string, TagValue[]>;
+  onChangeTags: (rowId: string, tags: TagValue[]) => void;
   selectedRows: string[];
   onSelectRows: React.Dispatch<React.SetStateAction<string[]>>;
   rowCategories: Record<string, string>;
@@ -32,6 +37,9 @@ export default function TransactionsTable({
   pageText,
   rows,
   categories,
+  tagOptions,
+  rowTags,
+  onChangeTags,
   selectedRows,
   onSelectRows,
   rowCategories,
@@ -179,9 +187,27 @@ export default function TransactionsTable({
           />
         ),
       },
+      {
+        field: 'tags',
+        headerName: `${pageText.COLUMNS.TAGS}`,
+        width: 260,
+        sortable: false,
+        filterable: false,
+        renderCell: (params) => (
+          <TagCell
+            tags={rowTags[params.row.id] ?? []}
+            options={tagOptions}
+            onChange={(tags) => onChangeTags(params.row.id, tags)}
+            text={pageText.TAGS}
+          />
+        ),
+      },
     ],
     [
       categories,
+      tagOptions,
+      rowTags,
+      onChangeTags,
       onChangeCategory,
       rowCategories,
       rowDescriptions,

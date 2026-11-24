@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import z from 'zod';
 import TransactionsTable from './TransactionsTable';
+import BulkActionsPanel from '@/components/BulkActionsPanel/BulkActionsPanel';
 import BulkCategoryBar from '@/components/BulkCategoryBar/BulkCategoryBar';
 import DuplicatesBar from './DuplicatesBar';
 import {
@@ -21,12 +22,21 @@ import { UiError } from '@/types/interfaces';
 
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
+import BulkTagBar from '@/components/BulkTagBar/BulkTagBar';
 import { ConfirmImportSchema, ConfirmImportInput } from 'schemas';
 import { saveTransactions } from '@/requests/saveTransactions';
 import { mapConfirmImportErrorToUiError } from '@/utils/mapConfirmImportErrorToUiError';
 import CreateAccountModal from './CreateAccountModal';
 import { getAccounts } from '@/requests/getAccounts';
 import { getImportRows } from '@/requests/getImportRows';
+import { useTags } from '@/hooks/useTags';
+import {
+  addTags,
+  removeTags,
+  TagValue,
+  tagOptions as buildTagOptions,
+  toTagRef,
+} from '@/utils/tags';
 
 interface TransactionsClientProps {
   transactionsPageText: Record<string, any>;
@@ -71,6 +81,25 @@ export default function TransactionsClient({
   const [forceImportRows, setForceImportRows] = useState<
     Record<string, boolean>
   >({});
+  // Tags start empty; new names are created when the import is confirmed
+  const [rowTags, setRowTags] = useState<Record<string, TagValue[]>>({});
+  const { tags } = useTags();
+  const tagOptions = useMemo(
+    () => buildTagOptions(tags, Object.values(rowTags).flat()),
+    [tags, rowTags],
+  );
+  const selectedRowTags = useMemo(
+    () => selectedRows.flatMap((id) => rowTags[id] ?? []),
+    [selectedRows, rowTags],
+  );
+  const updateSelectedTags = (update: (current: TagValue[]) => TagValue[]) => {
+    setRowTags((prev) => {
+      const next = { ...prev };
+      selectedRows.forEach((id) => (next[id] = update(prev[id] ?? [])));
+      return next;
+    });
+    setSelectedRows([]);
+  };
 
   // Unassigned rows first so users see what still needs attention
   const sortedRows = useMemo(
@@ -152,6 +181,9 @@ export default function TransactionsClient({
         forceImport: row.duplicate
           ? Boolean(forceImportRows[row.id])
           : undefined,
+        tags: rowTags[row.id]?.length
+          ? rowTags[row.id].map(toTagRef)
+          : undefined,
       }));
 
       const payload: ConfirmImportInput = {
@@ -212,12 +244,17 @@ export default function TransactionsClient({
           <ErrorBanner key={error.message} error={error} />
         ))}
 
-      {/* Inputs */}
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={2}
+      {/* Inputs: currency, account and "create account" share one aligned row
+          on desktop and stack full-width on phones */}
+      <Box
+        display="grid"
+        gap={2}
         mb={2}
-        alignItems="stretch"
+        gridTemplateColumns={{
+          xs: 'minmax(0, 1fr)',
+          md: 'minmax(0, 1fr) minmax(0, 2fr) auto',
+        }}
+        alignItems="center"
       >
         {/* Currency select */}
         <CurrencySelect
@@ -235,7 +272,7 @@ export default function TransactionsClient({
           onChange={setAccountId}
           onCreate={() => setIsCreateModalOpen(true)}
         />
-      </Stack>
+      </Box>
 
       {/* Duplicates summary */}
       <DuplicatesBar
@@ -249,29 +286,47 @@ export default function TransactionsClient({
         }
       />
 
-      {/* Bulk category */}
-      <BulkCategoryBar
-        pageText={transactionsPageText.BULK_CATEGORY_BAR}
-        categories={categories}
-        selectedRows={selectedRows}
-        onApply={(categoryId) => {
-          // this bar has no "None" option, so a category is always chosen
-          if (!categoryId) return;
-          setRowCategories((prev) => {
-            const next = { ...prev };
-            selectedRows.forEach((id) => (next[id] = categoryId));
-            return next;
-          });
+      {/* Bulk category and tags */}
+      <BulkActionsPanel
+        selectedCount={selectedRows.length}
+        label={transactionsPageText.BULK_CATEGORY_BAR.LABEL}
+      >
+        <BulkCategoryBar
+          pageText={transactionsPageText.BULK_CATEGORY_BAR}
+          categories={categories}
+          onApply={(categoryId) => {
+            // this bar has no "None" option, so a category is always chosen
+            if (!categoryId) return;
+            setRowCategories((prev) => {
+              const next = { ...prev };
+              selectedRows.forEach((id) => (next[id] = categoryId));
+              return next;
+            });
 
-          setSelectedRows([]);
-        }}
-      />
+            setSelectedRows([]);
+          }}
+        />
+        <BulkTagBar
+          text={transactionsPageText.BULK_TAG_BAR}
+          options={tagOptions}
+          removable={selectedRowTags}
+          onAdd={(toAdd) => updateSelectedTags((t) => addTags(t, toAdd))}
+          onRemove={(toRemove) =>
+            updateSelectedTags((t) => removeTags(t, toRemove))
+          }
+        />
+      </BulkActionsPanel>
 
       {/* Table */}
       <TransactionsTable
         pageText={transactionsPageText.TABLE}
         rows={sortedRows}
         categories={categories}
+        tagOptions={tagOptions}
+        rowTags={rowTags}
+        onChangeTags={(rowId: string, value: TagValue[]) =>
+          setRowTags((prev) => ({ ...prev, [rowId]: value }))
+        }
         selectedRows={selectedRows}
         onSelectRows={setSelectedRows}
         rowCategories={rowCategories}
