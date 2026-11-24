@@ -292,7 +292,7 @@
     },
     "BULK_CATEGORY_BAR": {
       "LABEL": "selected",
-      "APPLY_BUTTON": "Apply",
+      "APPLY_BUTTON": "Set category",
       "CATEGORY_LABEL": "Category"
     },
     "TABLE": {
@@ -436,8 +436,7 @@
       "TAG_SPEND": {
         "TITLE": "Spend by Tag",
         "TOOLTIP": "Spending per tag for the selected dates (the account and category filters don't apply). Refunds come off, internal transfers are left out. A transaction with several tags counts under each of them.",
-        "EMPTY": "No tagged spending in this period. Add tags to transactions in the Money Journal.",
-        "COUNT": "{count} transaction(s)"
+        "EMPTY": "No tagged spending in this period. Add tags to transactions in the Money Journal."
       }
     },
     "ERRORS": {
@@ -488,7 +487,8 @@
       "APPLY_BUTTON": "Apply",
       "TAG_FILTER": {
         "LABEL": "Tags",
-        "UNTAGGED": "Untagged"
+        "UNTAGGED": "Untagged",
+        "CLEAR_ALL": "Clear all"
       }
     },
     "TOTALS": {

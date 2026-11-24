@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import z from 'zod';
 import TransactionsTable from './TransactionsTable';
+import BulkActionsPanel from '@/components/BulkActionsPanel/BulkActionsPanel';
 import BulkCategoryBar from '@/components/BulkCategoryBar/BulkCategoryBar';
 import DuplicatesBar from './DuplicatesBar';
 import {
@@ -243,12 +244,17 @@ export default function TransactionsClient({
           <ErrorBanner key={error.message} error={error} />
         ))}
 
-      {/* Inputs */}
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={2}
+      {/* Inputs: currency, account and "create account" share one aligned row
+          on desktop and stack full-width on phones */}
+      <Box
+        display="grid"
+        gap={2}
         mb={2}
-        alignItems="stretch"
+        gridTemplateColumns={{
+          xs: 'minmax(0, 1fr)',
+          md: 'minmax(0, 1fr) minmax(0, 2fr) auto',
+        }}
+        alignItems="center"
       >
         {/* Currency select */}
         <CurrencySelect
@@ -266,7 +272,7 @@ export default function TransactionsClient({
           onChange={setAccountId}
           onCreate={() => setIsCreateModalOpen(true)}
         />
-      </Stack>
+      </Box>
 
       {/* Duplicates summary */}
       <DuplicatesBar
@@ -280,34 +286,36 @@ export default function TransactionsClient({
         }
       />
 
-      {/* Bulk category */}
-      <BulkCategoryBar
-        pageText={transactionsPageText.BULK_CATEGORY_BAR}
-        categories={categories}
-        selectedRows={selectedRows}
-        onApply={(categoryId) => {
-          // this bar has no "None" option, so a category is always chosen
-          if (!categoryId) return;
-          setRowCategories((prev) => {
-            const next = { ...prev };
-            selectedRows.forEach((id) => (next[id] = categoryId));
-            return next;
-          });
-
-          setSelectedRows([]);
-        }}
-      />
-
-      <BulkTagBar
-        text={transactionsPageText.BULK_TAG_BAR}
-        options={tagOptions}
+      {/* Bulk category and tags */}
+      <BulkActionsPanel
         selectedCount={selectedRows.length}
-        removable={selectedRowTags}
-        onAdd={(toAdd) => updateSelectedTags((t) => addTags(t, toAdd))}
-        onRemove={(toRemove) =>
-          updateSelectedTags((t) => removeTags(t, toRemove))
-        }
-      />
+        label={transactionsPageText.BULK_CATEGORY_BAR.LABEL}
+      >
+        <BulkCategoryBar
+          pageText={transactionsPageText.BULK_CATEGORY_BAR}
+          categories={categories}
+          onApply={(categoryId) => {
+            // this bar has no "None" option, so a category is always chosen
+            if (!categoryId) return;
+            setRowCategories((prev) => {
+              const next = { ...prev };
+              selectedRows.forEach((id) => (next[id] = categoryId));
+              return next;
+            });
+
+            setSelectedRows([]);
+          }}
+        />
+        <BulkTagBar
+          text={transactionsPageText.BULK_TAG_BAR}
+          options={tagOptions}
+          removable={selectedRowTags}
+          onAdd={(toAdd) => updateSelectedTags((t) => addTags(t, toAdd))}
+          onRemove={(toRemove) =>
+            updateSelectedTags((t) => removeTags(t, toRemove))
+          }
+        />
+      </BulkActionsPanel>
 
       {/* Table */}
       <TransactionsTable

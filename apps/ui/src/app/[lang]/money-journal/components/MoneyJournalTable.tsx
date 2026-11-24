@@ -353,6 +353,11 @@ export default function MoneyJournalTable({
           },
           '.mj-row-pending-delete': {
             opacity: 0.55,
+            // light red so a row about to be deleted stands out before saving
+            bgcolor: 'rgba(211, 47, 47, 0.12)',
+            '&:hover': {
+              bgcolor: 'rgba(211, 47, 47, 0.18)',
+            },
           },
           '.mj-row-pending-delete .MuiDataGrid-cell[data-field="description"], .mj-row-pending-delete .MuiDataGrid-cell[data-field="amount"], .mj-row-pending-delete .MuiDataGrid-cell[data-field="date"]':
             {

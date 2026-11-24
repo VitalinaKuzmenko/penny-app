@@ -31,6 +31,9 @@ interface TagPickerProps {
   text: Record<string, any>;
   autoFocus?: boolean;
   fullWidth?: boolean;
+  // keep the list inside the popover; a portalled list is positioned while
+  // the popover is still animating open and ends up covering the input
+  inPopover?: boolean;
 }
 
 export default function TagPicker({
@@ -40,13 +43,16 @@ export default function TagPicker({
   text,
   autoFocus,
   fullWidth,
+  inPopover,
 }: TagPickerProps) {
   return (
     <Autocomplete<TagOption, true, false, false>
       multiple
       size="small"
       autoHighlight
-      openOnFocus
+      // with no tags yet there's nothing to pick until the user types a name
+      openOnFocus={options.length > 0}
+      disablePortal={inPopover}
       filterSelectedOptions
       fullWidth={fullWidth}
       options={options}

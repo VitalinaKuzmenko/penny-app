@@ -427,26 +427,20 @@ export class ChartsService {
 
     const byTag = new Map<
       string,
-      { tag: (typeof links)[number]['tag']; totals: TypeTotals; count: number }
+      { tag: (typeof links)[number]['tag']; totals: TypeTotals }
     >();
     for (const { tag, transaction } of links) {
-      const entry = byTag.get(tag.id) ?? {
-        tag,
-        totals: emptyTypeTotals(),
-        count: 0,
-      };
+      const entry = byTag.get(tag.id) ?? { tag, totals: emptyTypeTotals() };
       entry.totals[transaction.type] += Number(transaction.amount);
-      entry.count += 1;
       byTag.set(tag.id, entry);
     }
 
     return [...byTag.values()]
-      .map(({ tag, totals, count }) => ({
+      .map(({ tag, totals }) => ({
         tagId: tag.id,
         name: tag.name,
         color: tag.color,
         spent: netSpend(totals.EXPENSE, totals.REFUND),
-        count,
       }))
       .filter((t) => t.spent > 0)
       .sort((a, b) => b.spent - a.spent);

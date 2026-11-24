@@ -28,6 +28,9 @@ interface FilterMultiSelectProps {
   value: string[];
   onChange: (ids: string[]) => void;
   minWidth?: number;
+  // For filters where nothing selected already means "everything": the top
+  // option only clears the selection, under this label
+  clearAllLabel?: string;
 }
 
 const FilterMultiSelect = ({
@@ -36,6 +39,7 @@ const FilterMultiSelect = ({
   value,
   onChange,
   minWidth = 260,
+  clearAllLabel,
 }: FilterMultiSelectProps) => {
   const allIds = useMemo(() => items.map((i) => i.id), [items]);
   const isAllSelected = value.length === allIds.length && allIds.length > 0;
@@ -44,7 +48,7 @@ const FilterMultiSelect = ({
     const selected = event.target.value as string[];
 
     if (selected.includes(ALL_VALUE)) {
-      onChange(isAllSelected ? [] : allIds);
+      onChange(clearAllLabel || isAllSelected ? [] : allIds);
       return;
     }
 
@@ -97,17 +101,29 @@ const FilterMultiSelect = ({
         }}
       >
         {/* Select / Clear all */}
-        <MenuItem
-          value={ALL_VALUE}
-          sx={{
-            '&:hover': {
-              bgcolor: 'grey.200',
-            },
-          }}
-        >
-          <Checkbox checked={isAllSelected} />
-          <ListItemText primary={isAllSelected ? 'Clear all' : 'Select all'} />
-        </MenuItem>
+        {clearAllLabel ? (
+          <MenuItem
+            value={ALL_VALUE}
+            disabled={value.length === 0}
+            sx={{ '&:hover': { bgcolor: 'grey.200' } }}
+          >
+            <ListItemText primary={clearAllLabel} />
+          </MenuItem>
+        ) : (
+          <MenuItem
+            value={ALL_VALUE}
+            sx={{
+              '&:hover': {
+                bgcolor: 'grey.200',
+              },
+            }}
+          >
+            <Checkbox checked={isAllSelected} />
+            <ListItemText
+              primary={isAllSelected ? 'Clear all' : 'Select all'}
+            />
+          </MenuItem>
+        )}
 
         <Divider />
 

@@ -138,6 +138,7 @@ export default function MoneyJournalFilters({
         label={text.TAG_FILTER.LABEL}
         items={tagItems}
         value={filters.tagIds}
+        clearAllLabel={text.TAG_FILTER.CLEAR_ALL}
         // every tag plus Untagged is the same as no filter; stored as [] so a tag
         // created later doesn't turn "everything" into a real filter
         onChange={(tagIds) =>

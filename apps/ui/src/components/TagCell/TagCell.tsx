@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Box, IconButton, Popover, Stack, Tooltip } from '@mui/material';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import TagChips from '@/components/TagChips/TagChips';
@@ -26,6 +26,7 @@ export default function TagCell({
   text,
 }: TagCellProps) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
 
   return (
     <Stack
@@ -35,7 +36,8 @@ export default function TagCell({
       sx={{ height: '100%', minWidth: 0 }}
     >
       {!disabled && (
-        <Tooltip title={text.EDIT} arrow>
+        // hidden while the picker is open so it can't cover it
+        <Tooltip title={anchor ? '' : text.EDIT} arrow>
           <IconButton
             size="small"
             aria-label={text.EDIT}
@@ -47,24 +49,37 @@ export default function TagCell({
       )}
       <TagChips tags={tags} />
 
-      <Popover
-        open={Boolean(anchor)}
-        anchorEl={anchor}
-        onClose={() => setAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-      >
-        {/* the grid would otherwise react to keys typed in the picker */}
-        <Box sx={{ p: 1.5, width: 340 }} onKeyDown={(e) => e.stopPropagation()}>
-          <TagPicker
-            options={options}
-            value={tags}
-            onChange={onChange}
-            text={text}
-            autoFocus
-            fullWidth
-          />
-        </Box>
-      </Popover>
+      {/* stops keys typed in the picker from reaching the grid; it sits outside
+          the popover so the popover still sees Escape and closes */}
+      <Box component="span" onKeyDown={(e) => e.stopPropagation()}>
+        <Popover
+          open={Boolean(anchor)}
+          anchorEl={anchor}
+          onClose={() => setAnchor(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          slotProps={{
+            // the picker's list renders inside the popover, so it may overflow it
+            paper: { sx: { overflow: 'visible' } },
+            // focusing opens the list; doing it before the open animation ends
+            // makes the list measure a half-scaled popover and cover the input
+            transition: {
+              onEntered: () =>
+                pickerRef.current?.querySelector('input')?.focus(),
+            },
+          }}
+        >
+          <Box ref={pickerRef} sx={{ p: 1.5, width: 340 }}>
+            <TagPicker
+              options={options}
+              value={tags}
+              onChange={onChange}
+              text={text}
+              fullWidth
+              inPopover
+            />
+          </Box>
+        </Popover>
+      </Box>
     </Stack>
   );
 }

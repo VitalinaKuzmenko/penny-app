@@ -13,8 +13,6 @@ export const TagSpendResponseSchema = z.array(
     name: z.string(),
     color: z.string().nullable(),
     spent: z.number(),
-    // transactions (expenses and refunds) behind the amount
-    count: z.number().int(),
   }),
 );
 

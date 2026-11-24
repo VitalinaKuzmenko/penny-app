@@ -14,6 +14,7 @@ import {
   UpdateTransactionsSchema,
 } from 'schemas';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
+import BulkActionsPanel from '@/components/BulkActionsPanel/BulkActionsPanel';
 import BulkCategoryBar from '@/components/BulkCategoryBar/BulkCategoryBar';
 import BulkTagBar from '@/components/BulkTagBar/BulkTagBar';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
@@ -353,33 +354,35 @@ export default function MoneyJournalClient({
 
       <TotalsBar totals={data?.totals ?? null} pageText={pageText} />
 
-      <BulkCategoryBar
-        pageText={pageText.BULK_CATEGORY_BAR}
-        categories={categories}
-        selectedRows={selectedRows}
-        onApply={(categoryId) => applyToSelection({ categoryId })}
+      <BulkActionsPanel
+        selectedCount={selectedRows.length}
+        label={pageText.BULK_CATEGORY_BAR.LABEL}
         actions={
           <CustomButton
             variantType="secondary"
             color="error"
+            size="small"
             onClick={() => applyToSelection({ deleted: true })}
-            sx={{ minWidth: 180 }}
           >
             {pageText.BULK_CATEGORY_BAR.DELETE_BUTTON}
           </CustomButton>
         }
-      />
-
-      <BulkTagBar
-        text={pageText.BULK_TAG_BAR}
-        options={tagOptions}
-        selectedCount={selectedRows.length}
-        removable={selectedRowTags}
-        onAdd={(toAdd) => updateSelectedTags((tags) => addTags(tags, toAdd))}
-        onRemove={(toRemove) =>
-          updateSelectedTags((tags) => removeTags(tags, toRemove))
-        }
-      />
+      >
+        <BulkCategoryBar
+          pageText={pageText.BULK_CATEGORY_BAR}
+          categories={categories}
+          onApply={(categoryId) => applyToSelection({ categoryId })}
+        />
+        <BulkTagBar
+          text={pageText.BULK_TAG_BAR}
+          options={tagOptions}
+          removable={selectedRowTags}
+          onAdd={(toAdd) => updateSelectedTags((tags) => addTags(tags, toAdd))}
+          onRemove={(toRemove) =>
+            updateSelectedTags((tags) => removeTags(tags, toRemove))
+          }
+        />
+      </BulkActionsPanel>
 
       {loadError && (
         <Box mb={2}>

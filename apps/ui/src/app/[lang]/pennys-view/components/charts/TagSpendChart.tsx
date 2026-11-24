@@ -16,7 +16,6 @@ import { TagSpendResponse } from 'schemas';
 import { useDashboardFilters } from '@/providers/FilterContext';
 import { getTagSpend } from '@/requests/charts/getTagSpend';
 import { formatCurrency } from '@/utils/formatCurrency';
-import { interpolate } from '@/utils/interpolate';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
@@ -128,9 +127,6 @@ export default function TagSpendChart({
                       <Typography fontWeight={600}>{item.name}</Typography>
                       <Typography variant="body2">
                         {formatCurrency(item.spent)}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {interpolate(text.COUNT, { count: item.count })}
                       </Typography>
                     </Paper>
                   );

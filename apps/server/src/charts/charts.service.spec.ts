@@ -325,14 +325,12 @@ describe('ChartsService — refunds', () => {
           name: 'Work',
           color: '#1E88E5',
           spent: 800,
-          count: 2,
         },
         {
           tagId: SPAIN.id,
           name: 'Spain trip',
           color: '#1E88E5',
           spent: 350.1,
-          count: 3,
         },
       ]);
     });
