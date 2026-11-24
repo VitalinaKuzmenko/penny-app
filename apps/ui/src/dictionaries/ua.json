@@ -296,6 +296,8 @@
         "CATEGORY": "Категорія"
       },
       "CUSTOM_CATEGORY_CELL_NAME": "Немає, просто дохід",
+      "REFUND_GROUP_LABEL": "Повернення за…",
+      "REFUND_CHIP": "повернення",
       "DUPLICATE_CHIP": "Дублікат",
       "DUPLICATE_TOOLTIP": "Збігається з наявною транзакцією на цьому рахунку: {date} · {amount} · {description}",
       "IMPORT_ANYWAY": "Імпортувати все одно"
@@ -319,6 +321,10 @@
       "IMPORT_ALREADY_CONFIRMED": {
         "TITLE": "Вже підтверджено",
         "MESSAGE": "Цей імпорт вже був підтверджений."
+      },
+      "IMPORT_INVALID_CATEGORY": {
+        "TITLE": "Невідома категорія",
+        "MESSAGE": "Одна або кілька вибраних категорій більше не існують. Оновіть сторінку та виберіть категорії знову."
       },
       "IMPORT_ROW_MISSING_INPUT": {
         "TITLE": "Відсутня категорія",

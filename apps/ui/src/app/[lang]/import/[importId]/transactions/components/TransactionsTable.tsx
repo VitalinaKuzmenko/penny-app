@@ -12,9 +12,12 @@ import {
   Tooltip,
   Checkbox,
   FormControlLabel,
+  ListSubheader,
   Stack,
 } from '@mui/material';
 import { CsvImportResponse, Category } from 'schemas';
+
+const TRANSFER_CATEGORY_NAME = 'Internal Transfer';
 
 interface TransactionsTableProps {
   pageText: Record<string, any>;
@@ -160,7 +163,7 @@ export default function TransactionsTable({
             params.row.autoAssigned &&
             rowCategories[params.row.id] === params.row.suggestedCategoryId;
 
-          const selectEl = (options: React.ReactNode) => (
+          const selectEl = (options: React.ReactNode, isRefund = false) => (
             <FormControl
               size="small"
               fullWidth
@@ -173,14 +176,27 @@ export default function TransactionsTable({
                 }
                 sx={{ width: '100%' }}
                 startAdornment={
-                  isAutoAssigned ? (
-                    <Chip
-                      label="auto"
-                      size="small"
-                      color="info"
-                      variant="outlined"
-                      sx={{ mr: 0.5, height: 18, fontSize: 10 }}
-                    />
+                  isAutoAssigned || isRefund ? (
+                    <>
+                      {isRefund && (
+                        <Chip
+                          label={pageText.REFUND_CHIP}
+                          size="small"
+                          color="success"
+                          variant="outlined"
+                          sx={{ mr: 0.5, height: 18, fontSize: 10 }}
+                        />
+                      )}
+                      {isAutoAssigned && (
+                        <Chip
+                          label="auto"
+                          size="small"
+                          color="info"
+                          variant="outlined"
+                          sx={{ mr: 0.5, height: 18, fontSize: 10 }}
+                        />
+                      )}
+                    </>
                   ) : undefined
                 }
               >
@@ -188,25 +204,45 @@ export default function TransactionsTable({
               </Select>
             </FormControl>
           );
-          // Early exit: hide selector for positive amounts without internal transfer
+          // Positive rows: plain income, an internal transfer, or a refund for a spending category
           if (amount > 0) {
-            const internalTransferCategory = categories.find(
-              (cat) => cat.name === 'Internal Transfer',
+            const transferCategory = categories.find(
+              (cat) => cat.name === TRANSFER_CATEGORY_NAME,
             );
-            if (!internalTransferCategory) return null;
+            const refundCategories = categories.filter(
+              (cat) => cat.id !== transferCategory?.id,
+            );
+            const selectedId = rowCategories[params.row.id];
+            const isRefund =
+              Boolean(selectedId) && selectedId !== transferCategory?.id;
 
             // MUI Select needs MenuItems as direct children — no Fragment wrapper
-            return selectEl([
-              <MenuItem
-                key={internalTransferCategory.id}
-                value={internalTransferCategory.id}
-              >
-                {internalTransferCategory.name}
-              </MenuItem>,
-              <MenuItem key="none" value="">
-                {pageText.CUSTOM_CATEGORY_CELL_NAME}
-              </MenuItem>,
-            ]);
+            return selectEl(
+              [
+                <MenuItem key="none" value="">
+                  {pageText.CUSTOM_CATEGORY_CELL_NAME}
+                </MenuItem>,
+                ...(transferCategory
+                  ? [
+                      <MenuItem
+                        key={transferCategory.id}
+                        value={transferCategory.id}
+                      >
+                        {transferCategory.name}
+                      </MenuItem>,
+                    ]
+                  : []),
+                <ListSubheader key="refund-header">
+                  {pageText.REFUND_GROUP_LABEL}
+                </ListSubheader>,
+                ...refundCategories.map((cat) => (
+                  <MenuItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </MenuItem>
+                )),
+              ],
+              isRefund,
+            );
           }
 
           // Options for normal rows

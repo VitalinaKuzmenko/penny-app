@@ -296,6 +296,8 @@
         "CATEGORY": "Категория"
       },
       "CUSTOM_CATEGORY_CELL_NAME": "Нет, просто доход",
+      "REFUND_GROUP_LABEL": "Возврат за…",
+      "REFUND_CHIP": "возврат",
       "DUPLICATE_CHIP": "Дубликат",
       "DUPLICATE_TOOLTIP": "Совпадает с существующей транзакцией на этом счёте: {date} · {amount} · {description}",
       "IMPORT_ANYWAY": "Импортировать всё равно"
@@ -319,6 +321,10 @@
       "IMPORT_ALREADY_CONFIRMED": {
         "TITLE": "Уже подтверждено",
         "MESSAGE": "Этот импорт уже был подтвержден."
+      },
+      "IMPORT_INVALID_CATEGORY": {
+        "TITLE": "Неизвестная категория",
+        "MESSAGE": "Одна или несколько выбранных категорий больше не существуют. Обновите страницу и выберите категории снова."
       },
       "IMPORT_ROW_MISSING_INPUT": {
         "TITLE": "Отсутствует категория",

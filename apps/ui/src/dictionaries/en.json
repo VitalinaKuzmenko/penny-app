@@ -302,6 +302,8 @@
         "CATEGORY": "Category"
       },
       "CUSTOM_CATEGORY_CELL_NAME": "None, just income",
+      "REFUND_GROUP_LABEL": "Refund for…",
+      "REFUND_CHIP": "refund",
       "DUPLICATE_CHIP": "Duplicate",
       "DUPLICATE_TOOLTIP": "Matches an existing transaction on this account: {date} · {amount} · {description}",
       "IMPORT_ANYWAY": "Import anyway"
@@ -325,6 +327,10 @@
       "IMPORT_ALREADY_CONFIRMED": {
         "TITLE": "Already confirmed",
         "MESSAGE": "This import has already been confirmed."
+      },
+      "IMPORT_INVALID_CATEGORY": {
+        "TITLE": "Unknown category",
+        "MESSAGE": "One or more selected categories no longer exist. Please refresh the page and choose the categories again."
       },
       "IMPORT_ROW_MISSING_INPUT": {
         "TITLE": "Missing category",

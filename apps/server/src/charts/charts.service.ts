@@ -10,9 +10,22 @@ import {
   MonthlyCategoryQueryDto,
 } from 'schemas-nest';
 
+import { TRANSFER_CATEGORY_NAME } from '../categories/default-categories';
+import { TransactionType } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
-const EXCLUDED_CATEGORY_NAME = 'Internal Transfer';
+import {
+  emptyTypeTotals,
+  incomeAndNetExpense,
+  netSpend,
+  totalsByType,
+  TypeTotals,
+} from './refund-netting';
+
+// Category spend charts need refunds too, so they can be subtracted
+const SPEND_TYPES = {
+  in: [TransactionType.EXPENSE, TransactionType.REFUND],
+};
 
 const utcYearRange = (year: number) => ({
   start: new Date(Date.UTC(year, 0, 1)),
@@ -50,7 +63,7 @@ const excludeInternalTransfers = {
     {
       category: {
         name: {
-          not: EXCLUDED_CATEGORY_NAME,
+          not: TRANSFER_CATEGORY_NAME,
         },
       },
     },
@@ -91,15 +104,13 @@ export class ChartsService {
       },
     });
 
-    const income = rows.find((r) => r.type === 'INCOME')?._sum.amount ?? 0;
-
-    const expense = rows.find((r) => r.type === 'EXPENSE')?._sum.amount ?? 0;
-    const savings = Number(income) - Number(expense);
+    const { income, expense } = incomeAndNetExpense(totalsByType(rows));
+    const savings = income - expense;
 
     return {
       year,
-      income: Number(income),
-      expense: Number(expense),
+      income,
+      expense,
       savings: savings < 0 ? 0 : savings,
     };
   }
@@ -113,7 +124,7 @@ export class ChartsService {
     const rows = await this.prisma.transaction.findMany({
       where: {
         userId,
-        type: 'EXPENSE',
+        type: SPEND_TYPES,
         date: {
           gte: start,
           lt: end,
@@ -128,6 +139,7 @@ export class ChartsService {
       },
       select: {
         amount: true,
+        type: true,
         date: true,
         categoryId: true,
         category: {
@@ -154,8 +166,11 @@ export class ChartsService {
       'Dec',
     ];
 
-    // group by category
-    const map = new Map<string, { categoryName: string; data: number[] }>();
+    // group by category; expenses and refunds kept apart so each month can be netted
+    const map = new Map<
+      string,
+      { categoryName: string; expense: number[]; refund: number[] }
+    >();
 
     for (const row of rows) {
       const monthIndex = row.date.getUTCMonth();
@@ -163,18 +178,24 @@ export class ChartsService {
       if (!map.has(row.categoryId)) {
         map.set(row.categoryId, {
           categoryName: row.category.name,
-          data: Array(12).fill(0),
+          expense: Array(12).fill(0),
+          refund: Array(12).fill(0),
         });
       }
 
-      map.get(row.categoryId)!.data[monthIndex] += Number(row.amount);
+      const entry = map.get(row.categoryId)!;
+      const bucket = row.type === 'REFUND' ? entry.refund : entry.expense;
+      bucket[monthIndex] += Number(row.amount);
     }
 
-    const datasets = Array.from(map.entries()).map(([categoryId, value]) => ({
-      categoryId,
-      categoryName: value.categoryName,
-      data: value.data,
-    }));
+    const datasets = Array.from(map.entries())
+      .map(([categoryId, value]) => ({
+        categoryId,
+        categoryName: value.categoryName,
+        data: value.expense.map((spent, i) => netSpend(spent, value.refund[i])),
+      }))
+      // a category whose refunds cancel all its spend has nothing to show
+      .filter((dataset) => dataset.data.some((amount) => amount > 0));
 
     const result = {
       labels,
@@ -191,10 +212,10 @@ export class ChartsService {
     const { start, end } = utcDayRange(startDate, endDate);
 
     const rows = await this.prisma.transaction.groupBy({
-      by: ['categoryId'],
+      by: ['categoryId', 'type'],
       where: {
         userId,
-        type,
+        type: type === 'EXPENSE' ? SPEND_TYPES : type,
         date: {
           gte: start,
           lte: end,
@@ -207,24 +228,40 @@ export class ChartsService {
       },
     });
 
-    const categoryIds = rows.map((r) => r.categoryId);
+    const totalsByCategory = new Map<string | null, TypeTotals>();
+    for (const r of rows) {
+      const totals = totalsByCategory.get(r.categoryId) ?? emptyTypeTotals();
+      totals[r.type] += Number(r._sum.amount ?? 0);
+      totalsByCategory.set(r.categoryId, totals);
+    }
+
+    const amounts = Array.from(totalsByCategory, ([categoryId, totals]) => ({
+      categoryId,
+      amount:
+        type === 'EXPENSE'
+          ? netSpend(totals.EXPENSE, totals.REFUND)
+          : totals.INCOME,
+    }))
+      // fully refunded categories would be empty slices
+      .filter((c) => type !== 'EXPENSE' || c.amount > 0);
+
+    const categoryIds = amounts.map((c) => c.categoryId);
 
     const categories = await this.prisma.category.findMany({
       where: { id: { in: categoryIds } },
       select: { id: true, name: true },
     });
 
-    const total = rows.reduce((sum, r) => sum + Number(r._sum.amount ?? 0), 0);
+    // sum of the shown slices, so percentages add up to 100
+    const total = amounts.reduce((sum, c) => sum + c.amount, 0);
 
     const result = {
       total,
-      categories: rows.map((r) => {
-        const category = categories.find((c) => c.id === r.categoryId);
-
-        const amount = Number(r._sum.amount ?? 0);
+      categories: amounts.map(({ categoryId, amount }) => {
+        const category = categories.find((c) => c.id === categoryId);
 
         return {
-          categoryId: r.categoryId,
+          categoryId,
           categoryName: category?.name ?? 'Unknown',
           amount,
           percentage:
@@ -259,7 +296,7 @@ export class ChartsService {
     });
 
     // 1. Aggregate into months
-    const grouped: Record<string, { INCOME: number; EXPENSE: number }> = {};
+    const grouped: Record<string, TypeTotals> = {};
 
     rows.forEach((r) => {
       const year = r.date.getUTCFullYear();
@@ -267,7 +304,7 @@ export class ChartsService {
       const key = `${year}-${month}`;
 
       if (!grouped[key]) {
-        grouped[key] = { INCOME: 0, EXPENSE: 0 };
+        grouped[key] = emptyTypeTotals();
       }
 
       grouped[key][r.type] += Number(r._sum.amount ?? 0);
@@ -280,8 +317,7 @@ export class ChartsService {
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([month, data]) => ({
           month,
-          income: data.INCOME,
-          expense: data.EXPENSE,
+          ...incomeAndNetExpense(data),
         }));
     }
 
@@ -303,12 +339,11 @@ export class ChartsService {
       const month = String(current.getUTCMonth() + 1).padStart(2, '0');
       const key = `${year}-${month}`;
 
-      const data = grouped[key] || { INCOME: 0, EXPENSE: 0 };
+      const data = grouped[key] || emptyTypeTotals();
 
       result.push({
         month: key,
-        income: data.INCOME,
-        expense: data.EXPENSE,
+        ...incomeAndNetExpense(data),
       });
 
       // move to next month
@@ -339,13 +374,7 @@ export class ChartsService {
       },
     });
 
-    const income = Number(
-      rows.find((r) => r.type === 'INCOME')?._sum.amount ?? 0,
-    );
-
-    const expense = Number(
-      rows.find((r) => r.type === 'EXPENSE')?._sum.amount ?? 0,
-    );
+    const { income, expense } = incomeAndNetExpense(totalsByType(rows));
     const ratio =
       income === 0 ? 0 : Number(((expense / income) * 100).toFixed(2));
 

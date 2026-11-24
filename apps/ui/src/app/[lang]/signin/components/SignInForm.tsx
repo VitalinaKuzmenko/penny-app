@@ -15,7 +15,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import GoogleIcon from '@mui/icons-material/Google';
 
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,7 +35,11 @@ interface SignInFormProps {
 
 export default function SignInForm({ signInPageText }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [error, setError] = useState<UiError | null>(null);
+  const [submitError, setSubmitError] = useState<UiError | null>(null);
+  // the ?error= value the user closed, so a different OAuth error still shows
+  const [dismissedOauthError, setDismissedOauthError] = useState<
+    string | null
+  >(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -50,19 +54,24 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
     resolver: zodResolver(LoginSchema),
   });
 
-  useEffect(() => {
-    const oauthError = searchParams.get('error');
-    if (!oauthError) return;
+  const oauthError = searchParams.get('error');
+  const oauthUiError: UiError | null =
+    oauthError && oauthError !== dismissedOauthError
+      ? {
+          title: signInPageText.FORM.ERRORS.GENERAL.TITLE,
+          message:
+            getNestedDict(
+              signInPageText.FORM.ERRORS,
+              oauthError.toUpperCase(),
+            ) ?? signInPageText.FORM.ERRORS.GENERAL.MESSAGE,
+        }
+      : null;
+  const error = submitError ?? oauthUiError;
 
-    const translated = getNestedDict(
-      signInPageText.FORM.ERRORS,
-      oauthError.toUpperCase(),
-    );
-    setError({
-      title: signInPageText.FORM.ERRORS.GENERAL.TITLE,
-      message: translated ?? signInPageText.FORM.ERRORS.GENERAL.MESSAGE,
-    });
-  }, [searchParams, signInPageText]);
+  const handleCloseError = () => {
+    setSubmitError(null);
+    setDismissedOauthError(oauthError);
+  };
 
   const handleSignUpClick = () => {
     router.push('/register');
@@ -91,7 +100,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
         return;
       }
 
-      setError({
+      setSubmitError({
         title: signInPageText.FORM.ERRORS.GENERAL.TITLE,
         message: signInPageText.FORM.ERRORS.GENERAL.MESSAGE,
       });
@@ -205,7 +214,7 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
 
       <ErrorBanner
         error={error}
-        onClose={() => setError(null)}
+        onClose={handleCloseError}
         colorMode="color"
       />
     </Box>
