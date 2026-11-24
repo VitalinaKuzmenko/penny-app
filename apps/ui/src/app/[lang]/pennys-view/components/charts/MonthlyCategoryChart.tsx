@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { useDashboardFilters } from '@/providers/FilterContext';
 import { getMonthlyCategory } from '@/requests/charts/getMonthlyCategory';
+import { chartCategoryIds } from '@/utils/chartCategoryIds';
 import { ApiError } from '@/utils/clientApiFetch';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
@@ -52,7 +53,7 @@ export default function MonthlyCategoryChart({
         const result = await getMonthlyCategory({
           year,
           accountIds: appliedFilters.accountIds,
-          categoryIds: appliedFilters.categoryIds,
+          categoryIds: chartCategoryIds(appliedFilters.categoryIds, categories),
         });
         setData(result);
       } catch (err) {
@@ -79,6 +80,7 @@ export default function MonthlyCategoryChart({
     year,
     appliedFilters.accountIds,
     appliedFilters.categoryIds,
+    categories,
     isInitialized,
   ]);
 

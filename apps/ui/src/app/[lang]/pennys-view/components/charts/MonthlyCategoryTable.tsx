@@ -6,6 +6,7 @@ import { Box, Paper, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridValueFormatter } from '@mui/x-data-grid';
 import { useDashboardFilters } from '@/providers/FilterContext';
 import { getMonthlyCategory } from '@/requests/charts/getMonthlyCategory';
+import { chartCategoryIds } from '@/utils/chartCategoryIds';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { formatCurrency } from '@/utils/formatCurrency';
@@ -46,7 +47,7 @@ export default function MonthlyCategoryTable({
         const result = await getMonthlyCategory({
           year,
           accountIds: appliedFilters.accountIds,
-          categoryIds: appliedFilters.categoryIds,
+          categoryIds: chartCategoryIds(appliedFilters.categoryIds, categories),
         });
         setData(result);
       } catch (err) {
@@ -73,6 +74,7 @@ export default function MonthlyCategoryTable({
     year,
     appliedFilters.accountIds,
     appliedFilters.categoryIds,
+    categories,
     isInitialized,
   ]);
 

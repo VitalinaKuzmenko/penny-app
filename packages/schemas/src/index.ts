@@ -28,6 +28,7 @@ export * from './currency/getCurrenciesResponse.schema';
 export * from './category/category.schema';
 
 // CHARTS
+export * from './charts/uncategorised';
 export * from './charts/get-income-expense.query';
 export * from './charts/get-income-expense.response';
 export * from './charts/monthly-category.query';

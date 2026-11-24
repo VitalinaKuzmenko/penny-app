@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import {
   CategoryBreakdownResponseSchema,
   MonthlyCategoryResponseSchema,
+  UNCATEGORISED_CATEGORY_ID,
+  UNCATEGORISED_CATEGORY_NAME,
 } from 'schemas';
 import {
   CategoryBreakdownQueryDto,
@@ -177,16 +179,17 @@ export class ChartsService {
 
     for (const row of rows) {
       const monthIndex = row.date.getUTCMonth();
+      const categoryId = row.categoryId ?? UNCATEGORISED_CATEGORY_ID;
 
-      if (!map.has(row.categoryId)) {
-        map.set(row.categoryId, {
-          categoryName: row.category.name,
+      if (!map.has(categoryId)) {
+        map.set(categoryId, {
+          categoryName: row.category?.name ?? UNCATEGORISED_CATEGORY_NAME,
           expense: Array(12).fill(0),
           refund: Array(12).fill(0),
         });
       }
 
-      const entry = map.get(row.categoryId)!;
+      const entry = map.get(categoryId)!;
       const bucket = row.type === 'REFUND' ? entry.refund : entry.expense;
       bucket[monthIndex] += Number(row.amount);
     }
@@ -249,7 +252,9 @@ export class ChartsService {
       // fully refunded categories would be empty slices
       .filter((c) => type !== 'EXPENSE' || c.amount > 0);
 
-    const categoryIds = amounts.map((c) => c.categoryId);
+    const categoryIds = amounts
+      .map((c) => c.categoryId)
+      .filter((id): id is string => id !== null);
 
     const categories = await this.prisma.category.findMany({
       where: { id: { in: categoryIds } },
@@ -265,8 +270,11 @@ export class ChartsService {
         const category = categories.find((c) => c.id === categoryId);
 
         return {
-          categoryId,
-          categoryName: category?.name ?? 'Unknown',
+          categoryId: categoryId ?? UNCATEGORISED_CATEGORY_ID,
+          categoryName:
+            categoryId === null
+              ? UNCATEGORISED_CATEGORY_NAME
+              : (category?.name ?? 'Unknown'),
           amount,
           percentage:
             total === 0 ? 0 : Number(((amount / total) * 100).toFixed(2)),
