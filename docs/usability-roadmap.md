@@ -185,7 +185,7 @@ EXPENSE`. It loads the submitted categories scoped by `userId` and
 
 ## Step 3: Money Journal (transactions page, spreadsheet replacement)
 
-Status: in progress (branch `feature/money-journal`).
+Status: done, PR #110 merged.
 
 New page `/[lang]/money-journal` ("Money Journal"; ru "Денежный журнал",
 ua "Грошовий журнал"), in the Navbar between Upload CSV and Penny's View.
@@ -377,6 +377,69 @@ New page, e.g. `/[lang]/manage` (or a section in `/profile`).
 
 - `PATCH /accounts/:id`: rename. Show each account's last import info from
   Step 1 here too.
+
+## Step 6: Year presets on Penny's View and the Money Journal
+
+Added 2026-11-24. One-click year filters on both pages, so the usual
+question ("how did 2025 go?") doesn't need two date pickers. Small, no
+migration, and independent of Steps 4–5, so it can be done at any time.
+This reverses the Step 3 decision to have no date presets.
+
+### Why it fits
+
+- Penny's View is already year-based: the income/expense chart and the
+  monthly category chart/table use `startDate.year()`, so a range that
+  spans two years only shows the start year there. Picking a whole year is
+  what the page expects anyway.
+- The Money Journal defaults to "this year" too, and its totals bar then
+  becomes a yearly summary.
+
+### UI/UX (proposal)
+
+- A row of year chips above the date pickers, in a shared
+  `YearPresets` component (`src/components`) used by both filter bars:
+
+  ```text
+  [ 2026 ]  [ 2025 ]  [ 2024 ]  [ 2023 ]  [ Older ▾ ]      From [01/01/2026]  To [31/12/2026]
+  ```
+
+  - Newest first; the current year comes first and is selected by default
+    (the pages already open on this year).
+  - Only years from the user's first transaction to the current year
+    (no empty years before the data starts). A new user sees just the
+    current year.
+  - At most 4 chips; older years go into an "Older" menu so the row
+    doesn't grow every January. On mobile the row scrolls sideways.
+
+- Clicking a chip sets From = 1 Jan and To = 31 Dec of that year and
+  **applies straight away** (a preset that still needs Apply feels broken).
+  Other changed-but-not-applied filters are applied with it.
+  - Money Journal: this goes through the existing "Discard unsaved
+    changes?" prompt, like Apply.
+- The chip is highlighted when the applied range is exactly that year.
+  Editing the pickers to anything else clears the highlight, so the
+  pickers stay the "custom range" option without an extra chip.
+- Reset goes back to the current year, as today.
+- Strings for "Older" and the chip tooltip ("1 Jan – 31 Dec 2025") in en,
+  ru and ua.
+
+### Server
+
+- Years need the user's first transaction date. Add
+  `firstTransactionDate` to `GET /accounts` next to `lastTransactionDate`
+  from Step 1: the same `groupBy`, plus `_min: { date }`, skipping deleted
+  rows. No new endpoint; the UI takes the earliest date across accounts.
+- Extend `AccountWithActivitySchema` in `packages/schemas`.
+
+### Open decisions
+
+1. Apply a chip immediately (proposed) or only fill the pickers and wait
+   for Apply, like the other filters?
+2. Show every year from the first transaction (proposed), or skip years
+   with no transactions in between?
+3. Money Journal only: also offer "All time" (useful for searching every
+   transaction by name), or keep the two pages identical?
+4. How many year chips before "Older" (proposed 4)?
 
 ## Open decisions
 
