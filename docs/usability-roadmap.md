@@ -551,6 +551,20 @@ Categories:
   bar), the Money Journal category cell, the category filters (Penny's View
   and Money Journal) and the chart legends/tooltips (category breakdown,
   monthly category chart and table).
+- The category dialog, top to bottom:
+  - a **live preview** of the icon and name as they'll look in dropdowns
+    and the Money Journal;
+  - the name field;
+  - **colour swatches** (round, the chosen one has a ring/tick);
+  - the **icon grid, grouped** under small headings (Food, Home,
+    Transport, Shopping, Health, Fun, Finance, People, Other). Icons are
+    drawn in the chosen colour, the chosen one is highlighted, and each has
+    a **translated tooltip** with its name (e.g. "Restaurant").
+  - No icon search: about 50 grouped icons are quick to scan, and search
+    would need translated keywords.
+  - On phones (`xs`) the dialog is **full screen** to give the grid room.
+- The tag dialog has the name and the tag colour swatches; the account
+  dialog has the name only. Both use the same dialog style.
 - Order everywhere: **by name ignoring case, Internal Transfer last**.
 - `isDefault` stays in the database with its current data and meaning, but
   no longer drives the order or any other behaviour. Any category can be
@@ -673,9 +687,10 @@ model Category {
 - Shared components in `src/components`:
   - `CategoryIcon` (name, colour, size; generic fallback) and a
     `CATEGORY_ICON_COMPONENTS` map from every curated name to its MUI
-    component, typed so a missing name fails the type-check;
+    component and group, typed so a missing name fails the type-check;
   - `ColourSwatchPicker` (used with the category or tag palette);
-  - `CategoryIconPicker` (grid).
+  - `CategoryIconPicker` (grouped grid with tooltips).
+- Strings for the icon names and group headings in en, ru and ua.
 - Settings tabs: a list with colour dot or icon, name, transaction count
   and edit/delete buttons, plus an "Add …" button. Dialogs:
   `CategoryDialog`, `TagDialog`, `AccountDialog`, `DeleteCategoryDialog`
