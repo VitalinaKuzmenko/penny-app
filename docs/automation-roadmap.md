@@ -231,7 +231,9 @@ Agreed direction — flag **plus** linking, not flag alone:
 
 Update 2026-11-24: the `Category.isTransfer` flag is part of Step 5 of
 `usability-roadmap.md` (Settings page), which makes the transfer category
-safe to rename. Linking and auto-detection are Step 7 there.
+safe to rename. Linking and auto-detection were **dropped**: every account
+is imported, a transfer without a partner needs no action, and linking
+would add effort only to double-check the data.
 
 ## 5. Test coverage — started 2026-09-12
 

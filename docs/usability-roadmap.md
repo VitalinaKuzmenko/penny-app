@@ -528,7 +528,7 @@ Internal Transfer:
 - Add **`Category.isTransfer`** (the flag part of `automation-roadmap.md`
   §4) and replace every check of the name `'Internal Transfer'` with it, so
   the transfer category **can be renamed** (e.g. "Переказ"). Linking the
-  two sides of a transfer stays open and is Step 7.
+  two sides of a transfer was dropped (see Out of scope).
 - The transfer category **can't be deleted**; its flag can't be changed.
   Each user has exactly one, seeded on sign-up.
 
@@ -708,7 +708,11 @@ model Category {
 
 ### Out of scope
 
-- Linking the two sides of a transfer (Step 7).
+- Linking the two sides of a transfer (`automation-roadmap.md` §4):
+  dropped on 2026-11-24. All accounts are imported, so a transfer with no
+  partner is normal (untracked account, not imported yet) and needs no
+  action, and linking would be extra effort only to double-check the data.
+  The `isTransfer` flag is enough.
 - Moving transactions between accounts, merging accounts.
 - Merging tags or categories by renaming (delete + move covers
   categories).
@@ -812,20 +816,6 @@ This reverses the Step 3 decision to have no date presets.
 3. Money Journal only: also offer "All time" (useful for searching every
    transaction by name), or keep the two pages identical?
 4. How many year chips before "Older" (proposed 4)?
-
-## Step 7: Link the two sides of an internal transfer
-
-Added 2026-11-24 as the follow-up to Step 5, which adds only the
-`Category.isTransfer` flag. This is the rest of `automation-roadmap.md` §4.
-Not planned in detail yet.
-
-- `Transaction.linkedTransactionId` (nullable self-relation) pairs the
-  outgoing `EXPENSE` on account A with the incoming `INCOME` on account B.
-- Suggest pairs: same user, unpaired, matching (or nearly matching) amount,
-  dates within a few days; one click links both and puts both in the
-  transfer category.
-- Linking is additive: a row can still be put in the transfer category
-  without a pair (e.g. the other account isn't tracked).
 
 ## Open decisions
 
