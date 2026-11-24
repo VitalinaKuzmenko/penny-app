@@ -15,6 +15,7 @@ import MonthlyCategoryTable from './charts/MonthlyCategoryTable';
 import CategoryBreakdownChart from './charts/CategoryBreakdownChart';
 import IncomeExpenseStackedChart from './charts/IncomeExpenseStackedChart';
 import IncomeExpenseGauge from './charts/IncomeExpenseGauge';
+import TagSpendChart from './charts/TagSpendChart';
 
 interface MainDashboardProps {
   accounts: Account[];
@@ -95,6 +96,8 @@ const MainDashboard = ({
               categories={categories}
               pennysViewPageText={pennysViewPageText}
             />
+
+            <TagSpendChart pennysViewPageText={pennysViewPageText} />
           </Box>
         )}
       </Box>

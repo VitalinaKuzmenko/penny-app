@@ -14,6 +14,7 @@ import {
 import { emptyTypeTotals } from '../charts/refund-netting';
 import { Prisma, TransactionType } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { byTagName, TagsService } from '../tags/tags.service';
 import { WinstonLogger } from '../utils/logger/logger';
 import { notDeleted } from '../utils/not-deleted';
 import { resolveTransactionType } from '../utils/transaction-type';
@@ -28,6 +29,7 @@ const listSelect = {
   deletedAt: true,
   category: { select: { id: true, name: true } },
   account: { select: { id: true, name: true } },
+  tags: { select: { tag: { select: { id: true, name: true, color: true } } } },
 } satisfies Prisma.TransactionSelect;
 
 type ListRow = Prisma.TransactionGetPayload<{ select: typeof listSelect }>;
@@ -49,6 +51,7 @@ const toListItem = (row: ListRow): TransactionListItem => ({
   currency: row.currency,
   category: row.category,
   account: row.account,
+  tags: row.tags.map((t) => t.tag).sort(byTagName),
   deleted: row.deletedAt !== null,
 });
 
@@ -57,6 +60,7 @@ export class TransactionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly logger: WinstonLogger,
+    private readonly tagsService: TagsService,
   ) {}
 
   async list(
@@ -138,7 +142,9 @@ export class TransactionsService {
     const lockedIds = changes
       .filter((c) => {
         const isEdit =
-          c.description !== undefined || c.categoryId !== undefined;
+          c.description !== undefined ||
+          c.categoryId !== undefined ||
+          c.tags !== undefined;
         const staysDeleted =
           rowById.get(c.id)!.deletedAt !== null && c.deleted !== false;
         return isEdit && staysDeleted;
@@ -199,6 +205,8 @@ export class TransactionsService {
       }
     }
 
+    const tagChanges = changes.filter((c) => c.tags !== undefined);
+
     await this.prisma.$transaction(
       async (tx) => {
         for (const { data, ids: groupIds } of groups.values()) {
@@ -215,17 +223,49 @@ export class TransactionsService {
             update: { categoryId },
           });
         }
+
+        if (tagChanges.length) {
+          await this.replaceTags(tx, userId, tagChanges);
+        }
       },
       { timeout: 30_000 },
     );
 
-    const updated = [...groups.values()].reduce(
-      (sum, g) => sum + g.ids.length,
-      0,
-    );
+    const updated = new Set([
+      ...[...groups.values()].flatMap((g) => g.ids),
+      ...tagChanges.map((c) => c.id),
+    ]).size;
     this.logger.info('Transactions updated', { userId, updated });
 
     return { updated };
+  }
+
+  // Each change carries the row's full set of tags; links not in it are removed
+  private async replaceTags(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    changes: UpdateTransactionsInput['changes'],
+  ) {
+    const resolve = await this.tagsService.resolveRefs(
+      tx,
+      userId,
+      changes.flatMap((c) => c.tags ?? []),
+      'transactions.invalid_tag',
+    );
+
+    for (const change of changes) {
+      const tagIds = [...new Set((change.tags ?? []).map(resolve))];
+
+      await tx.transactionTag.deleteMany({
+        where: { transactionId: change.id, tagId: { notIn: tagIds } },
+      });
+      if (tagIds.length) {
+        await tx.transactionTag.createMany({
+          data: tagIds.map((tagId) => ({ transactionId: change.id, tagId })),
+          skipDuplicates: true,
+        });
+      }
+    }
   }
 
   private buildWhere(
@@ -257,6 +297,21 @@ export class TransactionsService {
     }
     if (query.search) {
       where.description = { contains: query.search, mode: 'insensitive' };
+    }
+
+    // any of the picked tags; kept under AND so it doesn't clash with the category OR
+    const tagIds = query.tagIds ?? [];
+    if (tagIds.length || query.includeUntagged) {
+      where.AND = [
+        {
+          OR: [
+            ...(tagIds.length
+              ? [{ tags: { some: { tagId: { in: tagIds } } } }]
+              : []),
+            ...(query.includeUntagged ? [{ tags: { none: {} } }] : []),
+          ],
+        },
+      ];
     }
 
     return where;

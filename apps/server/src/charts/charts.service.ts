@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   CategoryBreakdownResponseSchema,
   MonthlyCategoryResponseSchema,
+  TagSpendResponse,
   UNCATEGORISED_CATEGORY_ID,
   UNCATEGORISED_CATEGORY_NAME,
 } from 'schemas';
@@ -10,6 +11,7 @@ import {
   IncomeExpenseRatioQueryDto,
   IncomeExpenseStackedQueryDto,
   MonthlyCategoryQueryDto,
+  TagSpendQueryDto,
 } from 'schemas-nest';
 
 import { TRANSFER_CATEGORY_NAME } from '../categories/default-categories';
@@ -397,5 +399,56 @@ export class ChartsService {
       expense,
       ratio,
     };
+  }
+
+  async getTagSpend(
+    userId: string,
+    { startDate, endDate }: TagSpendQueryDto,
+  ): Promise<TagSpendResponse> {
+    const { start, end } = utcDayRange(startDate, endDate);
+
+    // Prisma can't group by a many-to-many relation, so sum the links in code
+    const links = await this.prisma.transactionTag.findMany({
+      where: {
+        tag: { userId },
+        transaction: {
+          userId,
+          ...notDeleted,
+          type: SPEND_TYPES,
+          date: { gte: start, lte: end },
+          ...excludeInternalTransfers,
+        },
+      },
+      select: {
+        tag: { select: { id: true, name: true, color: true } },
+        transaction: { select: { type: true, amount: true } },
+      },
+    });
+
+    const byTag = new Map<
+      string,
+      { tag: (typeof links)[number]['tag']; totals: TypeTotals; count: number }
+    >();
+    for (const { tag, transaction } of links) {
+      const entry = byTag.get(tag.id) ?? {
+        tag,
+        totals: emptyTypeTotals(),
+        count: 0,
+      };
+      entry.totals[transaction.type] += Number(transaction.amount);
+      entry.count += 1;
+      byTag.set(tag.id, entry);
+    }
+
+    return [...byTag.values()]
+      .map(({ tag, totals, count }) => ({
+        tagId: tag.id,
+        name: tag.name,
+        color: tag.color,
+        spent: netSpend(totals.EXPENSE, totals.REFUND),
+        count,
+      }))
+      .filter((t) => t.spent > 0)
+      .sort((a, b) => b.spent - a.spent);
   }
 }

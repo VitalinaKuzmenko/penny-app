@@ -1,11 +1,14 @@
 import { Category, TransactionListItem } from 'schemas';
 import { resolveMoneyInType } from '@/utils/transactionType';
+import { sameTagSet, TagValue } from '@/utils/tags';
 
 // An unsaved edit to one row; only fields the user actually changed are set
 export interface PendingChange {
   description?: string;
   // null = clear the category
   categoryId?: string | null;
+  // the row's full set of tags after the edit
+  tags?: TagValue[];
   // true = delete, false = restore
   deleted?: boolean;
 }
@@ -34,6 +37,7 @@ export const effectiveRow = (
     description,
     categoryId,
     type,
+    tags: change?.tags ?? (row.tags as TagValue[]),
     pendingDelete,
     pendingRestore,
     // deleted rows must be restored first; rows about to be deleted aren't worth editing
@@ -65,12 +69,16 @@ export const normaliseChange = (
   if (change.deleted !== undefined && change.deleted !== row.deleted) {
     next.deleted = change.deleted;
   }
+  if (change.tags !== undefined && !sameTagSet(change.tags, row.tags)) {
+    next.tags = change.tags;
+  }
 
   // A row that stays deleted is locked and the server rejects edits on it,
   // so undoing a restore also drops edits made while it was restored
   if (row.deleted && next.deleted !== false) {
     delete next.description;
     delete next.categoryId;
+    delete next.tags;
   }
 
   return Object.keys(next).length ? next : null;

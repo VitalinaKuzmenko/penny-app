@@ -2,6 +2,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { TagsService } from '../tags/tags.service';
 import { WinstonLogger } from '../utils/logger/logger';
 import { buildTransactionFingerprint } from '../utils/transaction-fingerprint';
 
@@ -13,6 +14,8 @@ const ACCOUNT_ID = '33333333-3333-4333-8333-333333333333';
 const CATEGORY_ID = '44444444-4444-4444-8444-444444444444';
 const OVERRIDE_CATEGORY_ID = '55555555-5555-4555-8555-555555555555';
 const TRANSFER_CATEGORY_ID = '66666666-6666-4666-8666-666666666666';
+const SPAIN_TAG_ID = '88888888-8888-4888-8888-888888888881';
+const FOREIGN_TAG_ID = '88888888-8888-4888-8888-888888888889';
 
 // The user's own categories; anything else is "not owned"
 const userCategories = [
@@ -69,6 +72,16 @@ function createPrismaMock() {
     transaction: { createMany: jest.fn().mockResolvedValue({ count: 0 }) },
     categoryMapping: { upsert: jest.fn().mockResolvedValue({}) },
     transactionImport: { update: jest.fn().mockResolvedValue({}) },
+    tag: {
+      findMany: jest
+        .fn()
+        .mockResolvedValue([{ id: SPAIN_TAG_ID, name: 'Spain trip 2026' }]),
+      createManyAndReturn: jest.fn(
+        async ({ data }: { data: { name: string }[] }) =>
+          data.map((d, i) => ({ id: `new-tag-${i}`, name: d.name })),
+      ),
+    },
+    transactionTag: { createMany: jest.fn().mockResolvedValue({ count: 0 }) },
   };
   return {
     tx,
@@ -103,6 +116,7 @@ describe('ImportService', () => {
     const module = await Test.createTestingModule({
       providers: [
         ImportService,
+        TagsService,
         { provide: PrismaService, useValue: prisma },
         { provide: WinstonLogger, useValue: logger },
       ],
@@ -287,6 +301,7 @@ describe('ImportService', () => {
         forceImport?: boolean;
         categoryId?: string;
         description?: string;
+        tags?: ({ id: string } | { name: string })[];
       }[],
     ) => ({
       accountId: ACCOUNT_ID,
@@ -711,6 +726,72 @@ describe('ImportService', () => {
           duplicate: true,
           duplicateOf: { amount: 55 },
         });
+      });
+    });
+
+    describe('tags', () => {
+      it('tags the inserted rows, creating new tags, and skips rows dropped as duplicates', async () => {
+        prisma.transaction.findMany.mockResolvedValue([
+          existing('2026-10-01', -10, 'TESCO'),
+        ]);
+        stubImport('PENDING', [
+          row('r1', '2026-10-01', -10, 'TESCO'),
+          row('r2', '2026-10-02', -200, 'HOTEL'),
+          row('r3', '2026-10-03', -5, 'COFFEE'),
+        ]);
+
+        await service.confirmImport(
+          USER_ID,
+          IMPORT_ID,
+          dto([
+            { id: 'r1', tags: [{ id: SPAIN_TAG_ID }] },
+            { id: 'r2', tags: [{ id: SPAIN_TAG_ID }, { name: 'Hotels' }] },
+            { id: 'r3' },
+          ]),
+        );
+
+        const inserted = prisma.tx.transaction.createMany.mock.calls[0][0]
+          .data as { id: string; description: string }[];
+        expect(inserted.map((t) => t.description)).toEqual(['HOTEL', 'COFFEE']);
+        expect(inserted[0].id).toEqual(expect.any(String));
+        expect(prisma.tx.tag.createManyAndReturn).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: [expect.objectContaining({ name: 'Hotels' })],
+          }),
+        );
+        expect(prisma.tx.transactionTag.createMany).toHaveBeenCalledWith({
+          data: [
+            { transactionId: inserted[0].id, tagId: SPAIN_TAG_ID },
+            { transactionId: inserted[0].id, tagId: 'new-tag-0' },
+          ],
+        });
+      });
+
+      it('does not touch tags when no row has any', async () => {
+        stubImport('PENDING', [row('r1', '2026-10-01', -10, 'TESCO')]);
+
+        await service.confirmImport(USER_ID, IMPORT_ID, dto([{ id: 'r1' }]));
+
+        expect(prisma.tx.tag.findMany).not.toHaveBeenCalled();
+        expect(prisma.tx.transactionTag.createMany).not.toHaveBeenCalled();
+      });
+
+      it('rejects tag IDs that are not the user’s', async () => {
+        stubImport('PENDING', [row('r1', '2026-10-01', -10, 'TESCO')]);
+
+        await expect(
+          service.confirmImport(
+            USER_ID,
+            IMPORT_ID,
+            dto([{ id: 'r1', tags: [{ id: FOREIGN_TAG_ID }] }]),
+          ),
+        ).rejects.toMatchObject({
+          response: {
+            code: 'import.invalid_tag',
+            meta: { tagIds: [FOREIGN_TAG_ID] },
+          },
+        });
+        expect(prisma.tx.transactionTag.createMany).not.toHaveBeenCalled();
       });
     });
   });

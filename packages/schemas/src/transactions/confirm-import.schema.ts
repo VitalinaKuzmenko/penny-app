@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { TagRefsSchema } from '../tags/tag.schema';
 import { CurrencySchema } from '../types';
 
 export const ConfirmImportRowSchema = z.object({
   id: z.string().uuid(),
   categoryId: z.string().uuid().optional(),
   description: z.string().trim().min(1),
+  tags: TagRefsSchema.optional(),
   // user explicitly chose to import this row even though it was flagged as a duplicate
   forceImport: z.boolean().optional(),
 });

@@ -15,6 +15,8 @@ export const getTransactions = async (
     query.set('categoryIds', params.categoryIds.join(','));
   }
   if (params.includeUncategorised) query.set('includeUncategorised', 'true');
+  if (params.tagIds?.length) query.set('tagIds', params.tagIds.join(','));
+  if (params.includeUntagged) query.set('includeUntagged', 'true');
   if (params.type) query.set('type', params.type);
   if (params.search) query.set('search', params.search);
   if (params.includeDeleted) query.set('includeDeleted', 'true');

@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import { ListTransactionsQuerySchema, UpdateTransactionsSchema } from 'schemas';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { TagsService } from '../tags/tags.service';
 import { WinstonLogger } from '../utils/logger/logger';
 
 import { TransactionsService } from './transactions.service';
@@ -12,6 +13,9 @@ const ACCOUNT_ID = '33333333-3333-4333-8333-333333333333';
 const CLOTHES_ID = '44444444-4444-4444-8444-444444444444';
 const TRANSFER_ID = '66666666-6666-4666-8666-666666666666';
 const FOREIGN_CATEGORY_ID = '77777777-7777-4777-8777-777777777777';
+const SPAIN_TAG_ID = '88888888-8888-4888-8888-888888888881';
+const WORK_TAG_ID = '88888888-8888-4888-8888-888888888882';
+const FOREIGN_TAG_ID = '88888888-8888-4888-8888-888888888889';
 const T1 = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
 const T2 = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2';
 const T3 = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3';
@@ -34,6 +38,7 @@ const listRow = (id: string, overrides: Record<string, unknown> = {}) => ({
   deletedAt: null,
   category: { id: CLOTHES_ID, name: 'Clothes, cosmetics' },
   account: { id: ACCOUNT_ID, name: 'HSBC' },
+  tags: [],
   ...overrides,
 });
 
@@ -55,6 +60,20 @@ function createPrismaMock() {
   const tx = {
     transaction: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
     categoryMapping: { upsert: jest.fn().mockResolvedValue({}) },
+    tag: {
+      findMany: jest.fn().mockResolvedValue([
+        { id: SPAIN_TAG_ID, name: 'Spain trip 2026' },
+        { id: WORK_TAG_ID, name: 'Work' },
+      ]),
+      createManyAndReturn: jest.fn(
+        async ({ data }: { data: { name: string }[] }) =>
+          data.map((d, i) => ({ id: `new-tag-${i}`, name: d.name })),
+      ),
+    },
+    transactionTag: {
+      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+      createMany: jest.fn().mockResolvedValue({ count: 0 }),
+    },
   };
   return {
     tx,
@@ -85,6 +104,7 @@ describe('TransactionsService', () => {
     const module = await Test.createTestingModule({
       providers: [
         TransactionsService,
+        TagsService,
         { provide: PrismaService, useValue: prisma },
         { provide: WinstonLogger, useValue: logger },
       ],
@@ -145,6 +165,53 @@ describe('TransactionsService', () => {
 
       const { where } = prisma.transaction.findMany.mock.calls[0][0];
       expect(where.AND[0]).toEqual({ userId: USER_ID });
+    });
+
+    it('filters by any of the picked tags or untagged, alongside the category filter', async () => {
+      await service.list(
+        USER_ID,
+        query({
+          categoryIds: CLOTHES_ID,
+          tagIds: `${SPAIN_TAG_ID},${WORK_TAG_ID}`,
+          includeUntagged: 'true',
+        }),
+      );
+
+      const { where } = prisma.transaction.findMany.mock.calls[0][0];
+      expect(where.AND[0]).toEqual({
+        userId: USER_ID,
+        OR: [{ categoryId: { in: [CLOTHES_ID] } }],
+        AND: [
+          {
+            OR: [
+              {
+                tags: { some: { tagId: { in: [SPAIN_TAG_ID, WORK_TAG_ID] } } },
+              },
+              { tags: { none: {} } },
+            ],
+          },
+        ],
+      });
+      // the totals follow the tag filter too, so they give the event total
+      expect(prisma.transaction.groupBy.mock.calls[0][0].where).toEqual(where);
+    });
+
+    it('returns each row’s tags sorted by name', async () => {
+      prisma.transaction.findMany.mockResolvedValue([
+        listRow(T1, {
+          tags: [
+            { tag: { id: WORK_TAG_ID, name: 'work', color: null } },
+            { tag: { id: SPAIN_TAG_ID, name: 'Spain', color: '#1E88E5' } },
+          ],
+        }),
+      ]);
+
+      const { rows } = await service.list(USER_ID, query());
+
+      expect(rows[0].tags).toEqual([
+        { id: SPAIN_TAG_ID, name: 'Spain', color: '#1E88E5' },
+        { id: WORK_TAG_ID, name: 'work', color: null },
+      ]);
     });
 
     it('lists deleted rows when asked, but still leaves them out of the totals', async () => {
@@ -471,6 +538,99 @@ describe('TransactionsService', () => {
           data: { description: 'X', deletedAt: null },
         }),
       );
+    });
+
+    describe('tags', () => {
+      it('replaces a row’s tags with the given set, creating new names', async () => {
+        prisma.transaction.findMany.mockResolvedValue([stored(T1, 'EXPENSE')]);
+
+        const result = await update([
+          { id: T1, tags: [{ id: SPAIN_TAG_ID }, { name: 'Hotels' }] },
+        ]);
+
+        expect(result).toEqual({ updated: 1 });
+        // a tags-only change doesn't touch the transaction row itself
+        expect(prisma.tx.transaction.updateMany).not.toHaveBeenCalled();
+        expect(prisma.tx.tag.createManyAndReturn).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: [expect.objectContaining({ name: 'Hotels' })],
+          }),
+        );
+        expect(prisma.tx.transactionTag.deleteMany).toHaveBeenCalledWith({
+          where: {
+            transactionId: T1,
+            tagId: { notIn: [SPAIN_TAG_ID, 'new-tag-0'] },
+          },
+        });
+        expect(prisma.tx.transactionTag.createMany).toHaveBeenCalledWith({
+          data: [
+            { transactionId: T1, tagId: SPAIN_TAG_ID },
+            { transactionId: T1, tagId: 'new-tag-0' },
+          ],
+          skipDuplicates: true,
+        });
+      });
+
+      it('an existing name in another case reuses that tag once', async () => {
+        prisma.transaction.findMany.mockResolvedValue([stored(T1, 'EXPENSE')]);
+
+        await update([
+          { id: T1, tags: [{ name: 'spain trip 2026' }, { id: SPAIN_TAG_ID }] },
+        ]);
+
+        expect(prisma.tx.tag.createManyAndReturn).not.toHaveBeenCalled();
+        expect(prisma.tx.transactionTag.createMany).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: [{ transactionId: T1, tagId: SPAIN_TAG_ID }],
+          }),
+        );
+      });
+
+      it('an empty set removes every tag', async () => {
+        prisma.transaction.findMany.mockResolvedValue([stored(T1, 'EXPENSE')]);
+
+        await update([{ id: T1, tags: [] }]);
+
+        expect(prisma.tx.transactionTag.deleteMany).toHaveBeenCalledWith({
+          where: { transactionId: T1, tagId: { notIn: [] } },
+        });
+        expect(prisma.tx.transactionTag.createMany).not.toHaveBeenCalled();
+      });
+
+      it('rejects tags that are not the user’s', async () => {
+        prisma.transaction.findMany.mockResolvedValue([stored(T1, 'EXPENSE')]);
+
+        await expect(
+          update([{ id: T1, tags: [{ id: FOREIGN_TAG_ID }] }]),
+        ).rejects.toMatchObject({
+          response: { code: 'transactions.invalid_tag' },
+        });
+        expect(prisma.tx.transactionTag.createMany).not.toHaveBeenCalled();
+      });
+
+      it('refuses to change the tags of a deleted row', async () => {
+        prisma.transaction.findMany.mockResolvedValue([
+          stored(T1, 'EXPENSE', { deletedAt: new Date() }),
+        ]);
+
+        await expect(
+          update([{ id: T1, tags: [{ id: SPAIN_TAG_ID }] }]),
+        ).rejects.toMatchObject({
+          response: { code: 'transactions.deleted_not_editable' },
+        });
+        expect(prisma.$transaction).not.toHaveBeenCalled();
+      });
+
+      it('the request schema rejects the same tag twice and over-long names', () => {
+        const parse = (tags: unknown) =>
+          UpdateTransactionsSchema.safeParse({ changes: [{ id: T1, tags }] })
+            .success;
+
+        expect(parse([{ name: 'Spain' }, { name: 'SPAIN ' }])).toBe(false);
+        expect(parse([{ name: 'x'.repeat(101) }])).toBe(false);
+        expect(parse([{ name: '   ' }])).toBe(false);
+        expect(parse([{ name: 'x'.repeat(100) }])).toBe(true);
+      });
     });
   });
 });

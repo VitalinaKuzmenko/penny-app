@@ -22,6 +22,9 @@ import {
   IncomeExpenseStackedResponseSchema,
   IncomeExpenseRatioQuerySchema,
   IncomeExpenseRatioResponseSchema,
+  TagSpendQuerySchema,
+  TagSpendResponseSchema,
+  TagSchema,
   ListTransactionsQuerySchema,
   ListTransactionsResponseSchema,
   UpdateTransactionsSchema,
@@ -102,6 +105,11 @@ export class IncomeExpenseRatioQueryDto extends createZodDto(
 export class IncomeExpenseRatioResponseDto extends createZodDto(
   IncomeExpenseRatioResponseSchema,
 ) {}
+export class TagSpendQueryDto extends createZodDto(TagSpendQuerySchema) {}
+export class TagSpendResponseDto extends createZodDto(TagSpendResponseSchema) {}
+
+// TAGS
+export class TagDto extends createZodDto(TagSchema) {}
 
 // TRANSACTIONS (Money Journal)
 export class ListTransactionsQueryDto extends createZodDto(

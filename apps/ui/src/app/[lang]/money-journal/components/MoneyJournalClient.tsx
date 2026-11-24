@@ -15,15 +15,25 @@ import {
 } from 'schemas';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import BulkCategoryBar from '@/components/BulkCategoryBar/BulkCategoryBar';
+import BulkTagBar from '@/components/BulkTagBar/BulkTagBar';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { UiError } from '@/types/interfaces';
 import { getTransactions } from '@/requests/getTransactions';
 import { updateTransactions } from '@/requests/updateTransactions';
+import { useTags } from '@/hooks/useTags';
 import { interpolate } from '@/utils/interpolate';
 import { mapUpdateTransactionsErrorToUiError } from '@/utils/mapUpdateTransactionsErrorToUiError';
 import {
+  addTags,
+  removeTags,
+  TagValue,
+  tagOptions as buildTagOptions,
+  toTagRef,
+} from '@/utils/tags';
+import {
   MoneyJournalFilters as Filters,
   UNCATEGORISED_ID,
+  UNTAGGED_ID,
   useMoneyJournalFilters,
 } from '@/providers/MoneyJournalFilterContext';
 import MoneyJournalFilters from './MoneyJournalFilters';
@@ -31,6 +41,7 @@ import MoneyJournalTable from './MoneyJournalTable';
 import TotalsBar from './TotalsBar';
 import DiscardChangesDialog from './DiscardChangesDialog';
 import {
+  effectiveRow,
   normaliseChange,
   PendingChange,
   PendingChanges,
@@ -63,6 +74,8 @@ const toRequestParams = (
   const allAccounts =
     filters.accountIds.length === 0 ||
     filters.accountIds.length === accounts.length;
+  const tagIds = filters.tagIds.filter((id) => id !== UNTAGGED_ID);
+  const includeUntagged = filters.tagIds.includes(UNTAGGED_ID);
   const [sortBy] = sort.length ? sort : DEFAULT_SORT;
 
   return {
@@ -70,6 +83,8 @@ const toRequestParams = (
     to: filters.endDate?.format('YYYY-MM-DD'),
     ...(!allCategories && { categoryIds, includeUncategorised }),
     ...(!allAccounts && { accountIds: filters.accountIds }),
+    // the filter stores "every tag" as [], so nothing selected = no tag filter
+    ...(filters.tagIds.length > 0 && { tagIds, includeUntagged }),
     type: filters.type === 'ALL' ? undefined : filters.type,
     search: filters.search.trim() || undefined,
     includeDeleted: filters.showDeleted,
@@ -88,6 +103,7 @@ export default function MoneyJournalClient({
 }: MoneyJournalClientProps) {
   const { appliedFilters, applyFilters, isInitialized, initFilters } =
     useMoneyJournalFilters();
+  const { tags, loadFailed: tagsLoadFailed, reload: reloadTags } = useTags();
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -112,6 +128,15 @@ export default function MoneyJournalClient({
     (c) => c.description !== undefined && c.description.trim() === '',
   );
 
+  const tagOptions = useMemo(
+    () =>
+      buildTagOptions(
+        tags,
+        Object.values(pending).flatMap((c) => c.tags ?? []),
+      ),
+    [tags, pending],
+  );
+
   useEffect(() => {
     if (!isInitialized) {
       initFilters({
@@ -121,16 +146,15 @@ export default function MoneyJournalClient({
     }
   }, [accounts, categories, isInitialized, initFilters]);
 
-  const requestParams = useMemo(
-    () =>
-      toRequestParams(
-        appliedFilters,
-        categories,
-        accounts,
-        paginationModel,
-        sortModel,
-      ),
-    [appliedFilters, categories, accounts, paginationModel, sortModel],
+  // compared as a string so the fetch only re-runs when the request itself changes
+  const requestKey = JSON.stringify(
+    toRequestParams(
+      appliedFilters,
+      categories,
+      accounts,
+      paginationModel,
+      sortModel,
+    ),
   );
 
   useEffect(() => {
@@ -139,7 +163,7 @@ export default function MoneyJournalClient({
 
     setLoading(true);
     setLoadError(null);
-    getTransactions(requestParams)
+    getTransactions(JSON.parse(requestKey) as ListTransactionsParams)
       .then((result) => {
         if (cancelled) return;
         setData(result);
@@ -160,7 +184,7 @@ export default function MoneyJournalClient({
     return () => {
       cancelled = true;
     };
-  }, [requestParams, isInitialized, reloadKey, pageText]);
+  }, [requestKey, isInitialized, reloadKey, pageText]);
 
   // After deleting the last rows of the last page, step back to a page that has rows
   useEffect(() => {
@@ -220,6 +244,39 @@ export default function MoneyJournalClient({
     setSelectedRows([]);
   };
 
+  // Bulk add/remove works on each selected row's current (possibly unsaved) tags
+  const updateSelectedTags = (update: (current: TagValue[]) => TagValue[]) => {
+    const rows = data?.rows ?? [];
+    setPending((prev) => {
+      const next = { ...prev };
+      selectedRows.forEach((id) => {
+        const row = rows.find((r) => r.id === id);
+        if (!row) return;
+        const current = effectiveRow(row, prev[id], categories);
+        if (current.locked) return;
+        const normalised = normaliseChange(row, {
+          ...prev[id],
+          tags: update(current.tags),
+        });
+        if (normalised) {
+          next[id] = normalised;
+        } else {
+          delete next[id];
+        }
+      });
+      return next;
+    });
+    setSelectedRows([]);
+  };
+
+  const selectedRowTags = useMemo(() => {
+    const rows = data?.rows ?? [];
+    return selectedRows.flatMap((id) => {
+      const row = rows.find((r) => r.id === id);
+      return row ? effectiveRow(row, pending[id], categories).tags : [];
+    });
+  }, [data, selectedRows, pending, categories]);
+
   const handleSave = async () => {
     const payload = {
       changes: Object.entries(pending).map(([id, change]) => ({
@@ -227,6 +284,9 @@ export default function MoneyJournalClient({
         ...change,
         ...(change.description !== undefined && {
           description: change.description.trim(),
+        }),
+        ...(change.tags !== undefined && {
+          tags: change.tags.map(toTagRef),
         }),
       })),
     };
@@ -239,6 +299,8 @@ export default function MoneyJournalClient({
       setPending({});
       setSavedCount(result.updated);
       setReloadKey((k) => k + 1);
+      // new tags were created on save; they belong in the filter and pickers now
+      reloadTags();
     } catch (error: any) {
       console.error('Saving transactions failed:', error?.data ?? error);
       setSaveError(
@@ -264,9 +326,22 @@ export default function MoneyJournalClient({
         <ErrorBanner key={error.message} error={error} />
       ))}
 
+      {tagsLoadFailed && (
+        <Box mb={2}>
+          <ErrorBanner
+            error={{
+              severity: 'warning',
+              title: pageText.ERRORS.TAGS_LOAD.TITLE,
+              message: pageText.ERRORS.TAGS_LOAD.MESSAGE,
+            }}
+          />
+        </Box>
+      )}
+
       <MoneyJournalFilters
         accounts={accounts}
         categories={categories}
+        tags={tags}
         pageText={pageText}
         onApply={() =>
           guard(() => {
@@ -295,6 +370,17 @@ export default function MoneyJournalClient({
         }
       />
 
+      <BulkTagBar
+        text={pageText.BULK_TAG_BAR}
+        options={tagOptions}
+        selectedCount={selectedRows.length}
+        removable={selectedRowTags}
+        onAdd={(toAdd) => updateSelectedTags((tags) => addTags(tags, toAdd))}
+        onRemove={(toRemove) =>
+          updateSelectedTags((tags) => removeTags(tags, toRemove))
+        }
+      />
+
       {loadError && (
         <Box mb={2}>
           <ErrorBanner error={loadError} />
@@ -307,6 +393,7 @@ export default function MoneyJournalClient({
         rowCount={data?.rowCount ?? 0}
         loading={loading || !isInitialized}
         categories={categories}
+        tagOptions={tagOptions}
         pending={pending}
         onChange={handleChange}
         paginationModel={paginationModel}

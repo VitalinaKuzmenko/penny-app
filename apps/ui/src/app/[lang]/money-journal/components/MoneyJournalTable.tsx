@@ -19,7 +19,9 @@ import {
   TRANSACTIONS_PAGE_SIZES,
 } from 'schemas';
 import CategoryCellSelect from '@/components/CategoryCellSelect/CategoryCellSelect';
+import TagCell from '@/components/TagCell/TagCell';
 import { formatMoney } from '@/utils/formatMoney';
+import { TagValue } from '@/utils/tags';
 import { effectiveRow, PendingChange, PendingChanges } from './pendingChanges';
 
 interface MoneyJournalTableProps {
@@ -28,6 +30,8 @@ interface MoneyJournalTableProps {
   rowCount: number;
   loading: boolean;
   categories: Category[];
+  // saved tags plus new names already used in unsaved edits
+  tagOptions: TagValue[];
   pending: PendingChanges;
   onChange: (row: TransactionListItem, change: PendingChange) => void;
   paginationModel: GridPaginationModel;
@@ -48,6 +52,7 @@ export default function MoneyJournalTable({
   rowCount,
   loading,
   categories,
+  tagOptions,
   pending,
   onChange,
   paginationModel,
@@ -193,6 +198,28 @@ export default function MoneyJournalTable({
         },
       },
       {
+        field: 'tags',
+        headerName: text.COLUMNS.TAGS,
+        width: 260,
+        sortable: false,
+        renderCell: (params) => {
+          const view = effectiveRow(
+            params.row,
+            pending[params.row.id],
+            categories,
+          );
+          return (
+            <TagCell
+              tags={view.tags}
+              options={tagOptions}
+              onChange={(tags) => onChange(params.row, { tags })}
+              disabled={view.locked}
+              text={text.TAGS}
+            />
+          );
+        },
+      },
+      {
         field: 'account',
         headerName: text.COLUMNS.ACCOUNT,
         minWidth: 120,
@@ -274,7 +301,7 @@ export default function MoneyJournalTable({
         },
       },
     ],
-    [text, pending, categories, onChange],
+    [text, pending, categories, tagOptions, onChange],
   );
 
   return (

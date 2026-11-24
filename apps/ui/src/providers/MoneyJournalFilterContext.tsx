@@ -4,12 +4,14 @@ import { createContext, ReactNode, useContext, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 
 // Same draft → Apply pattern as the dashboard's FilterContext, with the
-// Money Journal's own filters (refunds, search, uncategorised, deleted rows)
+// Money Journal's own filters (refunds, search, uncategorised, tags, deleted rows)
 
 export type MoneyJournalTypeFilter = 'ALL' | 'INCOME' | 'EXPENSE' | 'REFUND';
 
 // Pseudo category id for rows without a category
 export const UNCATEGORISED_ID = '__uncategorised__';
+// Pseudo tag id for rows without any tag
+export const UNTAGGED_ID = '__untagged__';
 
 export interface MoneyJournalFilters {
   startDate: Dayjs | null;
@@ -17,6 +19,8 @@ export interface MoneyJournalFilters {
   // may include UNCATEGORISED_ID
   categoryIds: string[];
   accountIds: string[];
+  // may include UNTAGGED_ID; nothing selected = no tag filter
+  tagIds: string[];
   type: MoneyJournalTypeFilter;
   search: string;
   showDeleted: boolean;
@@ -37,6 +41,7 @@ const defaultFilters = (): MoneyJournalFilters => ({
   endDate: dayjs().endOf('year'),
   categoryIds: [],
   accountIds: [],
+  tagIds: [],
   type: 'ALL',
   search: '',
   showDeleted: false,

@@ -1,11 +1,15 @@
 import { z } from 'zod';
 
+import { TagRefsSchema } from '../tags/tag.schema';
+
 export const TransactionChangeSchema = z
   .object({
     id: z.string().uuid(),
     description: z.string().trim().min(1).optional(),
     // null clears the category
     categoryId: z.string().uuid().nullable().optional(),
+    // the row's full set of tags after the change; [] removes them all
+    tags: TagRefsSchema.optional(),
     // true = soft delete, false = restore
     deleted: z.boolean().optional(),
   })
@@ -13,6 +17,7 @@ export const TransactionChangeSchema = z
     (c) =>
       c.description !== undefined ||
       c.categoryId !== undefined ||
+      c.tags !== undefined ||
       c.deleted !== undefined,
     { message: 'Nothing to change' },
   );

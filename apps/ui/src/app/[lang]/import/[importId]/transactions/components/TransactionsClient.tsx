@@ -21,12 +21,21 @@ import { UiError } from '@/types/interfaces';
 
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
+import BulkTagBar from '@/components/BulkTagBar/BulkTagBar';
 import { ConfirmImportSchema, ConfirmImportInput } from 'schemas';
 import { saveTransactions } from '@/requests/saveTransactions';
 import { mapConfirmImportErrorToUiError } from '@/utils/mapConfirmImportErrorToUiError';
 import CreateAccountModal from './CreateAccountModal';
 import { getAccounts } from '@/requests/getAccounts';
 import { getImportRows } from '@/requests/getImportRows';
+import { useTags } from '@/hooks/useTags';
+import {
+  addTags,
+  removeTags,
+  TagValue,
+  tagOptions as buildTagOptions,
+  toTagRef,
+} from '@/utils/tags';
 
 interface TransactionsClientProps {
   transactionsPageText: Record<string, any>;
@@ -71,6 +80,25 @@ export default function TransactionsClient({
   const [forceImportRows, setForceImportRows] = useState<
     Record<string, boolean>
   >({});
+  // Tags start empty; new names are created when the import is confirmed
+  const [rowTags, setRowTags] = useState<Record<string, TagValue[]>>({});
+  const { tags } = useTags();
+  const tagOptions = useMemo(
+    () => buildTagOptions(tags, Object.values(rowTags).flat()),
+    [tags, rowTags],
+  );
+  const selectedRowTags = useMemo(
+    () => selectedRows.flatMap((id) => rowTags[id] ?? []),
+    [selectedRows, rowTags],
+  );
+  const updateSelectedTags = (update: (current: TagValue[]) => TagValue[]) => {
+    setRowTags((prev) => {
+      const next = { ...prev };
+      selectedRows.forEach((id) => (next[id] = update(prev[id] ?? [])));
+      return next;
+    });
+    setSelectedRows([]);
+  };
 
   // Unassigned rows first so users see what still needs attention
   const sortedRows = useMemo(
@@ -151,6 +179,9 @@ export default function TransactionsClient({
         description: rowDescriptions[row.id],
         forceImport: row.duplicate
           ? Boolean(forceImportRows[row.id])
+          : undefined,
+        tags: rowTags[row.id]?.length
+          ? rowTags[row.id].map(toTagRef)
           : undefined,
       }));
 
@@ -267,11 +298,27 @@ export default function TransactionsClient({
         }}
       />
 
+      <BulkTagBar
+        text={transactionsPageText.BULK_TAG_BAR}
+        options={tagOptions}
+        selectedCount={selectedRows.length}
+        removable={selectedRowTags}
+        onAdd={(toAdd) => updateSelectedTags((t) => addTags(t, toAdd))}
+        onRemove={(toRemove) =>
+          updateSelectedTags((t) => removeTags(t, toRemove))
+        }
+      />
+
       {/* Table */}
       <TransactionsTable
         pageText={transactionsPageText.TABLE}
         rows={sortedRows}
         categories={categories}
+        tagOptions={tagOptions}
+        rowTags={rowTags}
+        onChangeTags={(rowId: string, value: TagValue[]) =>
+          setRowTags((prev) => ({ ...prev, [rowId]: value }))
+        }
         selectedRows={selectedRows}
         onSelectRows={setSelectedRows}
         rowCategories={rowCategories}

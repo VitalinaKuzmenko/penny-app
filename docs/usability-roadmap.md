@@ -304,6 +304,47 @@ bar, so tags are of little use before Step 3 exists. They don't need the
 Manage page, though: tags are created inline, and full tag management moves
 to Step 5.
 
+Status: in progress (branch `feature/tags`).
+
+### Decisions (agreed 2026-11-24)
+
+- Tags are optional: a second way to group transactions next to categories.
+- Tag edits follow the Money Journal flow: they're collected as unsaved
+  changes and applied with Save.
+- New tags are created **on Save** (and on import confirm), never on their
+  own, so there is no `POST /tags`.
+- Names are trimmed, 1–100 characters and unique per user **ignoring
+  case**. If "Spain trip 2026" exists, "spain trip 2026" can't be created:
+  the picker shows the existing tag instead of "Create tag …".
+- Colour is assigned automatically from a fixed palette when a tag is
+  created. Editing it comes with Step 5.
+- Tags can be edited inline in a Tags cell or with Add tag / Remove tag in
+  the bulk bar, both in the Money Journal and in the import review.
+  - The cell is an autocomplete over the user's tags, plus
+    _"Create tag 'X'"_ when nothing matches ignoring case.
+  - Nothing is pre-filled. Tags are not remembered per description (unlike
+    `CategoryMapping`), because they are usually one-off events.
+- Money Journal filter: a tags multi-select plus "Untagged".
+  - Several tags are combined with **OR** (any of them).
+  - Nothing selected (the default and after Reset) means no tag filter.
+  - The totals bar follows the filter, so it gives the event total.
+- No sorting by tags.
+- Deleted rows show their tags greyed out; tags can't be edited until the
+  row is restored (same as description and category).
+- Display: chips have a fixed max width with an ellipsis and a tooltip with
+  the full name. A cell shows at most 2 chips, then "+N" with a tooltip
+  listing the rest.
+- Penny's View gets **no tag filter**. Instead there's a new "Spend by tag"
+  horizontal bar chart:
+  - it follows only the From/To dates;
+  - spend per tag = `max(0, EXPENSE − REFUND)`; transfers and deleted rows
+    are excluded;
+  - a transaction with several tags counts in full under each of them, so
+    there's no grand total;
+  - tags with 0 spend are hidden; the tooltip shows the full name, the
+    amount and the transaction count.
+- Strings go into `en.json`, `ru.json` and `ua.json`.
+
 ### Schema (needs a migration)
 
 ```prisma
@@ -330,25 +371,111 @@ model TransactionTag {
 }
 ```
 
-Deploy using the same order as the dedupe migration: back up, run
-`prisma migrate deploy` with the **prod** `DATABASE_URL` set explicitly,
-verify with `migrate status`, then deploy the server and the UI.
+- Plus `tags Tag[]` on `User` and `tags TransactionTag[]` on `Transaction`.
+- Case-insensitive uniqueness is enforced in the service: a lookup with
+  `mode: 'insensitive'` inside the same DB transaction.
+  `@@unique([userId, name])` is only an exact-match backstop. A `citext`
+  column was the alternative, but it needs a Postgres extension on prod.
+- Deploy in the usual order: back up, run `prisma migrate deploy` with the
+  **prod** `DATABASE_URL` set explicitly, verify with `migrate status`, then
+  deploy the server and the UI.
+
+### Shared schemas (`packages/schemas`, DTOs in `schemas-nest`)
+
+- `TagSchema` (`id`, `name`, `color`) and `TagNameSchema` (trimmed, 1–100).
+- `TagRef` = `{ id }` (existing tag) or `{ name }` (new tag).
+- `TransactionChangeSchema`: `tags?: TagRef[]`, the row's **full desired
+  set** (as `categoryId` is the desired value). A bulk "Add tag" just
+  updates each selected row's set. It counts in the "Nothing to change"
+  check.
+- `ListTransactionsQuerySchema`: `tagIds`, `includeUntagged`.
+- `TransactionListItemSchema`: `tags` (sorted by name).
+- `ConfirmImportRowSchema`: `tags?: TagRef[]`.
+- Chart query `{ startDate, endDate }` and response
+  `{ tagId, name, color, spent, count }[]`.
 
 ### Server
 
-- `GET /tags` and `POST /tags` (name, optional colour), unique per user.
-  `PATCH/DELETE /tags/:id` come with the Manage page in Step 5.
-- Assign/unassign tags on one or several transactions (bulk).
-- `GET /transactions` supports `tagIds`.
+- New `src/tags` module:
+  - `GET /tags`: the user's tags, sorted by name ignoring case.
+    `PATCH/DELETE /tags/:id` come with the Manage page in Step 5.
+  - A shared helper resolves `TagRef`s inside the caller's DB transaction:
+    - `{ id }` must belong to the user, otherwise 400
+      `transactions.invalid_tag` / `import.invalid_tag`;
+    - `{ name }` reuses a tag whose name matches ignoring case, or creates
+      it with the next palette colour;
+    - names are deduplicated within the request (first spelling wins).
+- `GET /transactions`:
+  - each row includes its tags;
+  - tag filter =
+    `OR [tags some tagId in tagIds, tags none (if includeUntagged)]`.
+    `buildWhere` already uses `where.OR` for categories, so the two filters
+    are combined with `AND` instead of overwriting each other.
+- `PATCH /transactions`:
+  - the deleted-row lock also covers `tags`;
+  - inside the existing DB transaction: resolve refs, then per row delete
+    links that are no longer in the set and `createMany` the new ones
+    (`skipDuplicates`);
+  - a tags-only change counts as updated and doesn't touch
+    `CategoryMapping`.
+- Confirm import: each inserted row gets its `id` up front (`randomUUID()`)
+  so its tag links can be created right after `createMany`. Rows skipped as
+  duplicates get no tags.
+- `GET /charts/tag-spend?startDate&endDate`: tag links of the user's
+  non-deleted, non-transfer `EXPENSE`/`REFUND` transactions in range,
+  aggregated per tag in code (`max(0, expense − refund)`, count), with 0
+  dropped and sorted by spend, highest first.
+- Tests:
+  - resolving refs: reuse ignoring case, dedupe within a request, foreign
+    IDs rejected, palette colour;
+  - update: set/replace/clear tags, deleted-row lock, tags-only change;
+  - list: OR filter, Untagged, combined with the category filter;
+  - import: tags saved on confirm, not on skipped duplicates, invalid tag
+    → 400;
+  - chart: clamp, transfers and deleted rows excluded, multi-tag rows
+    counted in full, 0 hidden.
 
 ### UI
 
-- Transactions page: select rows and add or remove a tag. The tag picker is
-  an autocomplete that also offers _"Create tag 'Spain trip 2026'"_, so
-  tags are created and assigned in one go without a separate page.
-- Show tags as chips in a column and add a tag filter to the filter bar;
-  the totals bar then gives the event total.
-- Optional later: assign tags during import.
+- Request functions `getTags` and `getTagSpend` use `clientApiFetch`; a
+  `useTags` hook loads the tags on the client so they can be reloaded after
+  Save.
+- Shared components in `src/components`:
+  - `TagChips`: truncation, tooltip, "+N"; unsaved new tags have a dashed
+    border.
+  - `TagPicker`: MUI `Autocomplete` (multiple).
+    - Options are the user's tags plus new names already pending on the
+      page.
+    - It offers "Create tag 'X'" only when nothing matches ignoring case.
+    - It limits names to 100 characters.
+  - `TagCell`: chips plus an edit button that opens `TagPicker` in a
+    popover, so rows keep the same height.
+  - `BulkTagBar`: a second bar under the category bar with a `TagPicker`
+    and Add tags / Remove tags. Several tags can be added or removed at
+    once; Remove is only enabled when a chosen tag is on a selected row.
+- Money Journal:
+  - `PendingChange.tags`; `normaliseChange` drops it when the set equals
+    the saved one; locked rows can't change tags.
+  - Tags column (`sortable: false`) with `TagCell`.
+  - The tag filter goes into `MoneyJournalFilters` and its filter context.
+  - After Save, tags are refetched too, so new ones appear in the filter
+    and picker.
+  - Error message for `transactions.invalid_tag`.
+- Import review (`TransactionsTable.tsx`, `TransactionsClient.tsx`):
+  - Tags column with `TagCell` and `BulkTagBar` under the category bar;
+  - `tags` sent on confirm;
+  - error message for `import.invalid_tag`.
+- Penny's View: `TagSpendChart` (recharts horizontal `BarChart`, tag
+  colours, truncated labels with tooltip) at the bottom of
+  `MainDashboard`, with an empty state when no tag has spend.
+
+### Out of scope
+
+- Renaming, recolouring and deleting tags (Step 5).
+- Sorting by tags.
+- A tag filter on Penny's View.
+- Clicking a bar to open the Money Journal filtered by that tag (the
+  journal has no URL params yet).
 
 ## Step 5: Manage page for categories, tags and accounts
 
@@ -369,7 +496,10 @@ New page, e.g. `/[lang]/manage` (or a section in `/profile`).
 
 ### Tags
 
-- `PATCH /tags/:id`: rename / recolour (keep names unique per user).
+- Step 4 only adds `GET /tags`; tags are created when they're first
+  assigned (there's no `POST /tags`).
+- `PATCH /tags/:id`: rename / recolour (keep names unique per user,
+  ignoring case, as in Step 4).
 - `DELETE /tags/:id`: removes the tag from its transactions
   (`TransactionTag` rows cascade); the transactions themselves stay.
 
@@ -481,10 +611,10 @@ This reverses the Step 3 decision to have no date presets.
 1. Order: start with Step 1 (smallest, no migration)?
 2. Deleting a category that still has transactions: move them to a
    category the user chooses, or block the delete?
-3. Assign tags during import as well, or only on the Transactions page to
-   begin with?
-4. i18n: add new strings to all of `en.json`, `ru.json`, `ua.json`, or
-   English only for now?
+3. ~~Assign tags during import as well, or only on the Transactions page to
+   begin with?~~ Both, in Step 4 (decided 2026-11-24).
+4. ~~i18n: add new strings to all of `en.json`, `ru.json`, `ua.json`, or
+   English only for now?~~ All three (decided 2026-11-24).
 
 ## Later ideas (from the same discussion, not planned yet)
 

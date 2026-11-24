@@ -16,6 +16,7 @@ describe('ChartsService — refunds', () => {
   const prisma = {
     transaction: { groupBy: jest.fn(), findMany: jest.fn() },
     category: { findMany: jest.fn() },
+    transactionTag: { findMany: jest.fn() },
   };
 
   beforeEach(async () => {
@@ -287,5 +288,77 @@ describe('ChartsService — refunds', () => {
     for (const [args] of calls) {
       expect(args.where).toMatchObject({ userId: USER_ID, deletedAt: null });
     }
+  });
+
+  describe('getTagSpend', () => {
+    const link = (
+      tag: { id: string; name: string },
+      type: 'EXPENSE' | 'REFUND',
+      amount: number,
+    ) => ({
+      tag: { ...tag, color: '#1E88E5' },
+      transaction: { type, amount: String(amount) },
+    });
+    const SPAIN = { id: 'spain-id', name: 'Spain trip' };
+    const WORK = { id: 'work-id', name: 'Work' };
+    const BIRTHDAY = { id: 'birthday-id', name: 'Birthday' };
+
+    it('nets refunds per tag, counts multi-tag rows under each tag, hides 0 and sorts by spend', async () => {
+      prisma.transactionTag.findMany.mockResolvedValue([
+        link(SPAIN, 'EXPENSE', 300),
+        link(WORK, 'EXPENSE', 300), // same hotel, tagged with both
+        link(SPAIN, 'EXPENSE', 100.1),
+        link(SPAIN, 'REFUND', 50),
+        link(WORK, 'EXPENSE', 500),
+        link(BIRTHDAY, 'EXPENSE', 20),
+        link(BIRTHDAY, 'REFUND', 30), // more refunded than spent
+      ]);
+
+      await expect(
+        service.getTagSpend(USER_ID, {
+          startDate: '2026-01-01',
+          endDate: '2026-12-31',
+        }),
+      ).resolves.toEqual([
+        {
+          tagId: WORK.id,
+          name: 'Work',
+          color: '#1E88E5',
+          spent: 800,
+          count: 2,
+        },
+        {
+          tagId: SPAIN.id,
+          name: 'Spain trip',
+          color: '#1E88E5',
+          spent: 350.1,
+          count: 3,
+        },
+      ]);
+    });
+
+    it('only counts the user’s non-deleted, non-transfer spend in the date range', async () => {
+      prisma.transactionTag.findMany.mockResolvedValue([]);
+
+      await service.getTagSpend(USER_ID, {
+        startDate: '2026-03-01',
+        endDate: '2026-03-31',
+      });
+
+      const { where } = prisma.transactionTag.findMany.mock.calls[0][0];
+      expect(where).toEqual({
+        tag: { userId: USER_ID },
+        transaction: expect.objectContaining({
+          userId: USER_ID,
+          deletedAt: null,
+          type: { in: ['EXPENSE', 'REFUND'] },
+          date: {
+            gte: new Date('2026-03-01T00:00:00.000Z'),
+            lte: new Date('2026-03-31T23:59:59.999Z'),
+          },
+        }),
+      });
+      expect(JSON.stringify(where)).toContain('Internal Transfer');
+    });
   });
 });

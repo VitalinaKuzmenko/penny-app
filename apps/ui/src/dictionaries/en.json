@@ -300,7 +300,8 @@
         "DATE": "Date",
         "DESCRIPTION": "Description",
         "AMOUNT": "Amount",
-        "CATEGORY": "Category"
+        "CATEGORY": "Category",
+        "TAGS": "Tags"
       },
       "CUSTOM_CATEGORY_CELL_NAME": "None, just income",
       "REFUND_GROUP_LABEL": "Refund for…",
@@ -309,7 +310,13 @@
       "DUPLICATE_TOOLTIP": "Matches an existing transaction on this account: {date} · {amount} · {description}",
       "IMPORT_ANYWAY": "Import anyway",
       "DUPLICATE_DELETED_CHIP": "Previously deleted",
-      "DUPLICATE_DELETED_TOOLTIP": "You deleted this transaction in the Money Journal: {date} · {amount} · {description}. It will be skipped unless you import it anyway."
+      "DUPLICATE_DELETED_TOOLTIP": "You deleted this transaction in the Money Journal: {date} · {amount} · {description}. It will be skipped unless you import it anyway.",
+      "TAGS": {
+        "EDIT": "Edit tags",
+        "PLACEHOLDER": "Find or create a tag",
+        "CREATE": "Create tag \"{name}\"",
+        "NO_OPTIONS": "No tags yet. Type a name to create one."
+      }
     },
     "DUPLICATES_BAR": {
       "SUMMARY": "{count} possible duplicate(s) found — skipped by default.",
@@ -346,6 +353,10 @@
       "UNKNOWN": {
         "TITLE": "Save failed",
         "MESSAGE": "Something went wrong while saving your transactions. Please try again."
+      },
+      "IMPORT_INVALID_TAG": {
+        "TITLE": "Unknown tag",
+        "MESSAGE": "One or more tags no longer exist. Please refresh the page and choose again."
       }
     },
     "CREATE_ACCOUNT_MODAL": {
@@ -355,6 +366,13 @@
       "CANCEL": "Cancel",
       "ERROR_ALREADY_EXISTS": "Account with this name already exists",
       "ERROR_GENERIC": "Failed to create account"
+    },
+    "BULK_TAG_BAR": {
+      "PLACEHOLDER": "Tags for the selected rows",
+      "CREATE": "Create tag \"{name}\"",
+      "NO_OPTIONS": "No tags yet. Type a name to create one.",
+      "ADD_BUTTON": "Add tags",
+      "REMOVE_BUTTON": "Remove tags"
     }
   },
   "DASHBOARD_PAGE": {
@@ -414,6 +432,12 @@
           "MONTH": "Month",
           "TOTAL": "Total"
         }
+      },
+      "TAG_SPEND": {
+        "TITLE": "Spend by Tag",
+        "TOOLTIP": "Spending per tag for the selected dates (the account and category filters don't apply). Refunds come off, internal transfers are left out. A transaction with several tags counts under each of them.",
+        "EMPTY": "No tagged spending in this period. Add tags to transactions in the Money Journal.",
+        "COUNT": "{count} transaction(s)"
       }
     },
     "ERRORS": {
@@ -461,7 +485,11 @@
       },
       "SHOW_DELETED": "Show deleted",
       "RESET_BUTTON": "Reset",
-      "APPLY_BUTTON": "Apply"
+      "APPLY_BUTTON": "Apply",
+      "TAG_FILTER": {
+        "LABEL": "Tags",
+        "UNTAGGED": "Untagged"
+      }
     },
     "TOTALS": {
       "COUNT": "Transactions",
@@ -479,7 +507,8 @@
         "CATEGORY": "Category",
         "ACCOUNT": "Account",
         "CURRENCY": "Currency",
-        "ACTIONS": ""
+        "ACTIONS": "",
+        "TAGS": "Tags"
       },
       "TYPES": {
         "INCOME": "Income",
@@ -498,7 +527,13 @@
       "PENDING_DELETE_CHIP": "will be deleted",
       "PENDING_RESTORE_CHIP": "will be restored",
       "EMPTY_DESCRIPTION": "Description can't be empty",
-      "NO_ROWS": "No transactions match these filters"
+      "NO_ROWS": "No transactions match these filters",
+      "TAGS": {
+        "EDIT": "Edit tags",
+        "PLACEHOLDER": "Find or create a tag",
+        "CREATE": "Create tag \"{name}\"",
+        "NO_OPTIONS": "No tags yet. Type a name to create one."
+      }
     },
     "BULK_CATEGORY_BAR": {
       "LABEL": "selected",
@@ -543,7 +578,22 @@
       "UNKNOWN": {
         "TITLE": "Save failed",
         "MESSAGE": "Something went wrong while saving your changes. Please try again."
+      },
+      "INVALID_TAG": {
+        "TITLE": "Unknown tag",
+        "MESSAGE": "One or more tags no longer exist. Please refresh the page and choose again."
+      },
+      "TAGS_LOAD": {
+        "TITLE": "Failed to load tags",
+        "MESSAGE": "The tag filter and picker may be incomplete. Please refresh the page."
       }
+    },
+    "BULK_TAG_BAR": {
+      "PLACEHOLDER": "Tags for the selected rows",
+      "CREATE": "Create tag \"{name}\"",
+      "NO_OPTIONS": "No tags yet. Type a name to create one.",
+      "ADD_BUTTON": "Add tags",
+      "REMOVE_BUTTON": "Remove tags"
     }
   }
 }
