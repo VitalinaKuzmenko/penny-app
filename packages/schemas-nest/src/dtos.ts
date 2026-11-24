@@ -22,6 +22,10 @@ import {
   IncomeExpenseStackedResponseSchema,
   IncomeExpenseRatioQuerySchema,
   IncomeExpenseRatioResponseSchema,
+  ListTransactionsQuerySchema,
+  ListTransactionsResponseSchema,
+  UpdateTransactionsSchema,
+  UpdateTransactionsResponseSchema,
 } from 'schemas';
 import { createZodDto } from 'nestjs-zod';
 
@@ -97,4 +101,18 @@ export class IncomeExpenseRatioQueryDto extends createZodDto(
 ) {}
 export class IncomeExpenseRatioResponseDto extends createZodDto(
   IncomeExpenseRatioResponseSchema,
+) {}
+
+// TRANSACTIONS (Money Journal)
+export class ListTransactionsQueryDto extends createZodDto(
+  ListTransactionsQuerySchema,
+) {}
+export class ListTransactionsResponseDto extends createZodDto(
+  ListTransactionsResponseSchema,
+) {}
+export class UpdateTransactionsDto extends createZodDto(
+  UpdateTransactionsSchema,
+) {}
+export class UpdateTransactionsResponseDto extends createZodDto(
+  UpdateTransactionsResponseSchema,
 ) {}

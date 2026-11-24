@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import z from 'zod';
 import TransactionsTable from './TransactionsTable';
-import BulkCategoryBar from './BulkCategoryBar';
+import BulkCategoryBar from '@/components/BulkCategoryBar/BulkCategoryBar';
 import DuplicatesBar from './DuplicatesBar';
 import {
   AccountWithActivity,
@@ -254,7 +254,9 @@ export default function TransactionsClient({
         pageText={transactionsPageText.BULK_CATEGORY_BAR}
         categories={categories}
         selectedRows={selectedRows}
-        onApply={(categoryId: string) => {
+        onApply={(categoryId) => {
+          // this bar has no "None" option, so a category is always chosen
+          if (!categoryId) return;
           setRowCategories((prev) => {
             const next = { ...prev };
             selectedRows.forEach((id) => (next[id] = categoryId));

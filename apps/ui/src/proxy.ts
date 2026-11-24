@@ -4,7 +4,13 @@ import Negotiator from 'negotiator';
 import { availableLanguages, LanguageType } from './utils/interfaces';
 
 const defaultLocale = 'en';
-const protectedPaths = ['/profile', '/upload-csv', '/pennys-view', '/import'];
+const protectedPaths = [
+  '/profile',
+  '/upload-csv',
+  '/money-journal',
+  '/pennys-view',
+  '/import',
+];
 
 export const getLocale = (request: Request) => {
   // 1️⃣ Check for manually selected language cookie

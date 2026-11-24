@@ -50,6 +50,7 @@ const existing = (
   amount: number,
   description: string,
   type: 'INCOME' | 'EXPENSE' | 'REFUND' = amount < 0 ? 'EXPENSE' : 'INCOME',
+  deletedAt: Date | null = null,
 ) => ({
   fingerprint: buildTransactionFingerprint(
     new Date(`${date}T00:00:00Z`),
@@ -60,6 +61,7 @@ const existing = (
   description,
   amount: Math.abs(amount),
   type,
+  deletedAt,
 });
 
 function createPrismaMock() {
@@ -218,6 +220,37 @@ describe('ImportService', () => {
       expect(result?.map((r) => r.duplicate)).toEqual([true, false, false]);
     });
 
+    it('marks a match against a soft-deleted transaction as previously deleted, after live matches', async () => {
+      prisma.transactionImport.findFirst.mockResolvedValue({
+        id: IMPORT_ID,
+        rows: [
+          row('r1', '2026-08-03', -3.5, 'COSTA'),
+          row('r2', '2026-08-03', -3.5, 'COSTA'),
+        ],
+      });
+      // returned live-first, as requested by the orderBy below
+      prisma.transaction.findMany.mockResolvedValue([
+        existing('2026-08-03', -3.5, 'COSTA'),
+        existing('2026-08-03', -3.5, 'COSTA', 'EXPENSE', new Date()),
+      ]);
+
+      const result = await service.getImportRows(
+        USER_ID,
+        IMPORT_ID,
+        ACCOUNT_ID,
+      );
+
+      expect(prisma.transaction.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: [{ deletedAt: { sort: 'asc', nulls: 'first' } }],
+        }),
+      );
+      expect(
+        prisma.transaction.findMany.mock.calls[0][0].where,
+      ).not.toHaveProperty('deletedAt');
+      expect(result?.map((r) => r.duplicateOf?.deleted)).toEqual([false, true]);
+    });
+
     it('attaches the learned category suggestion by normalised description', async () => {
       prisma.transactionImport.findFirst.mockResolvedValue({
         id: IMPORT_ID,
@@ -342,6 +375,24 @@ describe('ImportService', () => {
       const { data } = prisma.tx.transaction.createMany.mock.calls[0][0];
       expect(data).toHaveLength(1);
       expect(data[0]).toMatchObject({ amount: 12.55 });
+    });
+
+    it('still skips a row whose match was soft-deleted, so deleted rows stay gone', async () => {
+      stubImport('PENDING', [row('r1', '2026-08-03', -34.2, 'TESCO')]);
+      prisma.transaction.findMany.mockResolvedValue([
+        existing('2026-08-03', -34.2, 'TESCO', 'EXPENSE', new Date()),
+      ]);
+
+      const result = await service.confirmImport(
+        USER_ID,
+        IMPORT_ID,
+        dto([{ id: 'r1' }]),
+      );
+
+      expect(result).toEqual({ skippedDuplicates: 1 });
+      expect(
+        prisma.transaction.findMany.mock.calls[0][0].where,
+      ).not.toHaveProperty('deletedAt');
     });
 
     it('imports a flagged duplicate when the user sets forceImport', async () => {

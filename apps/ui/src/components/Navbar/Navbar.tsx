@@ -30,6 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
   const pages = [
     headerText.PAGES.HOME,
     headerText.PAGES.UPLOAD_CSV,
+    headerText.PAGES.MONEY_JOURNAL,
     headerText.PAGES.PENNYS_VIEW,
   ];
   const { user } = useAuth();

@@ -175,9 +175,17 @@ export class ImportService {
     // we can show the user exactly which existing transaction each row matched.
     const existingByFingerprint = new Map<
       string,
-      { date: Date; description: string | null; amount: number }[]
+      {
+        date: Date;
+        description: string | null;
+        amount: number;
+        deleted: boolean;
+      }[]
     >();
     if (accountId) {
+      // Soft-deleted rows still count as duplicates so they don't come back,
+      // but live matches are used first so "previously deleted" is only shown
+      // when nothing else explains the duplicate
       const existing = await this.prisma.transaction.findMany({
         where: { accountId, userId, fingerprint: { not: null } },
         select: {
@@ -186,7 +194,9 @@ export class ImportService {
           description: true,
           amount: true,
           type: true,
+          deletedAt: true,
         },
+        orderBy: [{ deletedAt: { sort: 'asc', nulls: 'first' } }],
       });
       for (const t of existing) {
         const fp = t.fingerprint as string;
@@ -198,6 +208,7 @@ export class ImportService {
             t.type === TransactionType.EXPENSE
               ? -Number(t.amount)
               : Number(t.amount),
+          deleted: t.deletedAt !== null,
         });
         existingByFingerprint.set(fp, list);
       }
@@ -236,6 +247,7 @@ export class ImportService {
               date: formatDateToString(match.date),
               description: match.description ?? '',
               amount: match.amount,
+              deleted: match.deleted,
             }
           : null,
       };

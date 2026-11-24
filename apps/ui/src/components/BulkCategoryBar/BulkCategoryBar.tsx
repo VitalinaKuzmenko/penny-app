@@ -11,14 +11,20 @@ import {
   FormControl,
   InputLabel,
 } from '@mui/material';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Category } from 'schemas';
+
+// Select can't use '' as a real option value, it means "nothing chosen"
+const NONE_VALUE = '__none__';
 
 interface BulkCategoryBarProps {
   pageText: Record<string, any>;
   categories: Category[];
   selectedRows: string[];
-  onApply: (categoryId: string) => void;
+  // null = clear the category; only sent when pageText.NONE_OPTION is set
+  onApply: (categoryId: string | null) => void;
+  // extra buttons for the selection, e.g. delete
+  actions?: ReactNode;
 }
 
 export default function BulkCategoryBar({
@@ -26,6 +32,7 @@ export default function BulkCategoryBar({
   categories,
   selectedRows,
   onApply,
+  actions,
 }: BulkCategoryBarProps) {
   const [bulkCategory, setBulkCategory] = useState<string>('');
 
@@ -34,7 +41,7 @@ export default function BulkCategoryBar({
 
   const handleApply = () => {
     if (bulkCategory) {
-      onApply(bulkCategory);
+      onApply(bulkCategory === NONE_VALUE ? null : bulkCategory);
       setBulkCategory('');
     }
   };
@@ -55,6 +62,9 @@ export default function BulkCategoryBar({
       <FormControl size="small" sx={{ flex: 2 }}>
         <InputLabel>{pageText.CATEGORY_LABEL}</InputLabel>
         <Select value={bulkCategory} label="Category" onChange={handleChange}>
+          {pageText.NONE_OPTION && (
+            <MenuItem value={NONE_VALUE}>{pageText.NONE_OPTION}</MenuItem>
+          )}
           {categories.map((cat) => (
             <MenuItem
               key={cat.id}
@@ -78,6 +88,8 @@ export default function BulkCategoryBar({
       >
         {pageText.APPLY_BUTTON}
       </CustomButton>
+
+      {actions}
     </Stack>
   );
 }

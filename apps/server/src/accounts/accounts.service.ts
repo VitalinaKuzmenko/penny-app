@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AccountWithActivity } from 'schemas';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { notDeleted } from '../utils/not-deleted';
 
 @Injectable()
 export class AccountsService {
@@ -21,7 +22,7 @@ export class AccountsService {
       }),
       this.prisma.transaction.groupBy({
         by: ['accountId'],
-        where: { userId },
+        where: { userId, ...notDeleted },
         _max: { date: true },
       }),
     ]);

@@ -9,6 +9,7 @@
         "NAME": "Upload CSV",
         "URL": "/upload-csv"
       },
+      "MONEY_JOURNAL": { "NAME": "Money Journal", "URL": "/money-journal" },
       "PENNYS_VIEW": {
         "NAME": "Penny's View",
         "URL": "/pennys-view"
@@ -306,7 +307,9 @@
       "REFUND_CHIP": "refund",
       "DUPLICATE_CHIP": "Duplicate",
       "DUPLICATE_TOOLTIP": "Matches an existing transaction on this account: {date} · {amount} · {description}",
-      "IMPORT_ANYWAY": "Import anyway"
+      "IMPORT_ANYWAY": "Import anyway",
+      "DUPLICATE_DELETED_CHIP": "Previously deleted",
+      "DUPLICATE_DELETED_TOOLTIP": "You deleted this transaction in the Money Journal: {date} · {amount} · {description}. It will be skipped unless you import it anyway."
     },
     "DUPLICATES_BAR": {
       "SUMMARY": "{count} possible duplicate(s) found — skipped by default.",
@@ -424,6 +427,122 @@
           "TITLE": "Failed to load data",
           "MESSAGE": "Failed to load data. Please try again."
         }
+      }
+    }
+  },
+  "MONEY_JOURNAL_PAGE": {
+    "TITLE": "Money Journal",
+    "SUBTITLE": "Every transaction in one place. Fix names and categories, or remove mistakes.",
+    "FILTERS": {
+      "START_DATE": {
+        "LABEL": "From"
+      },
+      "END_DATE": {
+        "LABEL": "To"
+      },
+      "TYPE_SELECT": {
+        "LABEL": "Type",
+        "OPTIONS": {
+          "ALL": "All",
+          "INCOME": "Income",
+          "EXPENSE": "Expense",
+          "REFUND": "Refund"
+        }
+      },
+      "CATEGORY_FILTER": {
+        "LABEL": "Categories",
+        "UNCATEGORISED": "Uncategorised"
+      },
+      "ACCOUNT_FILTER": {
+        "LABEL": "Accounts"
+      },
+      "SEARCH": {
+        "LABEL": "Search description"
+      },
+      "SHOW_DELETED": "Show deleted",
+      "RESET_BUTTON": "Reset",
+      "APPLY_BUTTON": "Apply"
+    },
+    "TOTALS": {
+      "COUNT": "Transactions",
+      "SPENT": "Spent",
+      "INCOME": "Income",
+      "NET": "Net",
+      "INFO": "Totals for everything that matches the filters, not just this page. Includes internal transfers; refunds come off spent. Deleted transactions are not counted. These can differ from Penny's View, which leaves transfers out."
+    },
+    "TABLE": {
+      "COLUMNS": {
+        "DATE": "Date",
+        "DESCRIPTION": "Description",
+        "AMOUNT": "Amount",
+        "TYPE": "Type",
+        "CATEGORY": "Category",
+        "ACCOUNT": "Account",
+        "CURRENCY": "Currency",
+        "ACTIONS": ""
+      },
+      "TYPES": {
+        "INCOME": "Income",
+        "EXPENSE": "Expense",
+        "REFUND": "Refund"
+      },
+      "CUSTOM_CATEGORY_CELL_NAME": "None, just income",
+      "NONE_OPTION": "None (uncategorised)",
+      "REFUND_GROUP_LABEL": "Refund for…",
+      "REFUND_CHIP": "refund",
+      "DELETE": "Delete",
+      "UNDO_DELETE": "Undo delete",
+      "RESTORE": "Restore",
+      "UNDO_RESTORE": "Undo restore",
+      "DELETED_CHIP": "deleted",
+      "PENDING_DELETE_CHIP": "will be deleted",
+      "PENDING_RESTORE_CHIP": "will be restored",
+      "EMPTY_DESCRIPTION": "Description can't be empty",
+      "NO_ROWS": "No transactions match these filters"
+    },
+    "BULK_CATEGORY_BAR": {
+      "LABEL": "selected",
+      "CATEGORY_LABEL": "Category",
+      "APPLY_BUTTON": "Set category",
+      "NONE_OPTION": "None (uncategorised)",
+      "DELETE_BUTTON": "Delete selected"
+    },
+    "SAVE_BAR": {
+      "UNSAVED": "{count} unsaved change(s)",
+      "SAVE": "Save",
+      "DISCARD": "Discard",
+      "SAVED": "Saved {count} change(s)"
+    },
+    "DISCARD_DIALOG": {
+      "TITLE": "Discard unsaved changes?",
+      "MESSAGE": "You have {count} unsaved change(s). They will be lost.",
+      "CONFIRM": "Discard",
+      "CANCEL": "Keep editing"
+    },
+    "ERRORS": {
+      "LOAD": {
+        "TITLE": "Failed to load transactions",
+        "MESSAGE": "Please try again."
+      },
+      "NOT_FOUND": {
+        "TITLE": "Transactions not found",
+        "MESSAGE": "Some transactions no longer exist. Please refresh the page."
+      },
+      "INVALID_CATEGORY": {
+        "TITLE": "Unknown category",
+        "MESSAGE": "One or more selected categories no longer exist. Please refresh the page and choose again."
+      },
+      "DELETED_NOT_EDITABLE": {
+        "TITLE": "Deleted transaction",
+        "MESSAGE": "Restore a deleted transaction before editing it."
+      },
+      "UNAUTHORIZED": {
+        "TITLE": "Session expired",
+        "MESSAGE": "Please sign in again to continue."
+      },
+      "UNKNOWN": {
+        "TITLE": "Save failed",
+        "MESSAGE": "Something went wrong while saving your changes. Please try again."
       }
     }
   }

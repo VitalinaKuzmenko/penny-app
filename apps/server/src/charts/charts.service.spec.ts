@@ -147,6 +147,30 @@ describe('ChartsService — refunds', () => {
         },
       ]);
     });
+
+    it('groups expenses without a category into an Uncategorised series', async () => {
+      prisma.transaction.findMany.mockResolvedValue([
+        {
+          categoryId: null,
+          category: null,
+          type: 'EXPENSE',
+          date: new Date('2026-02-10T00:00:00Z'),
+          amount: 12,
+        },
+      ]);
+
+      const result = await service.getMonthlyCategoryChart(USER_ID, {
+        year: 2026,
+      });
+
+      expect(result.datasets).toEqual([
+        {
+          categoryId: 'uncategorised',
+          categoryName: 'Uncategorised',
+          data: [0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        },
+      ]);
+    });
   });
 
   describe('getCategoryBreakdown', () => {
@@ -199,6 +223,34 @@ describe('ChartsService — refunds', () => {
       });
     });
 
+    it('shows expenses without a category as an Uncategorised slice', async () => {
+      prisma.transaction.groupBy.mockResolvedValue([
+        { categoryId: CLOTHES, type: 'EXPENSE', ...sum(30) },
+        { categoryId: null, type: 'EXPENSE', ...sum(10) },
+      ]);
+      prisma.category.findMany.mockResolvedValue([
+        { id: CLOTHES, name: 'Clothes' },
+      ]);
+
+      const result = await service.getCategoryBreakdown(USER_ID, {
+        type: 'EXPENSE',
+      });
+
+      // null must not reach the category lookup
+      expect(prisma.category.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: { in: [CLOTHES] } } }),
+      );
+      expect(result.categories).toEqual([
+        expect.objectContaining({ categoryName: 'Clothes', percentage: 75 }),
+        {
+          categoryId: 'uncategorised',
+          categoryName: 'Uncategorised',
+          amount: 10,
+          percentage: 25,
+        },
+      ]);
+    });
+
     it('queries only INCOME rows for the income breakdown', async () => {
       prisma.transaction.groupBy.mockResolvedValue([]);
       prisma.category.findMany.mockResolvedValue([]);
@@ -211,5 +263,29 @@ describe('ChartsService — refunds', () => {
         }),
       );
     });
+  });
+
+  it('leaves soft-deleted transactions out of every chart', async () => {
+    prisma.transaction.groupBy.mockResolvedValue([]);
+    prisma.transaction.findMany.mockResolvedValue([]);
+    prisma.category.findMany.mockResolvedValue([]);
+
+    await service.getIncomeExpenseByYear(USER_ID, { year: 2026 });
+    await service.getIncomeExpenseRatio(USER_ID, {
+      startDate: '2026-01-01',
+      endDate: '2026-12-31',
+    });
+    await service.getIncomeExpenseStacked(USER_ID, {});
+    await service.getMonthlyCategoryChart(USER_ID, { year: 2026 });
+    await service.getCategoryBreakdown(USER_ID, { type: 'EXPENSE' });
+
+    const calls = [
+      ...prisma.transaction.groupBy.mock.calls,
+      ...prisma.transaction.findMany.mock.calls,
+    ];
+    expect(calls).toHaveLength(5);
+    for (const [args] of calls) {
+      expect(args.where).toMatchObject({ userId: USER_ID, deletedAt: null });
+    }
   });
 });

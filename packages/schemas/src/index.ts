@@ -12,6 +12,11 @@ export * from './transactions/import-csv-response.schema';
 export * from './transactions/confirm-import-response.schema';
 export * from './transactions/confirm-import.schema';
 
+// MONEY JOURNAL (transactions list/edit)
+export * from './transactions/list-transactions.query';
+export * from './transactions/list-transactions.response';
+export * from './transactions/update-transactions.schema';
+
 // ACCOUNTS
 export * from './accounts/account.schema';
 export * from './accounts/create-account.schema';
@@ -23,6 +28,7 @@ export * from './currency/getCurrenciesResponse.schema';
 export * from './category/category.schema';
 
 // CHARTS
+export * from './charts/uncategorised';
 export * from './charts/get-income-expense.query';
 export * from './charts/get-income-expense.response';
 export * from './charts/monthly-category.query';
