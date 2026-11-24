@@ -66,5 +66,12 @@ export const normaliseChange = (
     next.deleted = change.deleted;
   }
 
+  // A row that stays deleted is locked and the server rejects edits on it,
+  // so undoing a restore also drops edits made while it was restored
+  if (row.deleted && next.deleted !== false) {
+    delete next.description;
+    delete next.categoryId;
+  }
+
   return Object.keys(next).length ? next : null;
 };
