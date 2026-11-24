@@ -394,34 +394,69 @@ This reverses the Step 3 decision to have no date presets.
 - The Money Journal defaults to "this year" too, and its totals bar then
   becomes a yearly summary.
 
-### UI/UX (proposal)
+### Decisions (agreed 2026-11-24)
 
-- A row of year chips above the date pickers, in a shared
-  `YearPresets` component (`src/components`) used by both filter bars:
+- A chip applies **immediately**; no Apply needed.
+- Years run from the user's **first transaction** to the current year,
+  every year in between included (even one without transactions).
+- The Money Journal also gets an **"All time"** chip. Penny's View doesn't,
+  because its year-based charts only show one year.
+- **4** year chips on desktop/tablet, **2** on phones; see the mobile layout
+  below.
+
+### UI/UX
+
+- A row of chips above the date pickers, in a shared `YearPresets`
+  component (`src/components`) used by both filter bars. Desktop/tablet
+  (`sm` and up):
 
   ```text
-  [ 2026 ]  [ 2025 ]  [ 2024 ]  [ 2023 ]  [ Older ▾ ]      From [01/01/2026]  To [31/12/2026]
+  Penny's View:   [ 2026 ]  [ 2025 ]  [ 2024 ]  [ 2023 ]  [ Older ▾ ]
+  Money Journal:  [ 2026 ]  [ 2025 ]  [ 2024 ]  [ 2023 ]  [ Older ▾ ]  [ All time ]
   ```
 
   - Newest first; the current year comes first and is selected by default
-    (the pages already open on this year).
-  - Only years from the user's first transaction to the current year
-    (no empty years before the data starts). A new user sees just the
-    current year.
-  - At most 4 chips; older years go into an "Older" menu so the row
-    doesn't grow every January. On mobile the row scrolls sideways.
+    (both pages already open on this year).
+  - Years before the 4 shown go into the "Older" menu (newest first), so
+    the row doesn't grow every January. "Older" only appears when there
+    are more years; a new user sees just the current year (plus "All time"
+    in the Money Journal).
+  - "All time" goes last: it's the broadest option and is used less often
+    than a single year.
 
-- Clicking a chip sets From = 1 Jan and To = 31 Dec of that year and
-  **applies straight away** (a preset that still needs Apply feels broken).
-  Other changed-but-not-applied filters are applied with it.
+- Phones (`xs`, below 600px): **2 year chips**, the rest in "Older":
+
+  ```text
+  Penny's View:   [ 2026 ]  [ 2025 ]  [ Older ▾ ]
+  Money Journal:  [ 2026 ]  [ 2025 ]  [ Older ▾ ]  [ All time ]
+  ```
+
+  - A 360px phone leaves about 328px for the row. Two years + "Older" +
+    "All time" fit on one line (about 290px); four years would need a
+    second line or sideways scrolling, and a hidden scrolled chip is easy
+    to miss.
+  - The last two years cover most visits, so the rest can sit in "Older".
+  - Both pages show the same number of years so they feel the same.
+  - Chips stay at MUI's default size, which is large enough to tap.
+
+- When the selected year is inside "Older", that chip shows the year and
+  is highlighted (e.g. `[ 2019 ▾ ]`), so the current selection is always
+  visible without opening the menu.
+- Clicking a year sets From = 1 Jan and To = 31 Dec of that year and
+  applies straight away. Other changed-but-not-applied filters are applied
+  with it, since there is only one "applied" state.
   - Money Journal: this goes through the existing "Discard unsaved
     changes?" prompt, like Apply.
-- The chip is highlighted when the applied range is exactly that year.
-  Editing the pickers to anything else clears the highlight, so the
-  pickers stay the "custom range" option without an extra chip.
+- "All time" (Money Journal) clears From and To, so the request has no
+  date filter, and applies straight away. The empty pickers show that no
+  date limit is set.
+- A chip is highlighted when the applied range is exactly that year (or
+  empty for "All time"). Editing the pickers to anything else clears the
+  highlight, so the pickers stay the "custom range" option without an
+  extra chip.
 - Reset goes back to the current year, as today.
-- Strings for "Older" and the chip tooltip ("1 Jan – 31 Dec 2025") in en,
-  ru and ua.
+- Strings for "Older", "All time" and the chip tooltip
+  ("1 Jan – 31 Dec 2025") in en, ru and ua.
 
 ### Server
 
@@ -431,7 +466,7 @@ This reverses the Step 3 decision to have no date presets.
   rows. No new endpoint; the UI takes the earliest date across accounts.
 - Extend `AccountWithActivitySchema` in `packages/schemas`.
 
-### Open decisions
+## Open decisions
 
 1. Apply a chip immediately (proposed) or only fill the pickers and wait
    for Apply, like the other filters?
