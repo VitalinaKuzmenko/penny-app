@@ -5,19 +5,14 @@ import * as React from 'react';
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid';
 import {
   Paper,
-  FormControl,
-  Select,
-  MenuItem,
   Chip,
   Tooltip,
   Checkbox,
   FormControlLabel,
-  ListSubheader,
   Stack,
 } from '@mui/material';
 import { CsvImportResponse, Category } from 'schemas';
-
-const TRANSFER_CATEGORY_NAME = 'Internal Transfer';
+import CategoryCellSelect from '@/components/CategoryCellSelect/CategoryCellSelect';
 
 interface TransactionsTableProps {
   pageText: Record<string, any>;
@@ -64,8 +59,14 @@ export default function TransactionsTable({
               renderCell: (params) => {
                 if (!params.row.duplicate) return null;
                 const match = params.row.duplicateOf;
+                // the user deleted the matching transaction in the Money Journal
+                const wasDeleted = Boolean(match?.deleted);
                 const tooltip = match
-                  ? String(pageText.DUPLICATE_TOOLTIP)
+                  ? String(
+                      wasDeleted
+                        ? pageText.DUPLICATE_DELETED_TOOLTIP
+                        : pageText.DUPLICATE_TOOLTIP,
+                    )
                       .replace('{date}', match.date)
                       .replace('{amount}', String(match.amount))
                       .replace('{description}', match.description)
@@ -79,9 +80,13 @@ export default function TransactionsTable({
                   >
                     <Tooltip title={tooltip} arrow>
                       <Chip
-                        label={pageText.DUPLICATE_CHIP}
+                        label={
+                          wasDeleted
+                            ? pageText.DUPLICATE_DELETED_CHIP
+                            : pageText.DUPLICATE_CHIP
+                        }
                         size="small"
-                        color="warning"
+                        color={wasDeleted ? 'default' : 'warning'}
                         variant="outlined"
                       />
                     </Tooltip>
@@ -157,103 +162,22 @@ export default function TransactionsTable({
           const categoryId = rowCategories[rowId];
           return categories.find((c) => c.id === categoryId)?.name ?? '';
         },
-        renderCell: (params) => {
-          const amount = Number(params.row.amount);
-          const isAutoAssigned =
-            params.row.autoAssigned &&
-            rowCategories[params.row.id] === params.row.suggestedCategoryId;
-
-          const selectEl = (options: React.ReactNode, isRefund = false) => (
-            <FormControl
-              size="small"
-              fullWidth
-              sx={{ height: '100%', display: 'flex', alignItems: 'center' }}
-            >
-              <Select
-                value={rowCategories[params.row.id] ?? ''}
-                onChange={(e) =>
-                  onChangeCategory(params.row.id, e.target.value)
-                }
-                sx={{ width: '100%' }}
-                startAdornment={
-                  isAutoAssigned || isRefund ? (
-                    <>
-                      {isRefund && (
-                        <Chip
-                          label={pageText.REFUND_CHIP}
-                          size="small"
-                          color="success"
-                          variant="outlined"
-                          sx={{ mr: 0.5, height: 18, fontSize: 10 }}
-                        />
-                      )}
-                      {isAutoAssigned && (
-                        <Chip
-                          label="auto"
-                          size="small"
-                          color="info"
-                          variant="outlined"
-                          sx={{ mr: 0.5, height: 18, fontSize: 10 }}
-                        />
-                      )}
-                    </>
-                  ) : undefined
-                }
-              >
-                {options}
-              </Select>
-            </FormControl>
-          );
-          // Positive rows: plain income, an internal transfer, or a refund for a spending category
-          if (amount > 0) {
-            const transferCategory = categories.find(
-              (cat) => cat.name === TRANSFER_CATEGORY_NAME,
-            );
-            const refundCategories = categories.filter(
-              (cat) => cat.id !== transferCategory?.id,
-            );
-            const selectedId = rowCategories[params.row.id];
-            const isRefund =
-              Boolean(selectedId) && selectedId !== transferCategory?.id;
-
-            // MUI Select needs MenuItems as direct children — no Fragment wrapper
-            return selectEl(
-              [
-                <MenuItem key="none" value="">
-                  {pageText.CUSTOM_CATEGORY_CELL_NAME}
-                </MenuItem>,
-                ...(transferCategory
-                  ? [
-                      <MenuItem
-                        key={transferCategory.id}
-                        value={transferCategory.id}
-                      >
-                        {transferCategory.name}
-                      </MenuItem>,
-                    ]
-                  : []),
-                <ListSubheader key="refund-header">
-                  {pageText.REFUND_GROUP_LABEL}
-                </ListSubheader>,
-                ...refundCategories.map((cat) => (
-                  <MenuItem key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </MenuItem>
-                )),
-              ],
-              isRefund,
-            );
-          }
-
-          // Options for normal rows
-          return selectEl(
-            categories.map((cat) => (
-              <MenuItem key={cat.id} value={cat.id}>
-                {cat.name}
-              </MenuItem>
-            )),
-          );
-        },
+        renderCell: (params) => (
+          <CategoryCellSelect
+            // Positive rows: plain income, an internal transfer, or a refund for a spending category
+            isMoneyIn={Number(params.row.amount) > 0}
+            value={rowCategories[params.row.id] ?? ''}
+            onChange={(categoryId) =>
+              onChangeCategory(params.row.id, categoryId)
+            }
+            categories={categories}
+            pageText={pageText}
+            isAutoAssigned={
+              params.row.autoAssigned &&
+              rowCategories[params.row.id] === params.row.suggestedCategoryId
+            }
+          />
+        ),
       },
     ],
     [
