@@ -183,71 +183,126 @@ EXPENSE`. It loads the submitted categories scoped by `userId` and
   re-importing the CSV would bring the refund back (dedupe can't match a
   deleted row). Rejected.
 
-## Step 3: Transactions page (spreadsheet replacement)
+## Step 3: Money Journal (transactions page, spreadsheet replacement)
 
-New page, e.g. `/[lang]/transactions`, added to the Navbar.
+Status: in progress (branch `feature/money-journal`).
+
+New page `/[lang]/money-journal` ("Money Journal"; ru "Денежный журнал",
+ua "Грошовий журнал"), in the Navbar between Upload CSV and Penny's View.
+
+### Decisions (agreed 2026-11-24)
+
+- Totals cover the whole filtered set, never just the page:
+  - spent = `EXPENSE − REFUND`, **not clamped**, so it can be negative;
+  - income = `INCOME`;
+  - net = income − spent;
+  - count = number of transactions.
+- **Internal transfers are included** in the totals and currencies are
+  summed together, so the numbers can differ from Penny's View, which
+  leaves transfers out and clamps at 0. A tooltip on the totals bar says so.
+- Editing a description keeps the original dedupe `fingerprint`, so
+  re-importing the same CSV still finds it. Empty descriptions are rejected;
+  there is no length limit.
+- A category can be cleared. An `INCOME`/`REFUND` row then becomes
+  `INCOME`; `EXPENSE` rows never change type (Step 2 rule).
+- Category changes (single and bulk) update `CategoryMapping` like import,
+  keyed by the current description. Clearing a category doesn't touch it.
+  A renamed row maps its new name, which won't match future CSV rows.
+- Deleting is a **soft delete** (`Transaction.deletedAt`):
+  - deleted rows are hidden everywhere (charts, account activity, totals)
+    but still count as duplicates on import, so they don't come back;
+  - the import review labels such matches "Previously deleted";
+  - a "Show deleted" switch lists them greyed out with a Restore action
+    (single row);
+  - a deleted row must be restored before it can be edited.
+- Expenses without a category show as an "Uncategorised" slice/series in
+  the dashboard's category charts (they used to crash them). When every
+  category is selected, the monthly chart sends no category filter so the
+  series appears there too.
+
+### Schema (needs a migration)
+
+```prisma
+model Transaction {
+  // ...
+  deletedAt DateTime? @map("deleted_at")
+}
+```
+
+Generated SQL: `ALTER TABLE "Transaction" ADD COLUMN "deleted_at" TIMESTAMP(3);`.
+No backfill. Deploy in the usual order: back up, run
+`prisma migrate deploy` with the **prod** `DATABASE_URL` set explicitly,
+verify with `migrate status`, then deploy the server and the UI.
 
 ### Server
 
-- New `GET /transactions` endpoint (the existing `TransactionController`
-  in `src/modules/transaction` has no routes yet). Filters:
-  - date range (`from`, `to`)
-  - `accountId[]`, `categoryId[]`, `type` (income/expense/refund)
+- New `src/transactions` module; the unused `src/modules/transaction` stub
+  was removed. Zod schemas live in `packages/schemas`.
+- `GET /transactions` query:
+  - `from`, `to` (`YYYY-MM-DD`, whole UTC days)
+  - `accountIds`, `categoryIds` (comma-separated, like the chart queries)
+  - `includeUncategorised`
+  - `type` (`INCOME`/`EXPENSE`/`REFUND`)
   - `search` (description, case-insensitive)
-  - `tagId[]` (once Step 5 is done)
-  - pagination and sorting
-- Response includes **totals for the whole filtered set**: count, total
-  expense, total income, net. These must not be limited to the current page.
-  Refunds follow Step 2: spent = `EXPENSE − REFUND`, income = `INCOME`
-  only, net = income − spent.
-- `PATCH /transactions/:id`: edit description and category.
-- `PATCH /transactions/bulk`: set category for several transactions at once.
-- Both PATCH endpoints: when the category changes on an `INCOME`/`REFUND`
-  row, re-derive the type with the Step 2 rule (so a refund can be turned
-  back into income and vice versa). `EXPENSE` rows never change type.
+  - `includeDeleted`
+  - `page`, `pageSize` (25/50/100)
+  - `sortField` (`date`/`category`/`account`), `sortOrder`
+  - `tagIds` comes in Step 4.
+  - Category sort puts uncategorised rows last in both directions.
+- Response: `rows`, `rowCount` (drives paging; includes deleted rows when
+  shown) and `totals` (deleted rows never counted).
+- `PATCH /transactions`: one all-or-nothing request with a list of
+  `{ id, description?, categoryId? (null clears), deleted? }`.
+  - This replaces the planned `PATCH /transactions/:id` and
+    `PATCH /transactions/bulk`, because edits are collected and saved together.
+  - No size limit.
+  - Unknown/foreign IDs → 404 `transactions.not_found`.
+  - Foreign categories → 400 `transactions.invalid_category`.
+  - Editing a deleted row → 400 `transactions.deleted_not_editable`.
 - All queries scoped by `userId`.
 
 ### UI
 
-- Filter bar above the table with quick date presets (this month, last
-  month, custom range) plus account, category, type and search filters.
-- MUI X DataGrid (community, v8) with server-side pagination and sorting.
-  The community version allows only one column filter at a time, so filters
-  live in the custom bar rather than in the grid's built-in filter panel.
-- Totals bar: count, spent, income, net for the current filter.
-- Inline edit of description and category; select rows to change their
-  category in one go.
-- Refunds shown as a positive amount with a "refund" label; income/refund
-  rows use the same category options as the import table (Step 2).
-- New request functions in `apps/ui/src/requests` following the existing
-  `'use server'` + `serverApiFetch` pattern.
+- Filters follow Penny's View: a `MoneyJournalFilterProvider` in the page
+  layout holds a draft and applied filters (Apply / Reset), with no URL
+  params and no date presets.
+  - From/To pickers default to this year.
+  - Type: All/Income/Expense/Refund.
+  - Categories (all selected + "Uncategorised"), accounts (all selected).
+  - Search and "Show deleted".
+  - Everything or nothing selected means no filter.
+- Totals bar: count, spent, income, net.
+- MUI X DataGrid (community, v8), server-side paging (25 by default) and
+  sorting on date (newest first), category and account.
+  - Columns: date, description, signed coloured amount, type, category,
+    account, currency and a delete/restore action.
+- Edits are explicit:
+  - description, category, delete and restore are collected as unsaved
+    changes, then applied with Save or Discard;
+  - paging, sorting or Apply with unsaved changes asks "Discard unsaved
+    changes?", and the browser warns before leaving;
+  - after saving, the table refetches, so rows that no longer match the
+    filters drop out.
+- Select rows to set (or clear) their category or delete them. The bulk bar
+  and the category cell select are shared with the import page
+  (`src/components`).
+- Request functions use `clientApiFetch`, like Penny's View charts, so
+  server error codes reach the page. (The plan said `'use server'` +
+  `serverApiFetch`.)
+- Strings added to `en.json`, `ru.json` and `ua.json`.
+- Known gap: client-side navigation via the Navbar doesn't trigger the
+  unsaved-changes warning (same as the import page).
 
-## Step 4: Manage page for categories (plus accounts)
-
-New page, e.g. `/[lang]/manage` (or a section in `/profile`).
-
-### Categories
-
-- Server currently only has `GET /categories`. Add:
-  - `POST /categories`: create (name, optional colour/icon), unique per user
-  - `PATCH /categories/:id`: rename / recolour
-  - `DELETE /categories/:id`: see open decision below
-- Charts exclude transfers by matching the category **name**
-  `'Internal Transfer'` in `charts.service.ts`, so renaming that category
-  breaks the exclusion. Either block renaming it or do the `isTransfer`
-  flag from `automation-roadmap.md` §4 first.
-- `CategoryMapping` rows reference categories, so they must be handled
-  when a category is deleted (move to the replacement or delete them).
-
-### Accounts
-
-- `PATCH /accounts/:id`: rename. Show each account's last import info from
-  Step 1 here too.
-
-## Step 5: Tags
+## Step 4: Tags
 
 For grouping across categories, e.g. _"Spain trip 2026"_ spans Flights,
 Hotels and Eating out.
+
+Comes right after the Transactions page (decided 2026-11-24): tags are
+assigned by selecting rows there and the event total comes from its totals
+bar, so tags are of little use before Step 3 exists. They don't need the
+Manage page, though: tags are created inline, and full tag management moves
+to Step 5.
 
 ### Schema (needs a migration)
 
@@ -281,16 +336,47 @@ verify with `migrate status`, then deploy the server and the UI.
 
 ### Server
 
-- CRUD: `GET/POST /tags`, `PATCH/DELETE /tags/:id`.
+- `GET /tags` and `POST /tags` (name, optional colour), unique per user.
+  `PATCH/DELETE /tags/:id` come with the Manage page in Step 5.
 - Assign/unassign tags on one or several transactions (bulk).
-- `GET /transactions` supports `tagId[]`.
+- `GET /transactions` supports `tagIds`.
 
 ### UI
 
-- Tag management on the Manage page from Step 4.
-- Transactions page: select rows and add or remove a tag. Show tags as chips
-  in a column and filter by tag; the totals bar then gives the event total.
+- Transactions page: select rows and add or remove a tag. The tag picker is
+  an autocomplete that also offers _"Create tag 'Spain trip 2026'"_, so
+  tags are created and assigned in one go without a separate page.
+- Show tags as chips in a column and add a tag filter to the filter bar;
+  the totals bar then gives the event total.
 - Optional later: assign tags during import.
+
+## Step 5: Manage page for categories, tags and accounts
+
+New page, e.g. `/[lang]/manage` (or a section in `/profile`).
+
+### Categories
+
+- Server currently only has `GET /categories`. Add:
+  - `POST /categories`: create (name, optional colour/icon), unique per user
+  - `PATCH /categories/:id`: rename / recolour
+  - `DELETE /categories/:id`: see open decision below
+- Charts exclude transfers by matching the category **name**
+  `'Internal Transfer'` in `charts.service.ts`, so renaming that category
+  breaks the exclusion. Either block renaming it or do the `isTransfer`
+  flag from `automation-roadmap.md` §4 first.
+- `CategoryMapping` rows reference categories, so they must be handled
+  when a category is deleted (move to the replacement or delete them).
+
+### Tags
+
+- `PATCH /tags/:id`: rename / recolour (keep names unique per user).
+- `DELETE /tags/:id`: removes the tag from its transactions
+  (`TransactionTag` rows cascade); the transactions themselves stay.
+
+### Accounts
+
+- `PATCH /accounts/:id`: rename. Show each account's last import info from
+  Step 1 here too.
 
 ## Open decisions
 
