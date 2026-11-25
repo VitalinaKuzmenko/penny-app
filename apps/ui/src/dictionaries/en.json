@@ -379,6 +379,10 @@
   "DASHBOARD_PAGE": {
     "TITLE": "Penny's View",
     "FILTERS": {
+      "YEAR_PRESETS": {
+        "OLDER": "Older",
+        "TOOLTIP": "1 Jan – 31 Dec {year}"
+      },
       "START_DATE": {
         "LABEL": "From"
       },
@@ -458,6 +462,11 @@
     "TITLE": "Money Journal",
     "SUBTITLE": "Every transaction in one place. Fix names and categories, or remove mistakes.",
     "FILTERS": {
+      "YEAR_PRESETS": {
+        "OLDER": "Older",
+        "ALL_TIME": "All time",
+        "TOOLTIP": "1 Jan – 31 Dec {year}"
+      },
       "START_DATE": {
         "LABEL": "From"
       },

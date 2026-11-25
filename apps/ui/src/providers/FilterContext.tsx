@@ -19,6 +19,9 @@ interface FilterContextProps {
   appliedFilters: DashboardFilters; // used by charts
   setFilters: (filters: Partial<DashboardFilters>) => void;
   applyFilters: () => void;
+  // merges into the draft and applies the result in one step (year presets)
+  applyWith: (filters: Partial<DashboardFilters>) => void;
+  // back to the opening state (this year, everything selected) and applied
   resetFilters: () => void;
   isInitialized: boolean;
   initFilters: (data: { categoryIds: string[]; accountIds: string[] }) => void;
@@ -35,6 +38,7 @@ const defaultFilters = (): DashboardFilters => ({
 const FilterContext = createContext<FilterContextProps | undefined>(undefined);
 
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
+  const [initial, setInitial] = useState<DashboardFilters>(defaultFilters);
   const [filters, setFiltersState] = useState<DashboardFilters>(defaultFilters);
   const [appliedFilters, setAppliedFilters] =
     useState<DashboardFilters>(defaultFilters);
@@ -47,8 +51,16 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const applyFilters = () => {
     setAppliedFilters(filters);
   };
+
+  const applyWith = (newFilters: Partial<DashboardFilters>) => {
+    const next = { ...filters, ...newFilters };
+    setFiltersState(next);
+    setAppliedFilters(next);
+  };
+
   const resetFilters = () => {
-    setFiltersState(defaultFilters);
+    setFiltersState(initial);
+    setAppliedFilters(initial);
   };
 
   const initFilters = ({
@@ -65,6 +77,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       accountIds,
     };
 
+    setInitial(defaults);
     setFiltersState(defaults);
     setAppliedFilters(defaults);
     setIsInitialized(true);
@@ -77,6 +90,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
         appliedFilters,
         setFilters,
         applyFilters,
+        applyWith,
         resetFilters,
         isInitialized,
         initFilters,

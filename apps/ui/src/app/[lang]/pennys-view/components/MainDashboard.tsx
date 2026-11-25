@@ -3,7 +3,7 @@
 
 import { Typography, Box } from '@mui/material';
 import DashboardFilters from './filters/DashboardFilters';
-import { Account, Category } from 'schemas';
+import { AccountWithActivity, Category } from 'schemas';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import IncomeExpenseChart from './charts/IncomeExpenseChart';
@@ -18,7 +18,7 @@ import IncomeExpenseGauge from './charts/IncomeExpenseGauge';
 import TagSpendChart from './charts/TagSpendChart';
 
 interface MainDashboardProps {
-  accounts: Account[];
+  accounts: AccountWithActivity[];
   categories: Category[];
   serverErrors: UiError[] | null;
   pennysViewPageText: Record<string, any>;

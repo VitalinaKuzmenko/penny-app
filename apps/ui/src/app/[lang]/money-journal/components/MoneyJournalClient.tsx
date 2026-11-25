@@ -6,6 +6,7 @@ import { Box, Paper, Snackbar, Stack, Typography } from '@mui/material';
 import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 import {
   Account,
+  AccountWithActivity,
   Category,
   ListTransactionsParams,
   ListTransactionsResponse,
@@ -49,7 +50,7 @@ import {
 } from './pendingChanges';
 
 interface MoneyJournalClientProps {
-  accounts: Account[];
+  accounts: AccountWithActivity[];
   categories: Category[];
   serverErrors: UiError[] | null;
   pageText: Record<string, any>;
@@ -102,8 +103,14 @@ export default function MoneyJournalClient({
   serverErrors,
   pageText,
 }: MoneyJournalClientProps) {
-  const { appliedFilters, applyFilters, isInitialized, initFilters } =
-    useMoneyJournalFilters();
+  const {
+    appliedFilters,
+    applyFilters,
+    applyWith,
+    resetFilters,
+    isInitialized,
+    initFilters,
+  } = useMoneyJournalFilters();
   const { tags, loadFailed: tagsLoadFailed, reload: reloadTags } = useTags();
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
@@ -347,6 +354,18 @@ export default function MoneyJournalClient({
         onApply={() =>
           guard(() => {
             applyFilters();
+            setPaginationModel((p) => ({ ...p, page: 0 }));
+          })
+        }
+        onApplyWith={(filters) =>
+          guard(() => {
+            applyWith(filters);
+            setPaginationModel((p) => ({ ...p, page: 0 }));
+          })
+        }
+        onReset={() =>
+          guard(() => {
+            resetFilters();
             setPaginationModel((p) => ({ ...p, page: 0 }));
           })
         }

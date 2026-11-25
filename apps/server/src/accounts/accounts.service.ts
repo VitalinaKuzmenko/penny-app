@@ -32,18 +32,21 @@ export class AccountsService {
       this.prisma.transaction.groupBy({
         by: ['accountId'],
         where: { userId, ...notDeleted },
+        _min: { date: true },
         _max: { date: true },
       }),
     ]);
 
-    const lastDateByAccount = new Map(
-      activity.map((row) => [row.accountId, row._max.date]),
+    const activityByAccount = new Map(
+      activity.map((row) => [row.accountId, row]),
     );
 
     return accounts.map(({ _count, ...account }) => ({
       ...account,
       lastTransactionDate:
-        lastDateByAccount.get(account.id)?.toISOString() ?? null,
+        activityByAccount.get(account.id)?._max.date?.toISOString() ?? null,
+      firstTransactionDate:
+        activityByAccount.get(account.id)?._min.date?.toISOString() ?? null,
       transactionCount: _count.transactions,
     }));
   }

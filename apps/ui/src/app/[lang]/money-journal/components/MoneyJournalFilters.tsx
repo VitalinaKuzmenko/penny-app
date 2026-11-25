@@ -10,26 +10,36 @@ import {
   TextField,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { Account, Category, Tag } from 'schemas';
+import { AccountWithActivity, Category, Tag } from 'schemas';
 import FilterMultiSelect from '@/components/FilterMultiSelect/FilterMultiSelect';
 import CategoryIcon from '@/components/CategoryIcon/CategoryIcon';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
+import YearPresets from '@/components/YearPresets/YearPresets';
 import {
+  MoneyJournalFilters as Filters,
   MoneyJournalTypeFilter,
   UNCATEGORISED_ID,
   UNTAGGED_ID,
   useMoneyJournalFilters,
 } from '@/providers/MoneyJournalFilterContext';
+import {
+  getPresetYears,
+  getSelectedPreset,
+  yearRange,
+} from '@/utils/yearPresets';
 
 const types: MoneyJournalTypeFilter[] = ['ALL', 'INCOME', 'EXPENSE', 'REFUND'];
 
 interface MoneyJournalFiltersProps {
-  accounts: Account[];
+  accounts: AccountWithActivity[];
   categories: Category[];
   tags: Tag[];
   pageText: Record<string, any>;
-  // Apply goes through the page so unsaved edits can be confirmed first
+  // Apply, Reset and the year presets go through the page so unsaved edits
+  // can be confirmed first
   onApply: () => void;
+  onApplyWith: (filters: Partial<Filters>) => void;
+  onReset: () => void;
 }
 
 export default function MoneyJournalFilters({
@@ -38,12 +48,15 @@ export default function MoneyJournalFilters({
   tags,
   pageText,
   onApply,
+  onApplyWith,
+  onReset,
 }: MoneyJournalFiltersProps) {
-  const { filters, appliedFilters, setFilters, resetFilters, isInitialized } =
+  const { filters, appliedFilters, setFilters, isInitialized } =
     useMoneyJournalFilters();
   const text = pageText.FILTERS;
 
   const isDirty = JSON.stringify(filters) !== JSON.stringify(appliedFilters);
+  const years = useMemo(() => getPresetYears(accounts), [accounts]);
 
   const categoryItems = useMemo(
     () => [
@@ -81,6 +94,22 @@ export default function MoneyJournalFilters({
       }}
       alignItems="center"
     >
+      <Box gridColumn="1 / -1">
+        <YearPresets
+          years={years}
+          selected={getSelectedPreset(
+            appliedFilters.startDate,
+            appliedFilters.endDate,
+          )}
+          onSelectYear={(year) => onApplyWith(yearRange(year))}
+          onSelectAllTime={() =>
+            onApplyWith({ startDate: null, endDate: null })
+          }
+          text={text.YEAR_PRESETS}
+          disabled={!isInitialized}
+        />
+      </Box>
+
       <DatePicker
         label={text.START_DATE.LABEL}
         value={filters.startDate}
@@ -167,7 +196,7 @@ export default function MoneyJournalFilters({
       <Box display="flex" gap={2}>
         <CustomButton
           variantType="secondary"
-          onClick={resetFilters}
+          onClick={onReset}
           sx={{ flex: 1 }}
         >
           {text.RESET_BUTTON}

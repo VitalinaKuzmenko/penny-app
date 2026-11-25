@@ -2,16 +2,23 @@
 'use client';
 
 import { Box } from '@mui/material';
+import { useMemo } from 'react';
 import { useDashboardFilters } from '@/providers/FilterContext';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { Account, Category } from 'schemas';
+import { AccountWithActivity, Category } from 'schemas';
 import TypeSelect from './TypeSelect';
 import AccountFilter from './AccountFilter';
 import CategoryFilter from './CategoryFilter';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
+import YearPresets from '@/components/YearPresets/YearPresets';
+import {
+  getPresetYears,
+  getSelectedPreset,
+  yearRange,
+} from '@/utils/yearPresets';
 
 interface DashboardFiltersProps {
-  accounts: Account[];
+  accounts: AccountWithActivity[];
   categories: Category[];
   pennysViewPageText: Record<string, any>;
 }
@@ -27,10 +34,12 @@ const DashboardFilters = ({
     setFilters,
     resetFilters,
     applyFilters,
+    applyWith,
     isInitialized,
   } = useDashboardFilters();
 
   const isDirty = JSON.stringify(filters) !== JSON.stringify(appliedFilters);
+  const years = useMemo(() => getPresetYears(accounts), [accounts]);
 
   return (
     <Box
@@ -44,6 +53,18 @@ const DashboardFilters = ({
         lg: 'repeat(7, 1fr)',
       }}
     >
+      <Box gridColumn="1 / -1">
+        <YearPresets
+          years={years}
+          selected={getSelectedPreset(
+            appliedFilters.startDate,
+            appliedFilters.endDate,
+          )}
+          onSelectYear={(year) => applyWith(yearRange(year))}
+          text={pennysViewPageText.FILTERS.YEAR_PRESETS}
+          disabled={!isInitialized}
+        />
+      </Box>
       {/* Start date */}
       <DatePicker
         label={pennysViewPageText.FILTERS.START_DATE.LABEL}

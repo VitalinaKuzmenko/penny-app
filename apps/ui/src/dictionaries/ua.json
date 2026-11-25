@@ -373,6 +373,10 @@
   "DASHBOARD_PAGE": {
     "TITLE": "Мій Penny",
     "FILTERS": {
+      "YEAR_PRESETS": {
+        "OLDER": "Раніше",
+        "TOOLTIP": "1 січ – 31 гру {year}"
+      },
       "START_DATE": { "LABEL": "З" },
       "END_DATE": { "LABEL": "По" },
       "TYPE_SELECT": { "LABEL": "Тип" },
@@ -442,6 +446,11 @@
     "TITLE": "Грошовий журнал",
     "SUBTITLE": "Усі транзакції в одному місці. Виправляйте назви й категорії або видаляйте помилки.",
     "FILTERS": {
+      "YEAR_PRESETS": {
+        "OLDER": "Раніше",
+        "ALL_TIME": "За весь час",
+        "TOOLTIP": "1 січ – 31 гру {year}"
+      },
       "START_DATE": {
         "LABEL": "З"
       },

@@ -3,7 +3,7 @@ import { LanguageType } from '@/utils/interfaces';
 import { getDictionary } from '@/utils/getDictionary';
 import { getAccounts } from '@/requests/getAccounts';
 import { getCategories } from '@/requests/getCategories';
-import { Account, Category } from 'schemas';
+import { AccountWithActivity, Category } from 'schemas';
 import { UiError } from '@/types/interfaces';
 import MoneyJournalClient from './components/MoneyJournalClient';
 
@@ -20,7 +20,7 @@ export default async function MoneyJournalPage({
 
   const results = await Promise.allSettled([getAccounts(), getCategories()]);
 
-  let accounts: Account[] = [];
+  let accounts: AccountWithActivity[] = [];
   let categories: Category[] = [];
 
   const errors: UiError[] = [];
@@ -29,7 +29,7 @@ export default async function MoneyJournalPage({
     if (result.status === 'fulfilled') {
       switch (index) {
         case 0:
-          accounts = result.value as Account[];
+          accounts = result.value as AccountWithActivity[];
           break;
         case 1:
           categories = result.value as Category[];
