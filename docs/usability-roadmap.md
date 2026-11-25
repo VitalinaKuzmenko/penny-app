@@ -728,6 +728,8 @@ model Category {
 
 ## Step 6: Year presets on Penny's View and the Money Journal
 
+Status: in progress (branch `feature/year-presets`). One PR.
+
 Added 2026-11-24. One-click year filters on both pages, so the usual
 question ("how did 2025 go?") doesn't need two date pickers. Small, no
 migration, and independent of Steps 4–5, so it can be done at any time.
@@ -751,6 +753,19 @@ This reverses the Step 3 decision to have no date presets.
   because its year-based charts only show one year.
 - **4** year chips on desktop/tablet, **2** on phones; see the mobile layout
   below.
+
+Agreed 2026-11-25:
+
+- The highlight follows the **applied** range, so it always matches what's
+  on screen. Editing a picker doesn't clear it until Apply.
+- Clicking the chip that is already highlighted **does nothing**.
+- **Reset applies immediately** on both pages, like a chip, and goes back
+  to the opening state: current year, everything selected, type All (other
+  Money Journal filters back to their defaults).
+  - Penny's View Reset currently clears the category and account
+    selections instead of selecting everything; it is changed to match
+    the Money Journal.
+  - Money Journal: Reset goes through the "Discard unsaved changes?" prompt.
 
 ### UI/UX
 
@@ -798,31 +813,86 @@ This reverses the Step 3 decision to have no date presets.
 - "All time" (Money Journal) clears From and To, so the request has no
   date filter, and applies straight away. The empty pickers show that no
   date limit is set.
-- A chip is highlighted when the applied range is exactly that year (or
-  empty for "All time"). Editing the pickers to anything else clears the
-  highlight, so the pickers stay the "custom range" option without an
-  extra chip.
-- Reset goes back to the current year, as today.
+- A chip is highlighted when the **applied** range is exactly that year,
+  1 Jan – 31 Dec (or empty for "All time"). Any other applied range
+  highlights nothing, so the pickers stay the "custom range" option
+  without an extra chip.
+- Clicking the highlighted chip does nothing.
+- Reset applies immediately and goes back to the opening state (see
+  Decisions), so the current year's chip is highlighted again.
 - Strings for "Older", "All time" and the chip tooltip
   ("1 Jan – 31 Dec 2025") in en, ru and ua.
 
+### Shared schemas (`packages/schemas`)
+
+- `AccountWithActivitySchema`: add
+  `firstTransactionDate: z.string().datetime().nullable()` (oldest
+  transaction on the account, deleted rows skipped).
+- Rebuild with `pnpm build:schemas` then `pnpm build:schemas-nest` before
+  type-checking the server and UI.
+
 ### Server
 
-- Years need the user's first transaction date. Add
-  `firstTransactionDate` to `GET /accounts` next to `lastTransactionDate`
-  from Step 1: the same `groupBy`, plus `_min: { date }`, skipping deleted
-  rows. No new endpoint; the UI takes the earliest date across accounts.
-- Extend `AccountWithActivitySchema` in `packages/schemas`.
+- No new endpoint. In `AccountsService.getUserAccounts` the existing
+  `groupBy` gets `_min: { date: true }` next to `_max`; it already skips
+  deleted rows (`notDeleted`). Return `firstTransactionDate` as ISO or
+  `null` for an account without transactions.
+- Update `accounts.service.spec.ts` to cover `firstTransactionDate`
+  (set, and `null` for an empty account).
 
-## Open decisions
+### UI
 
-1. Apply a chip immediately (proposed) or only fill the pickers and wait
-   for Apply, like the other filters?
-2. Show every year from the first transaction (proposed), or skip years
-   with no transactions in between?
-3. Money Journal only: also offer "All time" (useful for searching every
-   transaction by name), or keep the two pages identical?
-4. How many year chips before "Older" (proposed 4)?
+- **Year list**, a small helper in `src/utils` (e.g. `getPresetYears`):
+  - earliest `firstTransactionDate` across all accounts, year read in UTC
+    (`getUTCFullYear()`, like `formatDay`), since dates are whole UTC days;
+  - every year from that one up to the current year, newest first;
+  - no transactions (or a first year after the current one) → just the
+    current year.
+- **`YearPresets` component** (`src/components/YearPresets`):
+  - props: `years`, `selected` (`number | 'ALL' | null`),
+    `onSelectYear(year)`, optional `onSelectAllTime` (shows the "All time"
+    chip when given), and the strings;
+  - shows the first 4 years as chips (2 below `sm`, via `useMediaQuery`);
+    the rest go into the "Older ▾" chip's menu, which shows the selected
+    year (`[ 2019 ▾ ]`) and is highlighted when the selection is in there;
+  - tooltip "1 Jan – 31 Dec YYYY" on each year;
+  - a full-width row above the date pickers (`gridColumn: '1 / -1'`) in
+    both filter bars.
+- **`selected`** comes from the applied filters: a year when the applied
+  From/To are exactly 1 Jan and 31 Dec of the same year, `'ALL'` when both
+  are empty, otherwise `null`.
+- **Filter contexts** (`FilterContext`, `MoneyJournalFilterContext`):
+  - `applyFilters` copies the draft from the current render, so a chip
+    can't call `setFilters` and then `applyFilters` in the same click.
+    Add `applyWith(partial)`, which merges the partial into the draft
+    and sets both draft and applied to the result (other draft changes
+    are applied with it, as decided);
+  - `resetFilters` sets both draft and applied to the opening state.
+    `FilterContext` keeps that state from `initFilters` (as
+    `MoneyJournalFilterContext` already does) instead of `defaultFilters()`
+    with empty selections.
+- **Penny's View** (`DashboardFilters`): year chip →
+  `applyWith({ startDate: startOf year, endDate: endOf year })`; no
+  "All time". Accounts for the year list are already loaded by the page.
+- **Money Journal** (`MoneyJournalFilters` / `MoneyJournalClient`): year
+  chip, "All time" (`applyWith({ startDate: null, endDate: null })`) and
+  Reset go through `guard(...)` like Apply, so unsaved edits ask "Discard
+  unsaved changes?", and go back to page 0.
+- Strings in `en.json`, `ru.json`, `ua.json`: "Older", "All time" and the
+  tooltip template, under `DASHBOARD_PAGE.FILTERS` and
+  `MONEY_JOURNAL_PAGE.FILTERS` (there is no shared block).
+
+### Tests
+
+- Server spec only (above). The UI has no test setup, so the chips are
+  checked by hand: both pages, desktop and a 360px phone, a user with 1
+  year and with more than 4, a selected year inside "Older", Reset and
+  "All time" with unsaved Money Journal edits.
+
+### Out of scope
+
+- Date presets other than whole years (months, last 30 days).
+- Penny's View year-based charts for ranges that span two years.
 
 ## Open decisions
 
