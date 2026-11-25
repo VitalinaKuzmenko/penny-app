@@ -32,6 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
     headerText.PAGES.UPLOAD_CSV,
     headerText.PAGES.MONEY_JOURNAL,
     headerText.PAGES.PENNYS_VIEW,
+    headerText.PAGES.SETTINGS,
   ];
   const { user } = useAuth();
   const router = useRouter();

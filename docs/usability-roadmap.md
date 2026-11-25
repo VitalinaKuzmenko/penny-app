@@ -301,7 +301,7 @@ Hotels and Eating out.
 Comes right after the Transactions page (decided 2026-11-24): tags are
 assigned by selecting rows there and the event total comes from its totals
 bar, so tags are of little use before Step 3 exists. They don't need the
-Manage page, though: tags are created inline, and full tag management moves
+Settings page, though: tags are created inline, and full tag management moves
 to Step 5.
 
 Status: in progress (branch `feature/tags`).
@@ -398,7 +398,7 @@ model TransactionTag {
 
 - New `src/tags` module:
   - `GET /tags`: the user's tags, sorted by name ignoring case.
-    `PATCH/DELETE /tags/:id` come with the Manage page in Step 5.
+    `PATCH/DELETE /tags/:id` come with the Settings page in Step 5.
   - A shared helper resolves `TagRef`s inside the caller's DB transaction:
     - `{ id }` must belong to the user, otherwise 400
       `transactions.invalid_tag` / `import.invalid_tag`;
@@ -477,36 +477,254 @@ model TransactionTag {
 - Clicking a bar to open the Money Journal filtered by that tag (the
   journal has no URL params yet).
 
-## Step 5: Manage page for categories, tags and accounts
+## Step 5: Settings page for categories, tags and accounts
 
-New page, e.g. `/[lang]/manage` (or a section in `/profile`).
+A new **Settings** page (`/[lang]/settings`) for creating, renaming,
+recolouring and deleting categories, tags and accounts. Categories also get
+icons, shown across the app.
 
-### Categories
+Status: in progress (branch `feature/settings-page`). One PR.
 
-- Server currently only has `GET /categories`. Add:
-  - `POST /categories`: create (name, optional colour/icon), unique per user
-  - `PATCH /categories/:id`: rename / recolour
-  - `DELETE /categories/:id`: see open decision below
-- Charts exclude transfers by matching the category **name**
-  `'Internal Transfer'` in `charts.service.ts`, so renaming that category
-  breaks the exclusion. Either block renaming it or do the `isTransfer`
-  flag from `automation-roadmap.md` §4 first.
-- `CategoryMapping` rows reference categories, so they must be handled
-  when a category is deleted (move to the replacement or delete them).
+### Decisions (agreed 2026-11-24)
 
-### Tags
+Page:
 
-- Step 4 only adds `GET /tags`; tags are created when they're first
-  assigned (there's no `POST /tags`).
-- `PATCH /tags/:id`: rename / recolour (keep names unique per user,
-  ignoring case, as in Step 4).
-- `DELETE /tags/:id`: removes the tag from its transactions
-  (`TransactionTag` rows cascade); the transactions themselves stay.
+- Its own page, linked as the **last item in the navbar**, not a section of
+  `/profile`. `/profile` is only reachable via the avatar icon and is too
+  narrow for editable lists, and the page is used rarely, so it must be
+  easy to find.
+- Three **tabs**: Categories, Tags, Accounts. The tab is kept in the URL
+  (`/settings?tab=tags`, default `categories`), so a reload keeps it and
+  other pages can link to a tab later.
+- Every create, edit and delete **saves immediately** through a dialog or
+  confirm. There's no page-level Save: changes are rare and one at a time,
+  and a batch Save would need ordered, atomic batch endpoints (e.g. moving
+  transactions into a category that isn't saved yet, or swapping two
+  names).
+- Create/edit uses a **dialog on all three tabs**; only the fields differ:
+  categories have name, colour and icon; tags have name and colour;
+  accounts have a name only.
+- Each row shows how many transactions use it, **soft-deleted ones
+  included** (e.g. "124 transactions").
+- Names are trimmed, **unique per user ignoring case**, and checked in the
+  service as in Step 4 (the `@@unique([userId, name])` index is only the
+  exact-match backstop). Categories and accounts: 1–50 characters. Tags:
+  1–100, unchanged.
+- A name clash shows an error that **tells the user what to do**:
+  - Category: _"A category named 'Bills' already exists. To combine them,
+    delete this category and move its transactions to 'Bills'."_
+  - Tag: _"A tag named 'Spain' already exists. To combine them, filter the
+    Money Journal by this tag, add 'Spain' to those rows, then delete this
+    tag."_
+  - Account: _"An account named 'HSBC' already exists. Choose a different
+    name."_
+- Strings in `en.json`, `ru.json` and `ua.json`.
+- The empty scaffold modules `src/modules/category` and
+  `src/modules/account` (empty `/category` and `/account` controllers and
+  unused class-validator DTOs) are removed.
 
-### Accounts
+Internal Transfer:
 
-- `PATCH /accounts/:id`: rename. Show each account's last import info from
-  Step 1 here too.
+- Add **`Category.isTransfer`** (the flag part of `automation-roadmap.md`
+  §4) and replace every check of the name `'Internal Transfer'` with it, so
+  the transfer category **can be renamed** (e.g. "Переказ"). Linking the
+  two sides of a transfer was dropped (see Out of scope).
+- The transfer category **can't be deleted**; its flag can't be changed.
+  Each user has exactly one, seeded on sign-up.
+
+Categories:
+
+- Create with name, colour and icon.
+  - The colour is pre-filled with the **next palette colour not used yet**
+    (or the next in turn when all are used); the user can change it.
+  - The icon is pre-filled with the generic `category` icon, and the icon
+    grid is shown in the dialog, so picking a better one takes one click.
+- Colours come from a **preset palette** of about 18 swatches, no free
+  picker. It includes every colour of the seeded categories. Categories and
+  tags have **separate palettes**.
+- Icons: a **curated set of about 50 MUI icons** (food, home, transport,
+  shopping, health, fun, finance, people, other), stored by name in the
+  existing `icon` column, e.g. `restaurant`. It includes all icon names of
+  the seeded categories. A missing or unknown name shows the generic icon.
+- Icons are shown, tinted with the category colour, in: the Settings list,
+  the category dropdowns (import review and Money Journal, incl. the bulk
+  bar), the Money Journal category cell, the category filters (Penny's View
+  and Money Journal) and the chart legends/tooltips (category breakdown,
+  monthly category chart and table).
+- The category dialog, top to bottom:
+  - a **live preview** of the icon and name as they'll look in dropdowns
+    and the Money Journal;
+  - the name field;
+  - **colour swatches** (round, the chosen one has a ring/tick);
+  - the **icon grid, grouped** under small headings (Food, Home,
+    Transport, Shopping, Health, Fun, Finance, People, Other). Icons are
+    drawn in the chosen colour, the chosen one is highlighted, and each has
+    a **translated tooltip** with its name (e.g. "Restaurant").
+  - No icon search: about 50 grouped icons are quick to scan, and search
+    would need translated keywords.
+  - On phones (`xs`) the dialog is **full screen** to give the grid room.
+- The tag dialog has the name and the tag colour swatches; the account
+  dialog has the name only. Both use the same dialog style.
+- Order everywhere: **by name ignoring case, Internal Transfer last**.
+- `isDefault` stays in the database with its current data and meaning, but
+  no longer drives the order or any other behaviour. Any category can be
+  deleted except the transfer one, including the seeded ones.
+- Delete:
+  - **No transactions** (soft-deleted included): a simple confirm.
+  - **With transactions**: the dialog requires a **replacement category**
+    (any except itself and Internal Transfer) and offers **"Rename
+    instead"**. On confirm, every transaction (soft-deleted included) moves
+    to the replacement, then the category is deleted.
+  - Its `CategoryMapping` rows (import suggestions) **move to the
+    replacement**, so future imports suggest it.
+  - Types don't change: the deleted category is never the transfer one and
+    the replacement can't be, so `REFUND` stays `REFUND` and `EXPENSE` stays
+    `EXPENSE` (rule from Step 2).
+
+Tags:
+
+- Tags can also be **created** on the Settings page (new `POST /tags`), as
+  well as inline as in Step 4.
+- Rename and recolour (colour from the existing tag palette).
+- Delete: a confirm that says how many transactions lose the tag; the
+  `TransactionTag` links cascade and the transactions stay.
+
+Accounts:
+
+- Create (as in the import review's `CreateAccountModal`) and rename.
+- An account with **any transaction, soft-deleted included, can't be
+  deleted**: the Delete button is disabled with a tooltip suggesting a
+  rename. Soft-deleted rows are kept so re-imports skip them, so they
+  count. There's no "move transactions to another account": duplicate
+  detection is per account, so moving could create duplicates.
+- An account with no transactions is deleted after a confirm.
+- Only the transaction count is shown. Import freshness ("data up to …")
+  stays on Upload CSV and in the import account dropdown, because Settings
+  is about managing names.
+
+### Schema (needs a migration)
+
+```prisma
+model Category {
+  // ...
+  // the one category whose rows are transfers between own accounts: excluded from charts, positive rows stay INCOME
+  isTransfer Boolean @default(false) @map("is_transfer")
+}
+```
+
+- Backfill in the same migration:
+  `UPDATE "Category" SET "is_transfer" = true WHERE "name" = 'Internal Transfer';`
+- Sign-up seeding (`users.service.ts`, `DEFAULT_CATEGORIES`) sets
+  `isTransfer: true` on the transfer category.
+- Deploy in the usual order: back up, run `prisma migrate deploy` with the
+  **prod** `DATABASE_URL` set explicitly, verify with `migrate status`, then
+  deploy the server and the UI. Check on prod that every user has exactly
+  one `is_transfer` category.
+
+### Shared schemas (`packages/schemas`, DTOs in `schemas-nest`)
+
+- `CATEGORY_PALETTE` and `CATEGORY_ICONS` (the curated names) as constants,
+  used by the server for validation and by the UI for the pickers.
+  `TAG_PALETTE` moves here from `tags.service.ts`.
+- `CategorySchema`: add `isTransfer` and `transactionCount`.
+- `CategoryNameSchema` (trimmed, 1–50), `CreateCategorySchema`
+  (`name`, `color` in the palette, `icon` in the set) and
+  `UpdateCategorySchema` (any of them).
+- `DeleteCategoryQuerySchema`: `replacementCategoryId?`.
+- `TagSchema`: add `transactionCount`. `CreateTagSchema` and
+  `UpdateTagSchema` (`name`, `color` in the tag palette).
+- `AccountWithActivitySchema`: add `transactionCount`.
+  `UpdateAccountSchema` reuses the account name rule.
+
+### Server
+
+- Categories (`src/categories`):
+  - `GET /categories`: adds `isTransfer` and `transactionCount` (a
+    `groupBy` on `categoryId`, soft-deleted included); sorted in code by
+    name ignoring case, transfer last.
+  - `POST /categories`, `PATCH /categories/:id`: name clash ignoring case
+    → 400 `category.already_exists` with the existing name in `meta`.
+  - `DELETE /categories/:id?replacementCategoryId=`: one DB transaction:
+    - transfer category → 400 `category.cannot_delete_transfer`;
+    - has transactions and no replacement → 400
+      `category.replacement_required`;
+    - replacement is itself, the transfer category or not the user's →
+      400 `category.invalid_replacement`;
+    - otherwise `updateMany` transactions (soft-deleted included) and
+      `CategoryMapping` to the replacement, then delete.
+  - Unknown or foreign IDs → 404 `category.not_found`.
+- Transfer flag: `resolveTransactionType` takes `{ isTransfer }` instead of
+  the name; `excludeInternalTransfers` in `charts.service.ts` filters on
+  `isTransfer: false`. `TRANSFER_CATEGORY_NAME` stays only as the seeded
+  name.
+- Tags (`src/tags`): `GET /tags` adds `transactionCount`; `POST /tags`,
+  `PATCH /tags/:id` (clash → 400 `tag.already_exists`),
+  `DELETE /tags/:id`; foreign IDs → 404 `tag.not_found`.
+- Accounts (`src/accounts`): `GET /accounts` adds `transactionCount` (same
+  `groupBy`, but counting soft-deleted rows too); `POST /accounts` and
+  `PATCH /accounts/:id` check clashes ignoring case
+  (`account.already_exists`); `DELETE /accounts/:id` → 400
+  `account.has_transactions` when any transaction exists (soft-deleted
+  included); foreign IDs → 404 `account.not_found`.
+- Remove `src/modules/category` and `src/modules/account` and their
+  registration in `app.module.ts`.
+- Tests:
+  - categories: create/rename clash ignoring case, transfer rename allowed,
+    transfer delete blocked, replacement required / invalid (itself,
+    transfer, foreign), moves soft-deleted rows and mappings, order;
+  - transfer flag: `resolveTransactionType` and chart exclusion use the
+    flag, so a renamed transfer category is still excluded;
+  - tags: create, rename clash, recolour, delete cascades links only;
+  - accounts: create/rename clash ignoring case, delete blocked by a
+    soft-deleted row, delete of an empty account.
+
+### UI
+
+- `src/app/[lang]/settings`: server page (dictionary) and a client section
+  with MUI `Tabs` synced to `?tab=`. Signed-out users get the same
+  treatment as the other signed-in pages.
+- Navbar: "Settings" as the last item (desktop bar and mobile menu).
+- Shared components in `src/components`:
+  - `CategoryIcon` (name, colour, size; generic fallback) and a
+    `CATEGORY_ICON_COMPONENTS` map from every curated name to its MUI
+    component, typed so a missing name fails the type-check (the groups
+    come from `CATEGORY_ICON_GROUPS` in `packages/schemas`);
+  - `CategoryLabel` (icon + name) for dropdowns and table headers;
+  - `CategoryChartLegend` / `CategoryChartTooltip` for the recharts
+    legends and tooltips;
+  - `ColourSwatchPicker` (used with the category or tag palette);
+  - `CategoryIconPicker` (grouped grid with tooltips).
+- Strings for the icon names and group headings in en, ru and ua.
+- Settings tabs: a list with colour dot or icon, name, transaction count
+  and edit/delete buttons, plus an "Add …" button. Dialogs:
+  `CategoryDialog`, `TagDialog`, `AccountDialog`, `DeleteCategoryDialog`
+  (replacement select + "Rename instead"), and confirms for tags and
+  accounts. The transfer category has no Delete button (tooltip explains
+  why). After each change the tab reloads its list.
+- Request functions in `src/requests/settings` (`listCategories`,
+  `createCategory`, `updateCategory`, `deleteCategory`,
+  `listTagsWithCounts`, `createTag`, `updateTag`, `deleteTag`,
+  `listAccounts`, `renameAccount`, `deleteAccount`) use `clientApiFetch`,
+  so each tab reloads its list after a change. Creating an account reuses
+  `createAccount`.
+- Replace the name checks with `isTransfer` in `transactionType.ts`,
+  `chartCategoryIds.ts`, `CategoryCellSelect.tsx` and the hard-coded
+  string in `CategoryFilter.tsx`.
+- Add `CategoryIcon` to the places listed in the decisions.
+- Error messages for all the new error codes.
+
+### Out of scope
+
+- Linking the two sides of a transfer (`automation-roadmap.md` §4):
+  dropped on 2026-11-24. All accounts are imported, so a transfer with no
+  partner is normal (untracked account, not imported yet) and needs no
+  action, and linking would be extra effort only to double-check the data.
+  The `isTransfer` flag is enough.
+- Moving transactions between accounts, merging accounts.
+- Merging tags or categories by renaming (delete + move covers
+  categories).
+- An Income category (income stays uncategorised, as decided in Step 2).
+- Custom ordering of categories.
 
 ## Step 6: Year presets on Penny's View and the Money Journal
 
@@ -609,8 +827,10 @@ This reverses the Step 3 decision to have no date presets.
 ## Open decisions
 
 1. Order: start with Step 1 (smallest, no migration)?
-2. Deleting a category that still has transactions: move them to a
-   category the user chooses, or block the delete?
+2. ~~Deleting a category that still has transactions: move them to a
+   category the user chooses, or block the delete?~~ The user chooses a
+   replacement and the transactions move there (Step 5, decided
+   2026-11-24).
 3. ~~Assign tags during import as well, or only on the Transactions page to
    begin with?~~ Both, in Step 4 (decided 2026-11-24).
 4. ~~i18n: add new strings to all of `en.json`, `ru.json`, `ua.json`, or

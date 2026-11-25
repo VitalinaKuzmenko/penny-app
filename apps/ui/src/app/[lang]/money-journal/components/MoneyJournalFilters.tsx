@@ -12,6 +12,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Account, Category, Tag } from 'schemas';
 import FilterMultiSelect from '@/components/FilterMultiSelect/FilterMultiSelect';
+import CategoryIcon from '@/components/CategoryIcon/CategoryIcon';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import {
   MoneyJournalTypeFilter,
@@ -46,7 +47,11 @@ export default function MoneyJournalFilters({
 
   const categoryItems = useMemo(
     () => [
-      ...categories.map((c) => ({ id: c.id, label: c.name })),
+      ...categories.map((c) => ({
+        id: c.id,
+        label: c.name,
+        icon: <CategoryIcon icon={c.icon} color={c.color} />,
+      })),
       { id: UNCATEGORISED_ID, label: text.CATEGORY_FILTER.UNCATEGORISED },
     ],
     [categories, text],

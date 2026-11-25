@@ -26,6 +26,10 @@ export * from './currency/getCurrenciesResponse.schema';
 
 // CATEGORY
 export * from './category/category.schema';
+export * from './category/category-icons';
+
+// SETTINGS
+export * from './settings/palettes';
 
 // TAGS
 export * from './tags/tag.schema';

@@ -1,8 +1,9 @@
 import { resolveTransactionType } from './transaction-type';
 
 describe('resolveTransactionType', () => {
-  const clothes = { name: 'Clothes, cosmetics' };
-  const transfer = { name: 'Internal Transfer' };
+  const clothes = { isTransfer: false };
+  // recognised by the flag, so a renamed transfer category still counts
+  const transfer = { isTransfer: true };
 
   it.each([
     [-100, clothes, 'EXPENSE'],

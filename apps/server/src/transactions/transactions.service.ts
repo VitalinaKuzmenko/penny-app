@@ -120,7 +120,7 @@ export class TransactionsService {
     const categories = categoryIds.length
       ? await this.prisma.category.findMany({
           where: { userId, id: { in: categoryIds } },
-          select: { id: true, name: true },
+          select: { id: true, isTransfer: true },
         })
       : [];
     const categoryById = new Map(categories.map((c) => [c.id, c]));

@@ -1,9 +1,10 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { TAG_PALETTE } from 'schemas';
 
 import { PrismaService } from '../prisma/prisma.service';
 
-import { TAG_PALETTE, TagsService } from './tags.service';
+import { TagsService } from './tags.service';
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 const SPAIN_ID = '88888888-8888-4888-8888-888888888881';
@@ -24,26 +25,47 @@ function createTxMock(existing: { id: string; name: string }[]) {
 
 describe('TagsService', () => {
   let service: TagsService;
-  const prisma = { tag: { findMany: jest.fn() } };
+  const prisma = {
+    tag: {
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    $transaction: jest.fn(),
+  };
 
   beforeEach(async () => {
     jest.resetAllMocks();
+    prisma.$transaction.mockImplementation(
+      async (fn: (tx: typeof prisma) => unknown) => fn(prisma),
+    );
     const module = await Test.createTestingModule({
       providers: [TagsService, { provide: PrismaService, useValue: prisma }],
     }).compile();
     service = module.get(TagsService);
   });
 
-  it('lists the user’s tags sorted by name ignoring case', async () => {
+  it('lists the user’s tags sorted by name ignoring case, with counts', async () => {
     prisma.tag.findMany.mockResolvedValue([
-      { id: '1', name: 'work', color: null },
-      { id: '2', name: 'Spain trip', color: '#1E88E5' },
-      { id: '3', name: 'birthday', color: null },
+      { id: '1', name: 'work', color: null, _count: { transactions: 0 } },
+      {
+        id: '2',
+        name: 'Spain trip',
+        color: '#1E88E5',
+        _count: { transactions: 4 },
+      },
+      { id: '3', name: 'birthday', color: null, _count: { transactions: 1 } },
     ]);
 
     const tags = await service.getUserTags(USER_ID);
 
-    expect(tags.map((t) => t.name)).toEqual(['birthday', 'Spain trip', 'work']);
+    expect(tags.map((t) => [t.name, t.transactionCount])).toEqual([
+      ['birthday', 1],
+      ['Spain trip', 4],
+      ['work', 0],
+    ]);
     expect(prisma.tag.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { userId: USER_ID } }),
     );
@@ -105,6 +127,81 @@ describe('TagsService', () => {
         expect.objectContaining({ where: { userId: USER_ID } }),
       );
       expect(tx.tag.createManyAndReturn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('managing tags', () => {
+    const SPAIN = { id: SPAIN_ID, name: 'Spain' };
+
+    it('rejects creating a name that exists ignoring case', async () => {
+      prisma.tag.findMany.mockResolvedValue([SPAIN]);
+
+      await expect(
+        service.createTag(USER_ID, { name: 'SPAIN', color: TAG_PALETTE[0] }),
+      ).rejects.toMatchObject({
+        response: { code: 'tag.already_exists', meta: { name: 'Spain' } },
+      });
+      expect(prisma.tag.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { userId: USER_ID } }),
+      );
+      expect(prisma.tag.create).not.toHaveBeenCalled();
+    });
+
+    it('treats _ and % as plain characters, not wildcards', async () => {
+      prisma.tag.findMany.mockResolvedValue([{ id: 'x', name: 'trip 2026' }]);
+      prisma.tag.create.mockResolvedValue({
+        id: 'new',
+        name: 'trip_2026',
+        color: TAG_PALETTE[0],
+        _count: { transactions: 0 },
+      });
+
+      await service.createTag(USER_ID, {
+        name: 'trip_2026',
+        color: TAG_PALETTE[0],
+      });
+
+      expect(prisma.tag.create).toHaveBeenCalled();
+    });
+
+    it('renames a tag, checking clashes against the other tags only', async () => {
+      prisma.tag.findFirst.mockResolvedValue(SPAIN); // owned
+      // only the tag itself has the name, ignoring case
+      prisma.tag.findMany.mockResolvedValue([{ ...SPAIN, name: 'spain 2026' }]);
+      prisma.tag.update.mockResolvedValue({
+        ...SPAIN,
+        name: 'Spain 2026',
+        color: null,
+        _count: { transactions: 3 },
+      });
+
+      const tag = await service.updateTag(USER_ID, SPAIN_ID, {
+        name: 'Spain 2026',
+      });
+
+      expect(tag).toEqual({
+        id: SPAIN_ID,
+        name: 'Spain 2026',
+        color: null,
+        transactionCount: 3,
+      });
+      expect(prisma.tag.update).toHaveBeenCalled();
+    });
+
+    it('deletes only the user’s own tag', async () => {
+      prisma.tag.findFirst.mockResolvedValue(null);
+
+      await expect(
+        service.deleteTag(USER_ID, FOREIGN_TAG_ID),
+      ).rejects.toBeInstanceOf(NotFoundException);
+      expect(prisma.tag.delete).not.toHaveBeenCalled();
+
+      prisma.tag.findFirst.mockResolvedValue(SPAIN);
+      await service.deleteTag(USER_ID, SPAIN_ID);
+      // TransactionTag links cascade in the DB; transactions are untouched
+      expect(prisma.tag.delete).toHaveBeenCalledWith({
+        where: { id: SPAIN_ID },
+      });
     });
   });
 });

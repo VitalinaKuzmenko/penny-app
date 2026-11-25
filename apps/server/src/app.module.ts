@@ -13,8 +13,6 @@ import { CategoriesModule } from './categories/categories.module';
 import { ChartsModule } from './charts/charts.module';
 import { CurrenciesModule } from './currencies/currencies.module';
 import { ImportModule } from './import/import.module';
-import { AccountModule } from './modules/account/account.module';
-import { CategoryModule } from './modules/category/category.module';
 import { UserModule } from './modules/user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TagsModule } from './tags/tags.module';
@@ -30,8 +28,6 @@ import { TraceMiddleware } from './utils/logger/trace.middleware';
     PrismaModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     UserModule,
-    AccountModule,
-    CategoryModule,
     AuthModule,
     UsersModule,
     ConfigModule.forRoot({

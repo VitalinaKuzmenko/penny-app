@@ -9,7 +9,7 @@ import {
   Select,
 } from '@mui/material';
 import { Category } from 'schemas';
-import { TRANSFER_CATEGORY_NAME } from '@/utils/transactionType';
+import CategoryLabel from '@/components/CategoryLabel/CategoryLabel';
 
 interface CategoryCellSelectProps {
   // money in offers income / transfer / "refund for…"; money out offers plain categories
@@ -40,9 +40,7 @@ export default function CategoryCellSelect({
   displayEmpty = false,
   disabled = false,
 }: CategoryCellSelectProps) {
-  const transferCategory = categories.find(
-    (cat) => cat.name === TRANSFER_CATEGORY_NAME,
-  );
+  const transferCategory = categories.find((cat) => cat.isTransfer);
   const isRefund =
     isMoneyIn && Boolean(value) && value !== transferCategory?.id;
 
@@ -55,7 +53,7 @@ export default function CategoryCellSelect({
         ...(transferCategory
           ? [
               <MenuItem key={transferCategory.id} value={transferCategory.id}>
-                {transferCategory.name}
+                <CategoryLabel category={transferCategory} />
               </MenuItem>,
             ]
           : []),
@@ -66,7 +64,7 @@ export default function CategoryCellSelect({
           .filter((cat) => cat.id !== transferCategory?.id)
           .map((cat) => (
             <MenuItem key={cat.id} value={cat.id}>
-              {cat.name}
+              <CategoryLabel category={cat} />
             </MenuItem>
           )),
       ]
@@ -80,7 +78,7 @@ export default function CategoryCellSelect({
           : []),
         ...categories.map((cat) => (
           <MenuItem key={cat.id} value={cat.id}>
-            {cat.name}
+            <CategoryLabel category={cat} />
           </MenuItem>
         )),
       ];

@@ -127,7 +127,7 @@ penny-monorepo/
 ```
 User
   ├── accounts[]        → Account (name, unique per user)
-  ├── categories[]      → Category (name, icon, color, isDefault)
+  ├── categories[]      → Category (name, icon, color, isDefault, isTransfer)
   └── transactions[]    → Transaction (amount, currency, type, date, accountId, categoryId?)
 
 TransactionImport       ← staging table for CSV import
@@ -459,7 +459,9 @@ There is no endpoint to create, edit, or delete individual transactions except v
 
 ---
 
-### 8.7 `Internal Transfer` exclusion is by name (fragile)
+### 8.7 `Internal Transfer` exclusion is by name (fragile) ✅ FIXED
+
+> Fixed in Step 5 of `docs/usability-roadmap.md`: `Category.isTransfer` replaces every name check, so the transfer category can be renamed.
 
 ```typescript
 const EXCLUDED_CATEGORY_NAME = 'Internal Transfer';
@@ -544,7 +546,9 @@ Unhandled Prisma errors (beyond `P2002`) will produce 500 responses that may inc
 
 ---
 
-### 8.14 No account/category delete endpoints
+### 8.14 No account/category delete endpoints ✅ FIXED
+
+> Fixed in Step 5 of `docs/usability-roadmap.md` (Settings page): a category with transactions is deleted by moving them to a replacement; an account can only be deleted while it has no transactions.
 
 Users can create accounts and categories but cannot delete them. This will become a pain point as users accumulate test data.
 

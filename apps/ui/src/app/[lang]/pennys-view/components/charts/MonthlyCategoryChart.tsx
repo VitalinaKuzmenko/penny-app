@@ -19,9 +19,13 @@ import { ApiError } from '@/utils/clientApiFetch';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
-import { formatCurrency } from '@/utils/formatCurrency';
 import { Category, MonthlyCategoryResponse } from 'schemas';
 import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
+import {
+  CategoryChartLegend,
+  CategoryChartTooltip,
+  ChartCategoryItem,
+} from '@/components/CategoryChartLegend/CategoryChartLegend';
 interface MonthlyCategoryChartProps {
   categories: Category[];
   pennysViewPageText: Record<string, any>;
@@ -99,6 +103,14 @@ export default function MonthlyCategoryChart({
     return row;
   });
 
+  const legendItems: ChartCategoryItem[] = data.datasets.map((ds: any) => ({
+    id: ds.categoryId,
+    name: ds.categoryName,
+    color: categoryColorMap[ds.categoryId] || '#ccc',
+  }));
+  // bars are keyed by category name
+  const legendItemByName = new Map(legendItems.map((i) => [i.name, i]));
+
   return (
     <Box sx={{ width: '100%', mt: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -126,8 +138,23 @@ export default function MonthlyCategoryChart({
           <BarChart data={chartData}>
             <XAxis dataKey="month" />
             <YAxis />
-            <Tooltip formatter={(value) => formatCurrency(value)} />
-            <Legend />
+            <Tooltip
+              content={(props) => (
+                <CategoryChartTooltip
+                  {...props}
+                  categories={categories}
+                  itemFor={(entry) => legendItemByName.get(entry.dataKey)}
+                />
+              )}
+            />
+            <Legend
+              content={() => (
+                <CategoryChartLegend
+                  items={legendItems}
+                  categories={categories}
+                />
+              )}
+            />
 
             {data.datasets.map((ds: any) => (
               <Bar

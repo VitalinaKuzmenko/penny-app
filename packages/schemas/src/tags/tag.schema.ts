@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { TAG_PALETTE } from '../settings/palettes';
+
 export const TAG_NAME_MAX_LENGTH = 100;
 
 export const TagNameSchema = z.string().trim().min(1).max(TAG_NAME_MAX_LENGTH);
@@ -28,5 +30,23 @@ export const TagRefsSchema = z.array(TagRefSchema).refine(
   { message: 'Each tag may appear only once' },
 );
 
+// GET /tags: each tag with the number of transactions using it (soft-deleted included)
+export const TagWithCountSchema = TagSchema.extend({
+  transactionCount: z.number().int(),
+});
+
+export const CreateTagSchema = z.object({
+  name: TagNameSchema,
+  color: z.enum(TAG_PALETTE),
+});
+
+export const UpdateTagSchema = CreateTagSchema.partial().refine(
+  (body) => Object.keys(body).length > 0,
+  { message: 'Nothing to update' },
+);
+
 export type Tag = z.infer<typeof TagSchema>;
+export type TagWithCount = z.infer<typeof TagWithCountSchema>;
+export type CreateTagInput = z.infer<typeof CreateTagSchema>;
+export type UpdateTagInput = z.infer<typeof UpdateTagSchema>;
 export type TagRef = z.infer<typeof TagRefSchema>;

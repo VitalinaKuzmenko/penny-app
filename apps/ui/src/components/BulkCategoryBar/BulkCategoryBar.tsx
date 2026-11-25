@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { Category } from 'schemas';
+import CategoryLabel from '@/components/CategoryLabel/CategoryLabel';
 import {
   bulkButtonSx,
   bulkButtonsSx,
@@ -68,7 +69,7 @@ export default function BulkCategoryBar({
                 },
               }}
             >
-              {cat.name}
+              <CategoryLabel category={cat} />
             </MenuItem>
           ))}
         </Select>

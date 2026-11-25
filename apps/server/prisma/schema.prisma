@@ -75,6 +75,8 @@ model Category {
   icon      String?
   color     String?
   isDefault Boolean     @default(false) @map("is_default")
+  // the one category per user for moves between own accounts: excluded from charts, positive rows stay INCOME
+  isTransfer Boolean    @default(false) @map("is_transfer")
   createdAt DateTime    @default(now()) @map("created_at")
   updatedAt DateTime    @updatedAt @map("updated_at")
   userId    String      @map("user_id")

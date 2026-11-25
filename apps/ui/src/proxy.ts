@@ -10,6 +10,7 @@ const protectedPaths = [
   '/money-journal',
   '/pennys-view',
   '/import',
+  '/settings',
 ];
 
 export const getLocale = (request: Request) => {

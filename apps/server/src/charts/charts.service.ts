@@ -14,7 +14,6 @@ import {
   TagSpendQueryDto,
 } from 'schemas-nest';
 
-import { TRANSFER_CATEGORY_NAME } from '../categories/default-categories';
 import { TransactionType } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { notDeleted } from '../utils/not-deleted';
@@ -67,9 +66,7 @@ const excludeInternalTransfers = {
     },
     {
       category: {
-        name: {
-          not: TRANSFER_CATEGORY_NAME,
-        },
+        isTransfer: false,
       },
     },
   ],
