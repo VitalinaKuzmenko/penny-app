@@ -1,6 +1,11 @@
 html,
 body {
   max-width: 100vw;
+}
+
+/* Only on body: then the page scroll follows body's overflow, so MUI dialogs
+   can lock it. On html, html itself scrolls and the lock has no effect. */
+body {
   overflow-x: hidden;
 }
 
