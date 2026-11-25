@@ -15,11 +15,15 @@ import { useDashboardFilters } from '@/providers/FilterContext';
 import { getCategoryBreakdown } from '@/requests/charts/getCategoryBreakdown';
 import { ApiError } from '@/utils/clientApiFetch';
 import { Category, CategoryBreakdownResponse } from 'schemas';
-import { formatCurrency } from '@/utils/formatCurrency';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
+import {
+  CategoryChartLegend,
+  CategoryChartTooltip,
+  ChartCategoryItem,
+} from '@/components/CategoryChartLegend/CategoryChartLegend';
 
 interface CategoryBreakdownChartProps {
   categories: Category[];
@@ -95,6 +99,13 @@ export default function CategoryBreakdownChart({
       percentage: c.percentage,
     }));
 
+  const legendItems: ChartCategoryItem[] = chartData.map((c) => ({
+    id: c.categoryId,
+    name: c.name,
+    color: categoryColorMap[c.categoryId] || '#ccc',
+  }));
+  const legendItemById = new Map(legendItems.map((i) => [i.id, i]));
+
   return (
     <Box sx={{ width: '100%', mt: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -161,9 +172,26 @@ export default function CategoryBreakdownChart({
               ))}
             </Pie>
 
-            <Tooltip formatter={(value) => formatCurrency(value)} />
+            <Tooltip
+              content={(props) => (
+                <CategoryChartTooltip
+                  {...props}
+                  categories={categories}
+                  itemFor={(entry) =>
+                    legendItemById.get(entry.payload?.categoryId)
+                  }
+                />
+              )}
+            />
 
-            <Legend />
+            <Legend
+              content={() => (
+                <CategoryChartLegend
+                  items={legendItems}
+                  categories={categories}
+                />
+              )}
+            />
           </PieChart>
         </ResponsiveContainer>
       </Box>

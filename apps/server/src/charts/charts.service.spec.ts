@@ -356,7 +356,7 @@ describe('ChartsService — refunds', () => {
           },
         }),
       });
-      expect(JSON.stringify(where)).toContain('Internal Transfer');
+      expect(JSON.stringify(where)).toContain('"isTransfer":false');
     });
   });
 });

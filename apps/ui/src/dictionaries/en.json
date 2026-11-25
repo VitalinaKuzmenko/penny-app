@@ -14,6 +14,7 @@
         "NAME": "Penny's View",
         "URL": "/pennys-view"
       },
+      "SETTINGS": { "NAME": "Settings", "URL": "/settings" },
       "SIGN_IN": {
         "NAME": "Sign In",
         "URL": "/signin"
@@ -594,6 +595,150 @@
       "NO_OPTIONS": "No tags yet. Type a name to create one.",
       "ADD_BUTTON": "Add tags",
       "REMOVE_BUTTON": "Remove tags"
+    }
+  },
+  "SETTINGS_PAGE": {
+    "TITLE": "Settings",
+    "TABS": {
+      "CATEGORIES": "Categories",
+      "TAGS": "Tags",
+      "ACCOUNTS": "Accounts"
+    },
+    "COMMON": {
+      "CANCEL": "Cancel",
+      "SAVE": "Save",
+      "CREATE": "Create",
+      "DELETE": "Delete",
+      "EDIT": "Edit",
+      "NAME_LABEL": "Name",
+      "COLOUR_LABEL": "Colour",
+      "ICON_LABEL": "Icon",
+      "PREVIEW_LABEL": "Preview",
+      "TRANSACTION_COUNT": "{count} transaction(s)",
+      "NAME_REQUIRED": "Enter a name",
+      "GENERIC_ERROR": "Something went wrong. Please try again.",
+      "LOAD_ERROR": {
+        "TITLE": "Failed to load",
+        "MESSAGE": "Could not load this list. Please try refreshing the page."
+      }
+    },
+    "CATEGORIES": {
+      "ADD": "Add category",
+      "EMPTY": "No categories yet.",
+      "CREATE_TITLE": "Add category",
+      "EDIT_TITLE": "Edit category",
+      "NAME_PLACEHOLDER": "Category name",
+      "TRANSFER_HINT": "Moves between your own accounts. Kept out of the charts, so it can't be deleted.",
+      "ALREADY_EXISTS": "A category named “{name}” already exists. To combine them, delete this category and move its transactions to “{name}”.",
+      "DELETE_DIALOG": {
+        "TITLE": "Delete “{name}”?",
+        "MESSAGE_EMPTY": "No transactions use this category. It will be deleted.",
+        "MESSAGE_WITH_TRANSACTIONS": "{count} transaction(s) use this category, deleted ones included. Choose a category to move them to, or rename this one instead.",
+        "REPLACEMENT_LABEL": "Move transactions to",
+        "NO_REPLACEMENT": "There is no other category to move them to. Add one first, or rename this category instead.",
+        "RENAME_INSTEAD": "Rename instead",
+        "MOVE_AND_DELETE": "Move and delete",
+        "CHANGED": "This category's transactions changed. Please check and try again."
+      }
+    },
+    "TAGS": {
+      "ADD": "Add tag",
+      "EMPTY": "No tags yet. Create one here or add tags to transactions in the Money Journal.",
+      "CREATE_TITLE": "Add tag",
+      "EDIT_TITLE": "Edit tag",
+      "NAME_PLACEHOLDER": "Tag name",
+      "ALREADY_EXISTS": "A tag named “{name}” already exists. To combine them, filter the Money Journal by this tag, add “{name}” to those rows, then delete this tag.",
+      "DELETE_DIALOG": {
+        "TITLE": "Delete “{name}”?",
+        "MESSAGE_EMPTY": "No transactions use this tag. It will be deleted.",
+        "MESSAGE_WITH_TRANSACTIONS": "The tag will be removed from {count} transaction(s). The transactions themselves stay."
+      }
+    },
+    "ACCOUNTS": {
+      "ADD": "Add account",
+      "EMPTY": "No accounts yet.",
+      "CREATE_TITLE": "Add account",
+      "EDIT_TITLE": "Rename account",
+      "NAME_PLACEHOLDER": "Account name",
+      "ALREADY_EXISTS": "An account named “{name}” already exists. Choose a different name.",
+      "CANT_DELETE": "This account has transactions (deleted ones included), so it can't be deleted. You can rename it instead.",
+      "DELETE_DIALOG": {
+        "TITLE": "Delete “{name}”?",
+        "MESSAGE": "This account has no transactions. It will be deleted."
+      }
+    },
+    "ICONS": {
+      "GROUPS": {
+        "food": "Food",
+        "home": "Home",
+        "transport": "Transport",
+        "shopping": "Shopping",
+        "health": "Health",
+        "fun": "Fun",
+        "finance": "Finance",
+        "people": "People",
+        "other": "Other"
+      },
+      "NAMES": {
+        "restaurant": "Restaurant",
+        "local_grocery_store": "Groceries",
+        "local_cafe": "Café",
+        "fastfood": "Fast food",
+        "local_pizza": "Pizza",
+        "bakery_dining": "Bakery",
+        "local_bar": "Bar",
+        "home": "Home",
+        "bolt": "Electricity",
+        "water_drop": "Water",
+        "wifi": "Internet",
+        "chair": "Furniture",
+        "cleaning_services": "Cleaning",
+        "local_laundry_service": "Laundry",
+        "build": "Repairs",
+        "directions_bus": "Bus",
+        "directions_car": "Car",
+        "local_gas_station": "Fuel",
+        "train": "Train",
+        "flight": "Flights",
+        "local_taxi": "Taxi",
+        "pedal_bike": "Bike",
+        "local_parking": "Parking",
+        "shopping_bag": "Shopping",
+        "checkroom": "Clothes",
+        "spa": "Beauty",
+        "devices": "Electronics",
+        "phone_iphone": "Phone",
+        "card_giftcard": "Gifts",
+        "medical_services": "Medical",
+        "local_pharmacy": "Pharmacy",
+        "fitness_center": "Gym",
+        "favorite": "Health",
+        "sports_esports": "Games",
+        "movie": "Cinema",
+        "music_note": "Music",
+        "menu_book": "Books",
+        "sports_soccer": "Sport",
+        "beach_access": "Holidays",
+        "hotel": "Hotels",
+        "celebration": "Parties",
+        "receipt": "Bills",
+        "payments": "Payments",
+        "credit_card": "Credit card",
+        "account_balance": "Bank",
+        "savings": "Savings",
+        "request_quote": "Taxes",
+        "subscriptions": "Subscriptions",
+        "swap_horiz": "Transfers",
+        "family_restroom": "Family",
+        "child_care": "Kids",
+        "school": "Education",
+        "work": "Work",
+        "pets": "Pets",
+        "volunteer_activism": "Charity",
+        "category": "General",
+        "star": "Favourite",
+        "more_horiz": "Other"
+      }
     }
   }
 }

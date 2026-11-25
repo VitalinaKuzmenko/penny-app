@@ -13,6 +13,7 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import { UiError } from '@/types/interfaces';
 import { ApiError } from '@/utils/clientApiFetch';
 import { Category, MonthlyCategoryResponse } from 'schemas';
+import CategoryLabel from '@/components/CategoryLabel/CategoryLabel';
 import { hexToRgba } from '@/utils/hexToRgba';
 import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
 
@@ -95,9 +96,24 @@ export default function MonthlyCategoryTable({
     return row;
   });
 
+  const categoryById = new Map(categories.map((c) => [c.id, c]));
+
   const categoryCols: GridColDef[] = data.datasets.map((ds: any) => ({
     field: ds.categoryName,
     headerName: ds.categoryName,
+    renderHeader: () => {
+      const category = categoryById.get(ds.categoryId);
+      return category ? (
+        <Box
+          component="span"
+          sx={{ fontWeight: 'bold', display: 'inline-flex', minWidth: 0 }}
+        >
+          <CategoryLabel category={category} />
+        </Box>
+      ) : (
+        <strong>{ds.categoryName}</strong>
+      );
+    },
     width: 120,
     valueFormatter: ((value) =>
       formatCurrency(value ?? 0)) as GridValueFormatter,

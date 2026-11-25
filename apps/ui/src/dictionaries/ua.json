@@ -14,6 +14,7 @@
         "NAME": "Мій Penny",
         "URL": "/pennys-view"
       },
+      "SETTINGS": { "NAME": "Налаштування", "URL": "/settings" },
       "SIGN_IN": {
         "NAME": "Увійти",
         "URL": "/signin"
@@ -578,6 +579,150 @@
       "NO_OPTIONS": "Тегів поки немає. Введіть назву, щоб створити.",
       "ADD_BUTTON": "Додати теги",
       "REMOVE_BUTTON": "Прибрати теги"
+    }
+  },
+  "SETTINGS_PAGE": {
+    "TITLE": "Налаштування",
+    "TABS": {
+      "CATEGORIES": "Категорії",
+      "TAGS": "Теги",
+      "ACCOUNTS": "Рахунки"
+    },
+    "COMMON": {
+      "CANCEL": "Скасувати",
+      "SAVE": "Зберегти",
+      "CREATE": "Створити",
+      "DELETE": "Видалити",
+      "EDIT": "Змінити",
+      "NAME_LABEL": "Назва",
+      "COLOUR_LABEL": "Колір",
+      "ICON_LABEL": "Іконка",
+      "PREVIEW_LABEL": "Попередній перегляд",
+      "TRANSACTION_COUNT": "Транзакцій: {count}",
+      "NAME_REQUIRED": "Введіть назву",
+      "GENERIC_ERROR": "Щось пішло не так. Спробуйте ще раз.",
+      "LOAD_ERROR": {
+        "TITLE": "Не вдалося завантажити",
+        "MESSAGE": "Не вдалося завантажити список. Спробуйте оновити сторінку."
+      }
+    },
+    "CATEGORIES": {
+      "ADD": "Додати категорію",
+      "EMPTY": "Категорій поки немає.",
+      "CREATE_TITLE": "Нова категорія",
+      "EDIT_TITLE": "Змінити категорію",
+      "NAME_PLACEHOLDER": "Назва категорії",
+      "TRANSFER_HINT": "Перекази між вашими рахунками. Не враховуються в графіках, тому цю категорію не можна видалити.",
+      "ALREADY_EXISTS": "Категорія «{name}» вже існує. Щоб обʼєднати їх, видаліть цю категорію та перенесіть її транзакції до «{name}».",
+      "DELETE_DIALOG": {
+        "TITLE": "Видалити «{name}»?",
+        "MESSAGE_EMPTY": "У цій категорії немає транзакцій. Її буде видалено.",
+        "MESSAGE_WITH_TRANSACTIONS": "Транзакцій у цій категорії (включно з видаленими): {count}. Оберіть, куди їх перенести, або просто перейменуйте категорію.",
+        "REPLACEMENT_LABEL": "Перенести транзакції до",
+        "NO_REPLACEMENT": "Немає іншої категорії, куди їх можна перенести. Спершу додайте її або перейменуйте цю категорію.",
+        "RENAME_INSTEAD": "Перейменувати",
+        "MOVE_AND_DELETE": "Перенести та видалити",
+        "CHANGED": "Транзакції в цій категорії змінилися. Перевірте та спробуйте ще раз."
+      }
+    },
+    "TAGS": {
+      "ADD": "Додати тег",
+      "EMPTY": "Тегів поки немає. Створіть тег тут або додайте теги до транзакцій у Грошовому журналі.",
+      "CREATE_TITLE": "Новий тег",
+      "EDIT_TITLE": "Змінити тег",
+      "NAME_PLACEHOLDER": "Назва тегу",
+      "ALREADY_EXISTS": "Тег «{name}» вже існує. Щоб обʼєднати їх, відфільтруйте Грошовий журнал за цим тегом, додайте цим рядкам «{name}», потім видаліть цей тег.",
+      "DELETE_DIALOG": {
+        "TITLE": "Видалити «{name}»?",
+        "MESSAGE_EMPTY": "Цей тег не використовується в транзакціях. Його буде видалено.",
+        "MESSAGE_WITH_TRANSACTIONS": "Тег буде знято з транзакцій: {count}. Самі транзакції залишаться."
+      }
+    },
+    "ACCOUNTS": {
+      "ADD": "Додати рахунок",
+      "EMPTY": "Рахунків поки немає.",
+      "CREATE_TITLE": "Новий рахунок",
+      "EDIT_TITLE": "Перейменувати рахунок",
+      "NAME_PLACEHOLDER": "Назва рахунку",
+      "ALREADY_EXISTS": "Рахунок «{name}» вже існує. Оберіть іншу назву.",
+      "CANT_DELETE": "На цьому рахунку є транзакції (включно з видаленими), тому його не можна видалити. Його можна перейменувати.",
+      "DELETE_DIALOG": {
+        "TITLE": "Видалити «{name}»?",
+        "MESSAGE": "На цьому рахунку немає транзакцій. Його буде видалено."
+      }
+    },
+    "ICONS": {
+      "GROUPS": {
+        "food": "Їжа",
+        "home": "Дім",
+        "transport": "Транспорт",
+        "shopping": "Покупки",
+        "health": "Здоровʼя",
+        "fun": "Дозвілля",
+        "finance": "Фінанси",
+        "people": "Люди",
+        "other": "Інше"
+      },
+      "NAMES": {
+        "restaurant": "Ресторан",
+        "local_grocery_store": "Продукти",
+        "local_cafe": "Кафе",
+        "fastfood": "Фастфуд",
+        "local_pizza": "Піца",
+        "bakery_dining": "Випічка",
+        "local_bar": "Бар",
+        "home": "Дім",
+        "bolt": "Електрика",
+        "water_drop": "Вода",
+        "wifi": "Інтернет",
+        "chair": "Меблі",
+        "cleaning_services": "Прибирання",
+        "local_laundry_service": "Прання",
+        "build": "Ремонт",
+        "directions_bus": "Автобус",
+        "directions_car": "Авто",
+        "local_gas_station": "Пальне",
+        "train": "Потяг",
+        "flight": "Авіаквитки",
+        "local_taxi": "Таксі",
+        "pedal_bike": "Велосипед",
+        "local_parking": "Паркування",
+        "shopping_bag": "Покупки",
+        "checkroom": "Одяг",
+        "spa": "Краса",
+        "devices": "Електроніка",
+        "phone_iphone": "Телефон",
+        "card_giftcard": "Подарунки",
+        "medical_services": "Медицина",
+        "local_pharmacy": "Аптека",
+        "fitness_center": "Спортзал",
+        "favorite": "Здоровʼя",
+        "sports_esports": "Ігри",
+        "movie": "Кіно",
+        "music_note": "Музика",
+        "menu_book": "Книги",
+        "sports_soccer": "Спорт",
+        "beach_access": "Відпустка",
+        "hotel": "Готелі",
+        "celebration": "Свята",
+        "receipt": "Рахунки",
+        "payments": "Платежі",
+        "credit_card": "Кредитна картка",
+        "account_balance": "Банк",
+        "savings": "Заощадження",
+        "request_quote": "Податки",
+        "subscriptions": "Підписки",
+        "swap_horiz": "Перекази",
+        "family_restroom": "Родина",
+        "child_care": "Діти",
+        "school": "Освіта",
+        "work": "Робота",
+        "pets": "Улюбленці",
+        "volunteer_activism": "Благодійність",
+        "category": "Загальне",
+        "star": "Обране",
+        "more_horiz": "Інше"
+      }
     }
   }
 }

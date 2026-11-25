@@ -11,8 +11,9 @@ import {
   Divider,
   ListItemText,
   Checkbox,
+  ListItemIcon,
 } from '@mui/material';
-import { useMemo } from 'react';
+import { ReactElement, useMemo } from 'react';
 
 const ALL_VALUE = '__ALL__';
 const MAX_VISIBLE_CHIPS = 2;
@@ -20,6 +21,8 @@ const MAX_VISIBLE_CHIPS = 2;
 export interface FilterItem {
   id: string;
   label: string;
+  // e.g. a category icon, shown in the menu and on the selected chips
+  icon?: ReactElement;
 }
 
 interface FilterMultiSelectProps {
@@ -84,6 +87,7 @@ const FilterMultiSelect = ({
                 <Chip
                   key={item.id}
                   label={item.label}
+                  icon={item.icon}
                   size="small"
                   sx={{ maxWidth: 120 }}
                 />
@@ -138,6 +142,9 @@ const FilterMultiSelect = ({
             }}
           >
             <Checkbox checked={value.includes(item.id)} />
+            {item.icon && (
+              <ListItemIcon sx={{ minWidth: 32 }}>{item.icon}</ListItemIcon>
+            )}
             <ListItemText primary={item.label} />
           </MenuItem>
         ))}

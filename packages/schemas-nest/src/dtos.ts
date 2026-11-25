@@ -10,8 +10,12 @@ import {
   AccountSchema,
   AccountWithActivitySchema,
   CreateAccountSchema,
+  UpdateAccountSchema,
   GetCurrenciesResponseSchema,
   CategorySchema,
+  CreateCategorySchema,
+  UpdateCategorySchema,
+  DeleteCategoryQuerySchema,
   GetIncomeExpenseQuerySchema,
   GetIncomeExpenseResponseSchema,
   MonthlyCategoryQuerySchema,
@@ -25,6 +29,9 @@ import {
   TagSpendQuerySchema,
   TagSpendResponseSchema,
   TagSchema,
+  TagWithCountSchema,
+  CreateTagSchema,
+  UpdateTagSchema,
   ListTransactionsQuerySchema,
   ListTransactionsResponseSchema,
   UpdateTransactionsSchema,
@@ -62,6 +69,7 @@ export class AccountWithActivityDto extends createZodDto(
   AccountWithActivitySchema,
 ) {}
 export class CreateAccountDto extends createZodDto(CreateAccountSchema) {}
+export class UpdateAccountDto extends createZodDto(UpdateAccountSchema) {}
 
 // CURRENCY
 export class GetCurrenciesResponseDto extends createZodDto(
@@ -70,6 +78,11 @@ export class GetCurrenciesResponseDto extends createZodDto(
 
 // CATEGORY
 export class CategoryDto extends createZodDto(CategorySchema) {}
+export class CreateCategoryDto extends createZodDto(CreateCategorySchema) {}
+export class UpdateCategoryDto extends createZodDto(UpdateCategorySchema) {}
+export class DeleteCategoryQueryDto extends createZodDto(
+  DeleteCategoryQuerySchema,
+) {}
 
 // CHARTS
 export class GetIncomeExpenseQueryDto extends createZodDto(
@@ -110,6 +123,9 @@ export class TagSpendResponseDto extends createZodDto(TagSpendResponseSchema) {}
 
 // TAGS
 export class TagDto extends createZodDto(TagSchema) {}
+export class TagWithCountDto extends createZodDto(TagWithCountSchema) {}
+export class CreateTagDto extends createZodDto(CreateTagSchema) {}
+export class UpdateTagDto extends createZodDto(UpdateTagSchema) {}
 
 // TRANSACTIONS (Money Journal)
 export class ListTransactionsQueryDto extends createZodDto(

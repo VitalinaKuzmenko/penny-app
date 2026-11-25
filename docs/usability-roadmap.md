@@ -483,7 +483,7 @@ A new **Settings** page (`/[lang]/settings`) for creating, renaming,
 recolouring and deleting categories, tags and accounts. Categories also get
 icons, shown across the app.
 
-Status: planned (decisions agreed 2026-11-24). One PR.
+Status: in progress (branch `feature/settings-page`). One PR.
 
 ### Decisions (agreed 2026-11-24)
 
@@ -687,7 +687,11 @@ model Category {
 - Shared components in `src/components`:
   - `CategoryIcon` (name, colour, size; generic fallback) and a
     `CATEGORY_ICON_COMPONENTS` map from every curated name to its MUI
-    component and group, typed so a missing name fails the type-check;
+    component, typed so a missing name fails the type-check (the groups
+    come from `CATEGORY_ICON_GROUPS` in `packages/schemas`);
+  - `CategoryLabel` (icon + name) for dropdowns and table headers;
+  - `CategoryChartLegend` / `CategoryChartTooltip` for the recharts
+    legends and tooltips;
   - `ColourSwatchPicker` (used with the category or tag palette);
   - `CategoryIconPicker` (grouped grid with tooltips).
 - Strings for the icon names and group headings in en, ru and ua.
@@ -697,9 +701,12 @@ model Category {
   (replacement select + "Rename instead"), and confirms for tags and
   accounts. The transfer category has no Delete button (tooltip explains
   why). After each change the tab reloads its list.
-- Request functions `createCategory`, `updateCategory`, `deleteCategory`,
-  `createTag`, `updateTag`, `deleteTag`, `updateAccount`, `deleteAccount`
-  use `clientApiFetch`.
+- Request functions in `src/requests/settings` (`listCategories`,
+  `createCategory`, `updateCategory`, `deleteCategory`,
+  `listTagsWithCounts`, `createTag`, `updateTag`, `deleteTag`,
+  `listAccounts`, `renameAccount`, `deleteAccount`) use `clientApiFetch`,
+  so each tab reloads its list after a change. Creating an account reuses
+  `createAccount`.
 - Replace the name checks with `isTransfer` in `transactionType.ts`,
   `chartCategoryIds.ts`, `CategoryCellSelect.tsx` and the hard-coded
   string in `CategoryFilter.tsx`.

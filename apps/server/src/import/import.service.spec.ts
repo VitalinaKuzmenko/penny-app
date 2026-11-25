@@ -19,9 +19,10 @@ const FOREIGN_TAG_ID = '88888888-8888-4888-8888-888888888889';
 
 // The user's own categories; anything else is "not owned"
 const userCategories = [
-  { id: CATEGORY_ID, name: 'Clothes, cosmetics' },
-  { id: OVERRIDE_CATEGORY_ID, name: 'Others' },
-  { id: TRANSFER_CATEGORY_ID, name: 'Internal Transfer' },
+  { id: CATEGORY_ID, name: 'Clothes, cosmetics', isTransfer: false },
+  { id: OVERRIDE_CATEGORY_ID, name: 'Others', isTransfer: false },
+  // renamed by the user: recognised by the flag, not the name
+  { id: TRANSFER_CATEGORY_ID, name: 'Переказ', isTransfer: true },
 ];
 
 type Row = {

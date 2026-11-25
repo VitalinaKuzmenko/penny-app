@@ -21,8 +21,9 @@ const T2 = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2';
 const T3 = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3';
 
 const userCategories = [
-  { id: CLOTHES_ID, name: 'Clothes, cosmetics' },
-  { id: TRANSFER_ID, name: 'Internal Transfer' },
+  { id: CLOTHES_ID, name: 'Clothes, cosmetics', isTransfer: false },
+  // renamed by the user: recognised by the flag, not the name
+  { id: TRANSFER_ID, name: 'Переказ', isTransfer: true },
 ];
 
 const query = (input: Record<string, string> = {}) =>
@@ -241,10 +242,10 @@ describe('TransactionsService', () => {
         income: 1000,
         net: 1020.1,
       });
-      // no "Internal Transfer" exclusion, unlike the charts
+      // no transfer exclusion, unlike the charts
       expect(
         JSON.stringify(prisma.transaction.groupBy.mock.calls[0][0].where),
-      ).not.toContain('Internal Transfer');
+      ).not.toContain('isTransfer');
     });
 
     it('returns rows with numeric amounts, ISO dates and a deleted flag', async () => {

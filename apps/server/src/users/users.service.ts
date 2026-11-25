@@ -45,6 +45,7 @@ export class UsersService {
           icon: category.icon,
           color: category.color,
           isDefault: true,
+          isTransfer: category.isTransfer ?? false,
           userId: user.id,
         })),
       });
@@ -79,6 +80,7 @@ export class UsersService {
           icon: category.icon,
           color: category.color,
           isDefault: true,
+          isTransfer: category.isTransfer ?? false,
           userId: user.id,
         })),
       });
