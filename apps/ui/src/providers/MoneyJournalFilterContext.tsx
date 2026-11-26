@@ -31,6 +31,9 @@ interface MoneyJournalFilterContextProps {
   appliedFilters: MoneyJournalFilters; // used by the table
   setFilters: (filters: Partial<MoneyJournalFilters>) => void;
   applyFilters: () => void;
+  // merges into the draft and applies the result in one step (year presets)
+  applyWith: (filters: Partial<MoneyJournalFilters>) => void;
+  // back to the opening state (this year, everything selected) and applied
   resetFilters: () => void;
   isInitialized: boolean;
   initFilters: (data: { categoryIds: string[]; accountIds: string[] }) => void;
@@ -71,9 +74,16 @@ export const MoneyJournalFilterProvider = ({
     setAppliedFilters(filters);
   };
 
+  const applyWith = (newFilters: Partial<MoneyJournalFilters>) => {
+    const next = { ...filters, ...newFilters };
+    setFiltersState(next);
+    setAppliedFilters(next);
+  };
+
   // back to "everything selected", not to an empty selection
   const resetFilters = () => {
     setFiltersState(initial);
+    setAppliedFilters(initial);
   };
 
   const initFilters = ({
@@ -98,6 +108,7 @@ export const MoneyJournalFilterProvider = ({
         appliedFilters,
         setFilters,
         applyFilters,
+        applyWith,
         resetFilters,
         isInitialized,
         initFilters,

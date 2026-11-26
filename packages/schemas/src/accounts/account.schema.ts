@@ -10,6 +10,8 @@ export const AccountListSchema = z.array(AccountSchema);
 export const AccountWithActivitySchema = AccountSchema.extend({
   // Newest transaction date on the account (how far the data goes)
   lastTransactionDate: z.string().datetime().nullable(),
+  // Oldest transaction date on the account (drives the year presets)
+  firstTransactionDate: z.string().datetime().nullable(),
   // soft-deleted included, since they still block deleting the account
   transactionCount: z.number().int(),
 });

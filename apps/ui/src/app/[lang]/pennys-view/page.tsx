@@ -4,7 +4,7 @@ import { getDictionary } from '@/utils/getDictionary';
 import MainDashboard from './components/MainDashboard';
 import { getAccounts } from '@/requests/getAccounts';
 import { getCategories } from '@/requests/getCategories';
-import { Account, Category } from 'schemas';
+import { AccountWithActivity, Category } from 'schemas';
 import { UiError } from '@/types/interfaces';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +19,7 @@ export default async function PennysViewPage({
 
   const results = await Promise.allSettled([getAccounts(), getCategories()]);
 
-  let accounts: Account[] = [];
+  let accounts: AccountWithActivity[] = [];
   let categories: Category[] = [];
 
   const errors: UiError[] = [];
@@ -28,7 +28,7 @@ export default async function PennysViewPage({
     if (result.status === 'fulfilled') {
       switch (index) {
         case 0:
-          accounts = result.value as Account[];
+          accounts = result.value as AccountWithActivity[];
           break;
         case 1:
           categories = result.value as Category[];
