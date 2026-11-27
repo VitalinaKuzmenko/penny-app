@@ -399,6 +399,7 @@
   },
   "DASHBOARD_PAGE": {
     "TITLE": "Penny's View",
+    "SUBTITLE": "Your money story at a glance — see what came in, what went out, and how you're doing overall.",
     "FILTERS": {
       "YEAR_PRESETS": {
         "OLDER": "Older",

@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { Typography, Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import DashboardFilters from './filters/DashboardFilters';
 import { AccountWithActivity, Category } from 'schemas';
 import { UiError } from '@/types/interfaces';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import IncomeExpenseChart from './charts/IncomeExpenseChart';
 import { useDashboardFilters } from '@/providers/FilterContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import MonthlyCategoryChart from './charts/MonthlyCategoryChart';
 import MonthlyCategoryTable from './charts/MonthlyCategoryTable';
@@ -16,6 +16,10 @@ import CategoryBreakdownChart from './charts/CategoryBreakdownChart';
 import IncomeExpenseStackedChart from './charts/IncomeExpenseStackedChart';
 import IncomeExpenseGauge from './charts/IncomeExpenseGauge';
 import TagSpendChart from './charts/TagSpendChart';
+import DashboardCard from './DashboardCard';
+import SummaryCards from './SummaryCards';
+import PageHero from '@/components/PageHero/PageHero';
+import { GetIncomeExpenseResponse } from 'schemas';
 
 interface MainDashboardProps {
   accounts: AccountWithActivity[];
@@ -30,7 +34,11 @@ const MainDashboard = ({
   serverErrors,
   pennysViewPageText,
 }: MainDashboardProps) => {
-  const { initFilters, isInitialized } = useDashboardFilters();
+  const { initFilters, isInitialized, appliedFilters } = useDashboardFilters();
+  const [incomeExpense, setIncomeExpense] =
+    useState<GetIncomeExpenseResponse | null>(null);
+  // same year rule as the Income vs Expense chart
+  const year = appliedFilters.startDate?.year() ?? new Date().getFullYear();
 
   useEffect(() => {
     if (!isInitialized) {
@@ -42,13 +50,11 @@ const MainDashboard = ({
   }, [accounts, categories, isInitialized]);
 
   return (
-    <Box sx={{ p: { xs: 1, md: 3 } }}>
-      {/* Hero */}
-      <Box>
-        <Typography variant="h4" fontWeight={600} gutterBottom>
-          {pennysViewPageText.TITLE}
-        </Typography>
-      </Box>
+    <Box>
+      <PageHero
+        title={pennysViewPageText.TITLE}
+        subtitle={pennysViewPageText.SUBTITLE}
+      />
 
       {/* Error display */}
       {serverErrors &&
@@ -64,43 +70,80 @@ const MainDashboard = ({
       />
 
       {/* Charts */}
-      <Box>
-        {!isInitialized ? (
-          <Spinner fullScreen />
-        ) : (
-          <Box>
-            <IncomeExpenseChart pennysViewPageText={pennysViewPageText} />
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                flexDirection: { xs: 'column', md: 'row' },
-              }}
-            >
+      {!isInitialized ? (
+        <Spinner fullScreen />
+      ) : (
+        <Stack spacing={2.5}>
+          <SummaryCards
+            data={incomeExpense}
+            year={year}
+            pennysViewPageText={pennysViewPageText}
+          />
+
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 2.5,
+              gridTemplateColumns: {
+                xs: 'minmax(0, 1fr)',
+                lg: 'minmax(0, 1.2fr) minmax(0, 0.85fr) minmax(0, 1.15fr)',
+              },
+            }}
+          >
+            <Box>
+              <DashboardCard>
+                <IncomeExpenseChart
+                  pennysViewPageText={pennysViewPageText}
+                  onData={setIncomeExpense}
+                />
+              </DashboardCard>
+            </Box>
+            <DashboardCard>
               <IncomeExpenseGauge pennysViewPageText={pennysViewPageText} />
+            </DashboardCard>
+            <DashboardCard>
               <CategoryBreakdownChart
                 categories={categories}
                 pennysViewPageText={pennysViewPageText}
               />
-            </Box>
+            </DashboardCard>
+          </Box>
 
-            <IncomeExpenseStackedChart
-              pennysViewPageText={pennysViewPageText}
-            />
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 2.5,
+              gridTemplateColumns: {
+                xs: 'minmax(0, 1fr)',
+                lg: 'repeat(2, minmax(0, 1fr))',
+              },
+            }}
+          >
+            <DashboardCard>
+              <IncomeExpenseStackedChart
+                pennysViewPageText={pennysViewPageText}
+              />
+            </DashboardCard>
+            <DashboardCard>
+              <MonthlyCategoryChart
+                categories={categories}
+                pennysViewPageText={pennysViewPageText}
+              />
+            </DashboardCard>
+          </Box>
 
-            <MonthlyCategoryChart
-              categories={categories}
-              pennysViewPageText={pennysViewPageText}
-            />
+          <DashboardCard>
             <MonthlyCategoryTable
               categories={categories}
               pennysViewPageText={pennysViewPageText}
             />
+          </DashboardCard>
 
+          <DashboardCard>
             <TagSpendChart pennysViewPageText={pennysViewPageText} />
-          </Box>
-        )}
-      </Box>
+          </DashboardCard>
+        </Stack>
+      )}
     </Box>
   );
 };

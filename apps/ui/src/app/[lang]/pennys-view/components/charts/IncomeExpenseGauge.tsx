@@ -13,7 +13,8 @@ import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 import { getIncomeExpenseRatio } from '@/requests/charts/getIncomeExpenseRatio';
-import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
+import { ChartCardTitle } from '../DashboardCard';
+import SpeedRounded from '@mui/icons-material/SpeedRounded';
 
 interface IncomeExpenseGaugeProps {
   pennysViewPageText: Record<string, any>;
@@ -93,20 +94,16 @@ export default function IncomeExpenseGauge({
   };
 
   return (
-    <Box sx={{ width: '100%', mt: 3, textAlign: 'center' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <Typography variant="h6" fontWeight={600}>
-          {pennysViewPageText.CHARTS.SPENDING_RATIO.TITLE}
-        </Typography>
-
-        <InfoTooltip
-          content={
-            <Typography variant="body2">
-              {pennysViewPageText.CHARTS.SPENDING_RATIO.TOOLTIP}
-            </Typography>
-          }
-        />
-      </Box>
+    <Box sx={{ width: '100%', textAlign: 'center' }}>
+      <ChartCardTitle
+        icon={<SpeedRounded fontSize="inherit" />}
+        title={pennysViewPageText.CHARTS.SPENDING_RATIO.TITLE}
+        tooltip={
+          <Typography variant="body2">
+            {pennysViewPageText.CHARTS.SPENDING_RATIO.TOOLTIP}
+          </Typography>
+        }
+      />
 
       <Box sx={{ width: '100%', height: 260 }}>
         <ResponsiveContainer>
@@ -121,7 +118,7 @@ export default function IncomeExpenseGauge({
               stroke="none"
             >
               <Cell fill={getColor()} />
-              <Cell fill="#e0e0e0" />
+              <Cell fill="#F1E6EC" />
             </Pie>
           </PieChart>
         </ResponsiveContainer>

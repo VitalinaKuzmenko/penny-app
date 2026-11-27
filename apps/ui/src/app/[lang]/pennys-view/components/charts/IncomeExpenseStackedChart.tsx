@@ -20,7 +20,8 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
-import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
+import { ChartCardTitle } from '../DashboardCard';
+import InsertChartOutlinedRounded from '@mui/icons-material/InsertChartOutlinedRounded';
 
 interface IncomeExpenceStackedChartProps {
   pennysViewPageText: Record<string, any>;
@@ -96,30 +97,44 @@ export default function IncomeExpenseStackedChart({
   });
 
   return (
-    <Box sx={{ width: '100%', mt: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <Typography variant="h6" fontWeight={600}>
-          {pennysViewPageText.CHARTS.INCOME_EXPENSE_STACKED.TITLE}
-        </Typography>
-
-        <InfoTooltip
-          content={
-            <Typography variant="body2">
-              {pennysViewPageText.CHARTS.INCOME_EXPENSE_STACKED.TOOLTIP}
-            </Typography>
-          }
-        />
-      </Box>
+    <Box sx={{ width: '100%' }}>
+      <ChartCardTitle
+        icon={<InsertChartOutlinedRounded fontSize="inherit" />}
+        title={pennysViewPageText.CHARTS.INCOME_EXPENSE_STACKED.TITLE}
+        tooltip={
+          <Typography variant="body2">
+            {pennysViewPageText.CHARTS.INCOME_EXPENSE_STACKED.TOOLTIP}
+          </Typography>
+        }
+      />
 
       <Box sx={{ width: '100%', height: 320 }}>
         <ResponsiveContainer>
           <BarChart data={chartData}>
-            <XAxis dataKey="label" />
-            <YAxis />
+            <XAxis
+              dataKey="label"
+              tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
+              axisLine={{ stroke: theme.palette.divider }}
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
+              axisLine={{ stroke: theme.palette.divider }}
+              tickLine={false}
+            />
 
-            <Tooltip formatter={(value) => formatCurrency(value)} />
+            <Tooltip
+              formatter={(value) => formatCurrency(value)}
+              cursor={{ fill: 'rgba(83, 36, 70, 0.05)' }}
+            />
 
-            <Legend />
+            <Legend
+              iconType="circle"
+              iconSize={10}
+              verticalAlign="top"
+              align="right"
+              wrapperStyle={{ fontSize: 13, paddingBottom: 8 }}
+            />
 
             {/* Stacked bars */}
             <Bar
@@ -131,6 +146,7 @@ export default function IncomeExpenseStackedChart({
               dataKey="expense"
               stackId="total"
               fill={theme.palette.chart.expense}
+              radius={[6, 6, 0, 0]}
             />
           </BarChart>
         </ResponsiveContainer>
