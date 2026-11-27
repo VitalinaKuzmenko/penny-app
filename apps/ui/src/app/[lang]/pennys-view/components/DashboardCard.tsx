@@ -24,7 +24,7 @@ export function ChartCardTitle({
       direction="row"
       alignItems="center"
       spacing={1}
-      sx={{ mb: 1.5, minWidth: 0 }}
+      sx={{ mb: 1, minWidth: 0 }}
     >
       <Box sx={{ display: 'flex', color: 'secondary.main', fontSize: 28 }}>
         {icon}
@@ -51,8 +51,10 @@ export default function DashboardCard({ children }: DashboardCardProps) {
   return (
     <Paper
       sx={{
-        p: { xs: 2, md: 2.5 },
+        p: { xs: 2, md: 2 },
         borderRadius: '24px',
+        display: 'flex',
+        flexDirection: 'column',
         bgcolor: '#FFFBF9',
         minWidth: 0,
         height: '100%',

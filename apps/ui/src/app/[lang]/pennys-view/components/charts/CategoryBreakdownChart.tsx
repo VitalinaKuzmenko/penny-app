@@ -119,7 +119,7 @@ export default function CategoryBreakdownChart({
         }
       />
 
-      <Box sx={{ width: '100%', height: 320 }}>
+      <Box sx={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>
           <PieChart>
             <Pie

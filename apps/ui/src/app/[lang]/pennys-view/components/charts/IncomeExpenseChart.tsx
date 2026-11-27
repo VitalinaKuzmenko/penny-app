@@ -124,7 +124,7 @@ export default function IncomeExpenseChart({
         }
       />
 
-      <Box sx={{ width: '100%', height: 280 }}>
+      <Box sx={{ width: '100%', height: 250 }}>
         <ResponsiveContainer>
           <BarChart data={chartData} margin={{ top: 24, right: 8 }}>
             <XAxis

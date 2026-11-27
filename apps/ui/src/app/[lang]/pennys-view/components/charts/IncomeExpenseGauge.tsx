@@ -94,7 +94,15 @@ export default function IncomeExpenseGauge({
   };
 
   return (
-    <Box sx={{ width: '100%', textAlign: 'center' }}>
+    <Box
+      sx={{
+        width: '100%',
+        textAlign: 'center',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <ChartCardTitle
         icon={<SpeedRounded fontSize="inherit" />}
         title={pennysViewPageText.CHARTS.SPENDING_RATIO.TITLE}
@@ -105,11 +113,20 @@ export default function IncomeExpenseGauge({
         }
       />
 
-      <Box sx={{ width: '100%', height: 260 }}>
+      {/* centred in the card so it doesn't leave a gap under the arc */}
+      <Box
+        sx={{
+          position: 'relative',
+          width: '100%',
+          height: 170,
+          my: 'auto',
+        }}
+      >
         <ResponsiveContainer>
           <PieChart>
             <Pie
               data={gaugeData}
+              cy="85%"
               startAngle={180}
               endAngle={0}
               innerRadius={80}
@@ -126,8 +143,10 @@ export default function IncomeExpenseGauge({
         {/* Center content */}
         <Box
           sx={{
-            position: 'relative',
-            top: '-180px',
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 'calc(15% - 6px)',
           }}
         >
           <Typography variant="h4" fontWeight={700}>

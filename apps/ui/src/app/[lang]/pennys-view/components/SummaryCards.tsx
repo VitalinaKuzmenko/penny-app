@@ -81,7 +81,8 @@ export default function SummaryCards({
               overflow: 'hidden',
               borderRadius: '24px',
               background: card.bg,
-              p: 2,
+              px: 2,
+              py: 1.5,
               display: 'grid',
               alignItems: 'center',
               columnGap: 1.5,
@@ -147,7 +148,8 @@ export default function SummaryCards({
             <Box
               className="card-art"
               sx={{
-                width: 'clamp(70px, 30cqw, 140px)',
+                // capped so full-width cards (stacked layout) stay short
+                width: 'clamp(70px, 30cqw, 100px)',
                 // same box for every illustration so all cards are equally tall
                 aspectRatio: '1',
                 justifySelf: 'end',
