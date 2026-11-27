@@ -2,11 +2,33 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
+import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
+import PageHero from '@/components/PageHero/PageHero';
 import CategoriesTab from './CategoriesTab';
 import TagsTab from './TagsTab';
 import AccountsTab from './AccountsTab';
 import { SettingsTab } from './settingsTabs';
+
+const tabSx = {
+  minHeight: 48,
+  px: 3,
+  fontSize: '1rem',
+  borderRadius: 999,
+  border: '1px solid',
+  borderColor: 'divider',
+  bgcolor: 'background.paper',
+  color: 'text.primary',
+  transition: 'all 0.2s ease',
+  '&:hover': { bgcolor: 'grey.100' },
+  '&.Mui-selected': {
+    bgcolor: 'sidebar.activeBackground',
+    borderColor: 'secondary.light',
+    color: 'secondary.main',
+  },
+};
 
 interface SettingsClientProps {
   initialTab: SettingsTab;
@@ -30,31 +52,44 @@ export default function SettingsClient({
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" fontWeight={600} gutterBottom>
-        {pageText.TITLE}
-      </Typography>
+      <PageHero title={pageText.TITLE} subtitle={pageText.SUBTITLE} />
 
       <Tabs
         value={tab}
         onChange={handleChange}
         variant="scrollable"
         allowScrollButtonsMobile
-        sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
+        sx={{
+          position: 'relative',
+          zIndex: 1,
+          mb: 3,
+          '& .MuiTabs-indicator': { display: 'none' },
+          '& .MuiTabs-flexContainer': { gap: 1.5 },
+        }}
       >
         <Tab
           value="categories"
+          icon={<LayersOutlinedIcon />}
+          iconPosition="start"
+          sx={tabSx}
           label={pageText.TABS.CATEGORIES}
           id="settings-tab-categories"
           aria-controls="settings-panel"
         />
         <Tab
           value="tags"
+          icon={<LocalOfferOutlinedIcon />}
+          iconPosition="start"
+          sx={tabSx}
           label={pageText.TABS.TAGS}
           id="settings-tab-tags"
           aria-controls="settings-panel"
         />
         <Tab
           value="accounts"
+          icon={<AccountBalanceOutlinedIcon />}
+          iconPosition="start"
+          sx={tabSx}
           label={pageText.TABS.ACCOUNTS}
           id="settings-tab-accounts"
           aria-controls="settings-panel"

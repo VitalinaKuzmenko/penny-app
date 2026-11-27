@@ -2,8 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, List, Paper, Skeleton, Typography } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Box } from '@mui/material';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import {
   nextPaletteColour,
   TAG_NAME_MAX_LENGTH,
@@ -11,8 +11,6 @@ import {
   TagWithCount,
   UpdateTagInput,
 } from 'schemas';
-import CustomButton from '@/components/ui/CustomButton/CustomButton';
-import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { listTagsWithCounts } from '@/requests/settings/listTagsWithCounts';
 import { createTag } from '@/requests/settings/createTag';
 import { updateTag } from '@/requests/settings/updateTag';
@@ -20,22 +18,12 @@ import { deleteTag } from '@/requests/settings/deleteTag';
 import { interpolate } from '@/utils/interpolate';
 import { useSettingsList } from './useSettingsList';
 import SettingsListRow from './SettingsListRow';
+import SettingsListPanel from './SettingsListPanel';
 import SettingsItemDialog, { SettingsItemValues } from './SettingsItemDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import { apiErrorDetails } from './apiError';
 
 type Palette = (typeof TAG_PALETTE)[number];
-
-const ColourDot = ({ color }: { color: string | null }) => (
-  <Box
-    sx={{
-      width: 20,
-      height: 20,
-      borderRadius: '50%',
-      bgcolor: color ?? 'grey.400',
-    }}
-  />
-);
 
 interface TagsTabProps {
   // SETTINGS_PAGE
@@ -104,61 +92,42 @@ export default function TagsTab({ text }: TagsTabProps) {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <CustomButton
-          variantType="primary"
-          startIcon={<AddIcon />}
-          onClick={() => setEditing('new')}
-          disabled={loading || loadFailed}
-        >
-          {t.ADD}
-        </CustomButton>
-      </Box>
-
-      {loadFailed && (
-        <ErrorBanner
-          error={{
-            title: text.COMMON.LOAD_ERROR.TITLE,
-            message: text.COMMON.LOAD_ERROR.MESSAGE,
-            severity: 'error',
-          }}
-        />
-      )}
-
-      {loading ? (
-        <Skeleton variant="rounded" height={240} />
-      ) : (
-        !loadFailed && (
-          <Paper variant="outlined">
-            {tags.length ? (
-              <List disablePadding>
-                {tags.map((tag) => (
-                  <SettingsListRow
-                    key={tag.id}
-                    leading={<ColourDot color={tag.color} />}
-                    name={tag.name}
-                    secondary={interpolate(text.COMMON.TRANSACTION_COUNT, {
-                      count: tag.transactionCount,
-                    })}
-                    editLabel={text.COMMON.EDIT}
-                    deleteLabel={text.COMMON.DELETE}
-                    onEdit={() => setEditing(tag)}
-                    onDelete={() => setDeleting(tag)}
-                  />
-                ))}
-              </List>
-            ) : (
-              <Typography sx={{ p: 2 }} color="text.secondary">
-                {t.EMPTY}
-              </Typography>
-            )}
-          </Paper>
-        )
-      )}
+      <SettingsListPanel
+        icon={<LocalOfferOutlinedIcon />}
+        info={t.INFO}
+        count={tags.length}
+        addLabel={t.ADD}
+        onAdd={() => setEditing('new')}
+        emptyText={t.EMPTY}
+        loading={loading}
+        loadFailed={loadFailed}
+        text={text}
+      >
+        {tags.map((tag) => (
+          <SettingsListRow
+            key={tag.id}
+            leading={
+              <LocalOfferOutlinedIcon
+                sx={{ color: tag.color ?? 'text.secondary' }}
+              />
+            }
+            tint={tag.color}
+            name={tag.name}
+            secondary={interpolate(text.COMMON.TRANSACTION_COUNT, {
+              count: tag.transactionCount,
+            })}
+            editLabel={text.COMMON.EDIT}
+            deleteLabel={text.COMMON.DELETE}
+            onEdit={() => setEditing(tag)}
+            onDelete={() => setDeleting(tag)}
+          />
+        ))}
+      </SettingsListPanel>
 
       {editing && (
         <SettingsItemDialog
           title={editing === 'new' ? t.CREATE_TITLE : t.EDIT_TITLE}
+          subtitle={t.DIALOG_SUBTITLE}
           submitLabel={
             editing === 'new' ? text.COMMON.CREATE : text.COMMON.SAVE
           }

@@ -22,7 +22,7 @@ export default async function SettingsPage({
     : 'categories';
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ px: { xs: 2, md: 3 } }}>
       <SettingsClient initialTab={initialTab} pageText={dict.SETTINGS_PAGE} />
     </Container>
   );

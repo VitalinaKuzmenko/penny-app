@@ -629,6 +629,7 @@
   },
   "SETTINGS_PAGE": {
     "TITLE": "Settings",
+    "SUBTITLE": "Customise your categories, tags and accounts to keep Penny organised your way.",
     "TABS": {
       "CATEGORIES": "Categories",
       "TAGS": "Tags",
@@ -644,7 +645,9 @@
       "COLOUR_LABEL": "Colour",
       "ICON_LABEL": "Icon",
       "PREVIEW_LABEL": "Preview",
+      "PREVIEW_HINT": "This is how your category will look.",
       "TRANSACTION_COUNT": "{count} transaction(s)",
+      "TOTAL": "Total: {count}",
       "NAME_REQUIRED": "Enter a name",
       "GENERIC_ERROR": "Something went wrong. Please try again.",
       "LOAD_ERROR": {
@@ -654,9 +657,11 @@
     },
     "CATEGORIES": {
       "ADD": "Add category",
+      "INFO": "Changes here affect how categories appear when you review transactions and in Penny's View.",
       "EMPTY": "No categories yet.",
       "CREATE_TITLE": "Add category",
       "EDIT_TITLE": "Edit category",
+      "DIALOG_SUBTITLE": "Choose a name, colour and icon to organise your transactions.",
       "NAME_PLACEHOLDER": "Category name",
       "TRANSFER_HINT": "Moves between your own accounts. Kept out of the charts, so it can't be deleted.",
       "ALREADY_EXISTS": "A category named “{name}” already exists. To combine them, delete this category and move its transactions to “{name}”.",
@@ -673,9 +678,11 @@
     },
     "TAGS": {
       "ADD": "Add tag",
+      "INFO": "Tags group transactions across categories, so you can find them quickly in the Money Journal.",
       "EMPTY": "No tags yet. Create one here or add tags to transactions in the Money Journal.",
       "CREATE_TITLE": "Add tag",
       "EDIT_TITLE": "Edit tag",
+      "DIALOG_SUBTITLE": "Choose a name and colour to group your transactions.",
       "NAME_PLACEHOLDER": "Tag name",
       "ALREADY_EXISTS": "A tag named “{name}” already exists. To combine them, filter the Money Journal by this tag, add “{name}” to those rows, then delete this tag.",
       "DELETE_DIALOG": {
@@ -686,9 +693,11 @@
     },
     "ACCOUNTS": {
       "ADD": "Add account",
+      "INFO": "Accounts show where your transactions come from. You pick one each time you upload a CSV.",
       "EMPTY": "No accounts yet.",
       "CREATE_TITLE": "Add account",
       "EDIT_TITLE": "Rename account",
+      "DIALOG_SUBTITLE": "Give this account a name you'll easily recognise.",
       "NAME_PLACEHOLDER": "Account name",
       "ALREADY_EXISTS": "An account named “{name}” already exists. Choose a different name.",
       "CANT_DELETE": "This account has transactions (deleted ones included), so it can't be deleted. You can rename it instead.",

@@ -36,7 +36,7 @@ const pageIcons = [
   SettingsOutlined,
 ];
 
-const SIDEBAR_WIDTH = 250;
+const SIDEBAR_WIDTH = 251;
 
 interface NavbarProps {
   headerText: Record<string, any>;
