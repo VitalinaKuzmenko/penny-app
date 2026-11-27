@@ -7,20 +7,36 @@ import {
 import CssBaseline from '@mui/material/CssBaseline';
 import { ReactNode } from 'react';
 
+const plum = '#532446';
+const plumDark = '#3A1832';
+const radius = 16;
+const softShadow = '0 4px 20px rgba(83, 36, 70, 0.08)';
+const hoverShadow = '0 8px 28px rgba(83, 36, 70, 0.14)';
+const headingFont =
+  '"Fraunces", "Playfair Display", "Iowan Old Style", Georgia, serif';
+const bodyFont =
+  '"Nunito", "Quicksand", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+
+const headingStyle = {
+  fontFamily: headingFont,
+  fontWeight: 700,
+  letterSpacing: '-0.01em',
+};
+
 export const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#041646',
-      light: '#3B4A8A',
-      dark: '#020B2D',
+      main: '#F2616F', // coral
+      light: '#FF8A94',
+      dark: '#D94656',
       contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#f36919ff',
-      light: '#ffaf72ff',
-      dark: '#C2410C',
-      contrastText: '#1F2937',
+      main: '#6B2150', // plum
+      light: '#B79AD9', // lavender
+      dark: plumDark,
+      contrastText: '#FFFFFF',
     },
     success: {
       main: '#10B981',
@@ -41,26 +57,122 @@ export const theme = createTheme({
       main: '#38BDF8',
     },
     background: {
-      default: '#D1D5DB',
+      default: '#FBF3EA', // warm cream
       paper: '#FFFFFF',
     },
+    text: {
+      primary: '#3A1832',
+      secondary: '#7A6573',
+    },
+    divider: 'rgba(83, 36, 70, 0.12)',
     grey: {
-      50: '#F9FAFB',
-      100: '#F3F4F6',
-      200: '#E5E7EB',
-      300: '#D1D5DB',
-      400: '#9CA3AF',
-      500: '#6B7280',
-      600: '#4B5563',
-      700: '#374151',
-      800: '#1F2937',
-      900: '#111827',
+      50: '#FAF6F2',
+      100: '#F5EEF3',
+      200: '#EADFE6',
+      300: '#D9CBD3',
+      400: '#B3A2AD',
+      500: '#85727D',
+      600: '#65535D',
+      700: '#4A3A44',
+      800: '#33252E',
+      900: '#1F1419',
     },
     chart: {
       income: '#10B981', // same as success.main
       expense: '#EF4444', // same as error.main
       savings: '#38BDF8', // same as info.main
       neutral: '#E5E7EB',
+    },
+    sidebar: {
+      background: plum,
+      text: '#F6E9F1',
+      mutedText: 'rgba(246, 233, 241, 0.72)',
+      hover: 'rgba(255, 255, 255, 0.08)',
+      activeBackground: '#F1E8FB', // lavender
+      activeText: plumDark,
+    },
+  },
+  shape: { borderRadius: 12 },
+  typography: {
+    fontFamily: bodyFont,
+    h1: headingStyle,
+    h2: headingStyle,
+    h3: headingStyle,
+    h4: headingStyle,
+    h5: headingStyle,
+    h6: { ...headingStyle, fontWeight: 600 },
+    button: { textTransform: 'none', fontWeight: 700 },
+  },
+  components: {
+    MuiButton: {
+      defaultProps: { disableElevation: true },
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          padding: '8px 20px',
+          transition: 'all 0.2s ease',
+        },
+        containedPrimary: {
+          boxShadow: '0 4px 14px rgba(242, 97, 111, 0.35)',
+          '&:hover': { boxShadow: '0 6px 18px rgba(242, 97, 111, 0.45)' },
+        },
+        outlined: { borderWidth: 1.5, '&:hover': { borderWidth: 1.5 } },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        rounded: { borderRadius: radius },
+        elevation1: { boxShadow: softShadow },
+        elevation2: { boxShadow: softShadow },
+        elevation3: { boxShadow: hoverShadow },
+      },
+    },
+    MuiCard: {
+      defaultProps: { elevation: 1 },
+      styleOverrides: { root: { borderRadius: 20 } },
+    },
+    MuiDialog: {
+      styleOverrides: { paper: { borderRadius: 24 } },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          backgroundColor: '#FFFFFF',
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: { root: { fontWeight: 600 } },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          fontWeight: 700,
+          color: plum,
+          backgroundColor: '#F5EEF3',
+        },
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: { backgroundColor: plumDark, borderRadius: 8 },
+        arrow: { color: plumDark },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: { paper: { borderRadius: 14 } },
+    },
+    MuiAlert: {
+      styleOverrides: { root: { borderRadius: 12 } },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        indicator: { height: 3, borderRadius: 3 },
+      },
+    },
+    MuiTab: {
+      styleOverrides: { root: { textTransform: 'none', fontWeight: 700 } },
     },
   },
 });
@@ -82,6 +194,7 @@ declare module '@mui/material/styles' {
       savings: string;
       neutral: string;
     };
+    sidebar: SidebarColors;
   }
   interface PaletteOptions {
     chart?: {
@@ -90,5 +203,14 @@ declare module '@mui/material/styles' {
       savings?: string;
       neutral?: string;
     };
+    sidebar?: Partial<SidebarColors>;
+  }
+  interface SidebarColors {
+    background: string;
+    text: string;
+    mutedText: string;
+    hover: string;
+    activeBackground: string;
+    activeText: string;
   }
 }

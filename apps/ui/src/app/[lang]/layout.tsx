@@ -41,9 +41,13 @@ export default async function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider>
             <AuthProvider initialUser={user}>
-              <Header lang={lang} />
-              <main className="app-main">{children}</main>
-              <Footer />
+              <div className="app-shell">
+                <Header lang={lang} />
+                <div className="app-content">
+                  <main className="app-main">{children}</main>
+                  <Footer />
+                </div>
+              </div>
             </AuthProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>

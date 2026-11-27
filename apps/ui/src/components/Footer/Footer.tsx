@@ -8,10 +8,12 @@ export const Footer = () => {
   return (
     <Box
       sx={{
-        minHeight: '200px',
-        backgroundColor: 'primary.main',
-        color: 'white',
-        border: '3px solid black',
+        minHeight: '160px',
+        mx: { xs: 1.5, md: 2.5 },
+        mb: { xs: 1.5, md: 2.5 },
+        borderRadius: 5,
+        backgroundColor: 'sidebar.background',
+        color: 'sidebar.text',
         display: 'flex',
         justifyContent: 'center',
       }}
@@ -25,8 +27,9 @@ export const Footer = () => {
           <Image
             src={logo}
             alt="logo"
-            width={90}
-            height={90}
+            width={64}
+            height={64}
+            style={{ borderRadius: 12 }}
           />
         </Typography>
         <Typography

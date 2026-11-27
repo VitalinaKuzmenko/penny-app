@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 import { AsyncContext } from './async-context';
 
@@ -7,7 +7,7 @@ import { AsyncContext } from './async-context';
 export class TraceMiddleware implements NestMiddleware {
   use(req: any, res: any, next: () => void) {
     AsyncContext.run(() => {
-      const traceId = uuidv4();
+      const traceId = randomUUID();
       AsyncContext.set('traceId', traceId);
       req.traceId = traceId;
       next();
