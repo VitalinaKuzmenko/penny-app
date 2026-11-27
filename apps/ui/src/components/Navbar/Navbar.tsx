@@ -19,7 +19,7 @@ import ButtonBase from '@mui/material/ButtonBase';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Image from 'next/image';
-import logo from '../../../public/penny_logo.svg';
+import logo from '../../../public/Penny_logo_transparent.png';
 import cat from '../../../public/cat.png';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher';
@@ -36,7 +36,7 @@ const pageIcons = [
   SettingsOutlined,
 ];
 
-const SIDEBAR_WIDTH = 260;
+const SIDEBAR_WIDTH = 250;
 
 interface NavbarProps {
   headerText: Record<string, any>;
@@ -101,7 +101,10 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
   return (
     <Box
       component="header"
-      sx={{ flexShrink: 0, width: { md: SIDEBAR_WIDTH } }}
+      sx={{
+        flex: 'none',
+        width: { md: SIDEBAR_WIDTH },
+      }}
     >
       {/* mobile top bar */}
       <AppBar
@@ -151,12 +154,14 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
             </>
           )}
 
-          <Box
-            component="a"
-            href="/"
-            sx={{ display: 'flex', mr: 'auto', borderRadius: 2, overflow: 'hidden' }}
-          >
-            <Image src={logo} alt="logo" width={48} height={48} />
+          <Box component="a" href="/" sx={{ display: 'flex', mr: 'auto' }}>
+            <Image
+              src={logo}
+              alt="Penny"
+              height={44}
+              style={{ width: 'auto' }}
+              priority
+            />
           </Box>
 
           <LanguageSwitcher />
@@ -181,22 +186,18 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
           pb: 2,
         }}
       >
-        <Box
-          component="a"
-          href="/"
-          aria-label="Penny"
-          sx={{
-            px: 1.5,
-            mb: 4,
-            color: 'inherit',
-            textDecoration: 'none',
-            fontFamily: (t) => t.typography.h1.fontFamily,
-            fontSize: 40,
-            fontWeight: 700,
-            lineHeight: 1,
-          }}
-        >
-          Penny
+        <Box component="a" href="/" sx={{ display: 'block', px: 1, mb: 3 }}>
+          <Image
+            src={logo}
+            alt="Penny"
+            priority
+            style={{
+              width: '70%',
+              maxWidth: 170,
+              height: 'auto',
+              display: 'block',
+            }}
+          />
         </Box>
 
         {user && (
@@ -220,7 +221,9 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
                       fontSize: 16,
                       fontWeight: 600,
                       color: active ? 'sidebar.activeText' : 'sidebar.text',
-                      bgcolor: active ? 'sidebar.activeBackground' : 'transparent',
+                      bgcolor: active
+                        ? 'sidebar.activeBackground'
+                        : 'transparent',
                       transition: 'background-color 0.2s, color 0.2s',
                       '&:hover': {
                         bgcolor: active
@@ -251,7 +254,13 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
             src={cat}
             alt=""
             aria-hidden
-            style={{ width: '85%', height: 'auto', maxHeight: '32vh', objectFit: 'contain', objectPosition: 'left bottom' }}
+            style={{
+              width: '85%',
+              height: 'auto',
+              maxHeight: '32vh',
+              objectFit: 'contain',
+              objectPosition: 'left bottom',
+            }}
           />
         </Box>
 

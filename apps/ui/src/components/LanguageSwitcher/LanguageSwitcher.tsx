@@ -41,6 +41,7 @@ export const LanguageSwitcher = () => {
 
           '& .MuiOutlinedInput-root': {
             color: 'white',
+            backgroundColor: 'transparent',
             '& .MuiOutlinedInput-notchedOutline': {
               borderColor: 'white',
             },
