@@ -22,13 +22,27 @@ export default function DuplicatesBar({
   return (
     <Alert
       severity="warning"
-      sx={{ mb: 2, alignItems: 'center' }}
+      sx={{
+        mb: 2,
+        alignItems: 'center',
+        borderRadius: '16px',
+      }}
       action={
         <Stack direction="row" spacing={1}>
-          <CustomButton variantType="text" size="small" onClick={onSkipAll}>
+          <CustomButton
+            variantType="text"
+            color="secondary"
+            size="small"
+            onClick={onSkipAll}
+          >
             {pageText.SKIP_ALL}
           </CustomButton>
-          <CustomButton variantType="text" size="small" onClick={onImportAll}>
+          <CustomButton
+            variantType="text"
+            color="secondary"
+            size="small"
+            onClick={onImportAll}
+          >
             {pageText.IMPORT_ALL}
           </CustomButton>
         </Stack>

@@ -5,21 +5,18 @@ import {
   Container,
   Paper,
   Stack,
-  Typography,
   Tooltip,
 } from '@mui/material';
 import FileUploadOutlined from '@mui/icons-material/FileUploadOutlined';
-import Image from 'next/image';
 import { ReactNode, useState } from 'react';
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import UploadFileContainer from './UploadFileContainer';
 import UploadCsvTrustBar from './UploadCsvTrustBar';
 import UploadCsvFormatOverview from './UploadCsvFormatOverview';
-import UploadCsvStepper from './UploadCsvStepper';
+import ImportStepper from '@/components/ImportStepper/ImportStepper';
+import PageHero from '@/components/PageHero/PageHero';
 import UploadCsvWhatNext from './UploadCsvWhatNext';
-import heart from '../../../../../public/heart.png';
-import books from '../../../../../public/books.png';
 import { UiError } from '@/types/interfaces';
 import { useRouter } from 'next/navigation';
 import { uploadCsvFile } from '@/requests/importCsv';
@@ -65,52 +62,13 @@ export default function UploadCsvSection({
 
   return (
     <Container maxWidth="xl" disableGutters>
-      {/* Hero */}
-      <Box sx={{ position: 'relative', pb: { xs: 2, md: 3 } }}>
-        <Box sx={{ maxWidth: { md: '58%' } }}>
-          <Stack direction="row" alignItems="flex-start" spacing={1}>
-            <Typography
-              variant="h3"
-              component="h1"
-              sx={{
-                color: 'secondary.main',
-                fontSize: { xs: '2rem', md: '2.75rem' },
-              }}
-            >
-              {uploadCsvPageText.TITLE}
-            </Typography>
-            <Image src={heart} alt="" aria-hidden width={44} height={39} />
-          </Stack>
-
-          <Typography color="text.secondary" sx={{ mt: 1, maxWidth: 560 }}>
-            {uploadCsvPageText.SUBTITLE}
-          </Typography>
-        </Box>
-
-        <Box
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            position: 'absolute',
-            top: -16,
-            right: 0,
-            width: 'min(40%, 480px)',
-            pointerEvents: 'none',
-          }}
-        >
-          <Image
-            src={books}
-            alt=""
-            aria-hidden
-            style={{
-              width: '100%',
-              height: 'auto',
-            }}
-          />
-        </Box>
-      </Box>
+      <PageHero
+        title={uploadCsvPageText.TITLE}
+        subtitle={uploadCsvPageText.SUBTITLE}
+      />
 
       <Box sx={{ mt: { xs: 2, md: 5 } }}>
-        <UploadCsvStepper labels={uploadCsvPageText.STEPPER} />
+        <ImportStepper labels={uploadCsvPageText.STEPPER} currentStep={1} />
       </Box>
 
       <Box

@@ -4,6 +4,7 @@
 import {
   Autocomplete,
   Box,
+  Chip,
   createFilterOptions,
   Stack,
   TextField,
@@ -11,7 +12,7 @@ import {
 import { TAG_NAME_MAX_LENGTH } from 'schemas';
 import { interpolate } from '@/utils/interpolate';
 import { sameTagName, TagValue, tagKey } from '@/utils/tags';
-import { TagDot } from '@/components/TagChips/TagChips';
+import { TagDot, tagChipSx } from '@/components/TagChips/TagChips';
 
 type TagOption = TagValue & { create?: boolean };
 
@@ -90,7 +91,25 @@ export default function TagPicker({
           )}
         </li>
       )}
-      slotProps={{ chip: { size: 'small', sx: { maxWidth: 160 } } }}
+      renderValue={(selected, getItemProps) =>
+        selected.map((tag, index) => {
+          const { key, ...itemProps } = getItemProps({ index });
+          return (
+            <Chip
+              key={key}
+              {...itemProps}
+              size="small"
+              label={tag.name}
+              icon={<TagDot color={tag.color} />}
+              sx={{
+                maxWidth: 160,
+                pl: 0.75,
+                ...tagChipSx(tag.color, Boolean(tag.id)),
+              }}
+            />
+          );
+        })
+      }
       noOptionsText={text.NO_OPTIONS}
       renderInput={(params) => (
         <TextField

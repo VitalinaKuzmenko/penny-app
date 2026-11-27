@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Chip, Stack, Tooltip } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { TagValue, tagKey } from '@/utils/tags';
 
 interface TagChipsProps {
@@ -24,6 +25,29 @@ export function TagDot({ color }: { color?: string | null }) {
     />
   );
 }
+
+// Light fill and border from the tag colour; falls back to grey if unparsable
+const tint = (color: string | null | undefined) => {
+  if (!color) return null;
+  try {
+    return { bg: alpha(color, 0.16), border: alpha(color, 0.45) };
+  } catch {
+    return null;
+  }
+};
+
+// Shared look for every tag chip (cells, pickers, filters)
+export const tagChipSx = (
+  color: string | null | undefined,
+  // unsaved tags look provisional until Save
+  saved = true,
+) => ({
+  fontWeight: 600,
+  border: '1px solid',
+  bgcolor: tint(color)?.bg ?? 'grey.100',
+  borderColor: tint(color)?.border ?? 'grey.300',
+  borderStyle: saved ? 'solid' : 'dashed',
+});
 
 export default function TagChips({
   tags,
@@ -52,8 +76,7 @@ export default function TagChips({
             sx={{
               maxWidth: maxChipWidth,
               pl: 0.75,
-              // unsaved tags look provisional until Save
-              borderStyle: tag.id ? 'solid' : 'dashed',
+              ...tagChipSx(tag.color, Boolean(tag.id)),
             }}
           />
         </Tooltip>

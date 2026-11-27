@@ -1,20 +1,23 @@
 import { Box, Typography } from '@mui/material';
 import CheckRounded from '@mui/icons-material/CheckRounded';
 
-interface UploadCsvStepperProps {
+interface ImportStepperProps {
   labels: string[];
+  // zero-based index of the step the user is on
+  currentStep: number;
 }
 
-// Static progress indicator: this page is always step 2 of the import flow
-const CURRENT_STEP = 1;
-
-const UploadCsvStepper = ({ labels }: UploadCsvStepperProps) => (
+// Display-only progress indicator for the import flow
+const ImportStepper = ({ labels, currentStep }: ImportStepperProps) => (
   <Box
     component="ol"
     sx={{
       listStyle: 'none',
       m: 0,
       p: 0,
+      // keeps the steps above the hero illustration that overlaps them
+      position: 'relative',
+      zIndex: 1,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -22,8 +25,8 @@ const UploadCsvStepper = ({ labels }: UploadCsvStepperProps) => (
     }}
   >
     {labels.map((label, index) => {
-      const done = index < CURRENT_STEP;
-      const active = index === CURRENT_STEP;
+      const done = index < currentStep;
+      const active = index === currentStep;
 
       return (
         <Box
@@ -105,4 +108,4 @@ const UploadCsvStepper = ({ labels }: UploadCsvStepperProps) => (
   </Box>
 );
 
-export default UploadCsvStepper;
+export default ImportStepper;

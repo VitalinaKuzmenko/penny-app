@@ -77,7 +77,7 @@ export default function BulkCategoryBar({
 
       <Box sx={bulkButtonsSx}>
         <CustomButton
-          variantType="secondary"
+          variantType="contained"
           onClick={handleApply}
           disabled={!bulkCategory}
           sx={bulkButtonSx}

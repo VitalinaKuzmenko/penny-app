@@ -75,7 +75,7 @@ export default function MoneyJournalFilters({
   );
   const tagItems = useMemo(
     () => [
-      ...tags.map((t) => ({ id: t.id, label: t.name })),
+      ...tags.map((t) => ({ id: t.id, label: t.name, color: t.color })),
       { id: UNTAGGED_ID, label: text.TAG_FILTER.UNTAGGED },
     ],
     [tags, text],

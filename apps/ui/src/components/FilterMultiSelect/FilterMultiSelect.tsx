@@ -14,6 +14,7 @@ import {
   ListItemIcon,
 } from '@mui/material';
 import { ReactElement, useMemo } from 'react';
+import { tagChipSx } from '@/components/TagChips/TagChips';
 
 const ALL_VALUE = '__ALL__';
 const MAX_VISIBLE_CHIPS = 2;
@@ -23,6 +24,8 @@ export interface FilterItem {
   label: string;
   // e.g. a category icon, shown in the menu and on the selected chips
   icon?: ReactElement;
+  // tag colour: the selected chip gets the shared tinted tag style
+  color?: string | null;
 }
 
 interface FilterMultiSelectProps {
@@ -89,7 +92,10 @@ const FilterMultiSelect = ({
                   label={item.label}
                   icon={item.icon}
                   size="small"
-                  sx={{ maxWidth: 120 }}
+                  sx={{
+                    maxWidth: 120,
+                    ...(item.color !== undefined && tagChipSx(item.color)),
+                  }}
                 />
               ))}
 

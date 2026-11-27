@@ -4,6 +4,7 @@
 import * as React from 'react';
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid';
 import {
+  Box,
   Paper,
   Chip,
   Tooltip,
@@ -96,6 +97,10 @@ export default function TransactionsTable({
                         size="small"
                         color={wasDeleted ? 'default' : 'warning'}
                         variant="outlined"
+                        sx={{
+                          fontWeight: 600,
+                          bgcolor: wasDeleted ? undefined : '#FFF4E5',
+                        }}
                       />
                     </Tooltip>
                     <FormControlLabel
@@ -158,6 +163,20 @@ export default function TransactionsTable({
         minWidth: 100,
         flex: 1,
         filterable: true,
+        renderCell: (params) => {
+          const isMoneyIn = Number(params.row.amount) > 0;
+          return (
+            <Box
+              component="span"
+              sx={{
+                color: isMoneyIn ? 'success.dark' : 'inherit',
+                fontWeight: isMoneyIn ? 700 : 400,
+              }}
+            >
+              {params.value}
+            </Box>
+          );
+        },
       },
       {
         field: 'category',
@@ -220,18 +239,26 @@ export default function TransactionsTable({
   );
 
   return (
-    <Paper sx={{ height: 600, width: '100%', borderRadius: 4 }}>
+    <Paper
+      sx={{
+        height: 600,
+        width: '100%',
+        borderRadius: '20px',
+        overflow: 'hidden',
+      }}
+    >
       <DataGrid
         rows={rows}
         columns={columns}
         getRowId={(row) => row.id}
         checkboxSelection
         disableRowSelectionOnClick
-        getRowClassName={(params) =>
-          params.row.duplicate && !forceImportRows[params.row.id]
-            ? 'penny-row-skipped'
-            : ''
-        }
+        getRowClassName={(params) => {
+          if (!params.row.duplicate) return '';
+          return forceImportRows[params.row.id]
+            ? 'penny-row-duplicate'
+            : 'penny-row-duplicate penny-row-skipped';
+        }}
         rowSelectionModel={{
           type: 'include',
           ids: new Set<GridRowId>(selectedRows),
@@ -242,8 +269,20 @@ export default function TransactionsTable({
         filterMode="client"
         hideFooter={true}
         sx={{
+          border: 'none',
+          '--DataGrid-t-header-background-base': '#FBF3FA',
+          '--DataGrid-t-color-border-base': 'rgba(83, 36, 70, 0.08)',
+          '.MuiCheckbox-root.Mui-checked, .MuiCheckbox-root.MuiCheckbox-indeterminate':
+            {
+              color: 'secondary.main',
+            },
           '.MuiDataGrid-columnHeaderTitle': {
             fontWeight: 'bold',
+            color: 'secondary.main',
+          },
+          // Duplicates get a warm tint so they stand out from regular rows
+          '.penny-row-duplicate': {
+            backgroundColor: '#FFF4E5',
           },
           // Skipped duplicates read as "won't be imported" without hiding them
           '.penny-row-skipped': {
@@ -258,9 +297,10 @@ export default function TransactionsTable({
             outline: 'none',
           },
           // Remove row selection highlight
-          '.MuiDataGrid-row.Mui-selected': {
-            backgroundColor: 'transparent',
-          },
+          '.MuiDataGrid-row.Mui-selected, .MuiDataGrid-row.Mui-selected:hover':
+            {
+              backgroundColor: '#F5EAFB',
+            },
           '.MuiDataGrid-cell:focus-within': {
             outline: 'none',
           },

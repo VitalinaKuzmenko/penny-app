@@ -295,7 +295,8 @@
   },
   "TRANSACTIONS_PAGE": {
     "TITLE": "Check your transactions",
-    "SUBTITLE": "Make sure everything looks correct before saving.",
+    "SUBTITLE": "Check your imported transactions, assign categories, and make any edits before adding them to your finances.",
+    "STEPPER": ["Prepare CSV", "Upload", "Review & categorize"],
     "CURRENCY_SELECT": {
       "LABEL": "Currency",
       "PLACEHOLDER": "Select currency"
@@ -343,9 +344,12 @@
     },
     "FOOTER": {
       "BACK_TO_HOME_PAGE": "Back to home",
-      "SAVE_BUTTON": "Save & continue",
-      "SAVE_BUTTON_WITH_COUNT": "Save {count} transaction(s)",
-      "SKIPPED_SUFFIX": "({skipped} skipped)"
+      "SAVE_BUTTON": "Go to Penny's View",
+      "TRANSACTIONS_COUNT": "{count} transactions",
+      "SKIPPED_COUNT": "{count} duplicates (skipped)",
+      "READY_TITLE": "Looks good!",
+      "NOT_READY_TITLE": "Almost there!",
+      "READY_TEXT": "Once you're happy with your categories, add these transactions to your finances and see the bigger picture."
     },
     "ERRORS": {
       "IMPORT_NOT_FOUND": {

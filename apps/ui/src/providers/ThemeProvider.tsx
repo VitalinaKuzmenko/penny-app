@@ -164,7 +164,16 @@ export const theme = createTheme({
       styleOverrides: { paper: { borderRadius: 14 } },
     },
     MuiAlert: {
-      styleOverrides: { root: { borderRadius: 12 } },
+      styleOverrides: {
+        root: { borderRadius: 12 },
+        // brighter than MUI's default pale warning so it stands out on cream
+        standardWarning: {
+          backgroundColor: '#FFE2B8',
+          color: '#7A4100',
+          border: '1px solid #F7B04D',
+          '& .MuiAlert-icon': { color: '#E07B00' },
+        },
+      },
     },
     MuiTabs: {
       styleOverrides: {
