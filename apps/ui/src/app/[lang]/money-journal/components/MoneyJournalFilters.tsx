@@ -5,10 +5,12 @@ import { useMemo } from 'react';
 import {
   Box,
   FormControlLabel,
+  InputAdornment,
   MenuItem,
   Switch,
   TextField,
 } from '@mui/material';
+import SearchRounded from '@mui/icons-material/SearchRounded';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AccountWithActivity, Category, Tag } from 'schemas';
 import FilterMultiSelect from '@/components/FilterMultiSelect/FilterMultiSelect';
@@ -41,6 +43,16 @@ interface MoneyJournalFiltersProps {
   onApplyWith: (filters: Partial<Filters>) => void;
   onReset: () => void;
 }
+
+// same compact buttons as the Penny's View filters
+const compactButtonSx = {
+  height: 32,
+  minWidth: 0,
+  px: 1.5,
+  py: 0,
+  fontSize: '0.8rem',
+  borderRadius: '10px',
+} as const;
 
 export default function MoneyJournalFilters({
   accounts,
@@ -82,19 +94,20 @@ export default function MoneyJournalFilters({
   );
 
   return (
+    // no card around the filters: controls sit on the page background, as on Penny's View
     <Box
-      display="grid"
-      gap={2}
-      mb={3}
-      gridTemplateColumns={{
-        xs: '1fr',
-        sm: '1fr 1fr',
-        md: 'repeat(3, 1fr)',
-        lg: 'repeat(4, 1fr)',
+      sx={{
+        mb: 2.5,
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 1.5,
+        '& .MuiOutlinedInput-root': { bgcolor: 'transparent' },
+        // every control fills its flex item, whatever the screen size
+        '& .MuiFormControl-root': { width: '100%', minWidth: 0 },
       }}
-      alignItems="center"
     >
-      <Box gridColumn="1 / -1">
+      <Box sx={{ flex: '1 1 100%' }}>
         <YearPresets
           years={years}
           selected={getSelectedPreset(
@@ -110,82 +123,118 @@ export default function MoneyJournalFilters({
         />
       </Box>
 
-      <DatePicker
-        label={text.START_DATE.LABEL}
-        value={filters.startDate}
-        onChange={(startDate) => setFilters({ startDate })}
-        slotProps={{ textField: { size: 'small' } }}
-        format="DD/MM/YYYY"
-      />
+      <Box sx={{ flex: '1 1 150px', minWidth: 0 }}>
+        <DatePicker
+          label={text.START_DATE.LABEL}
+          value={filters.startDate}
+          onChange={(startDate) => setFilters({ startDate })}
+          slotProps={{ textField: { size: 'small', fullWidth: true } }}
+          format="DD/MM/YYYY"
+        />
+      </Box>
 
-      <DatePicker
-        label={text.END_DATE.LABEL}
-        value={filters.endDate}
-        onChange={(endDate) => setFilters({ endDate })}
-        slotProps={{ textField: { size: 'small' } }}
-        format="DD/MM/YYYY"
-      />
+      <Box sx={{ flex: '1 1 150px', minWidth: 0 }}>
+        <DatePicker
+          label={text.END_DATE.LABEL}
+          value={filters.endDate}
+          onChange={(endDate) => setFilters({ endDate })}
+          slotProps={{ textField: { size: 'small', fullWidth: true } }}
+          format="DD/MM/YYYY"
+        />
+      </Box>
 
-      <TextField
-        select
-        size="small"
-        label={text.TYPE_SELECT.LABEL}
-        value={filters.type}
-        onChange={(e) =>
-          setFilters({ type: e.target.value as MoneyJournalTypeFilter })
-        }
-      >
-        {types.map((t) => (
-          <MenuItem key={t} value={t}>
-            {text.TYPE_SELECT.OPTIONS[t]}
-          </MenuItem>
-        ))}
-      </TextField>
+      <Box sx={{ flex: '1 1 150px', minWidth: 0 }}>
+        <TextField
+          select
+          size="small"
+          fullWidth
+          label={text.TYPE_SELECT.LABEL}
+          value={filters.type}
+          onChange={(e) =>
+            setFilters({ type: e.target.value as MoneyJournalTypeFilter })
+          }
+        >
+          {types.map((t) => (
+            <MenuItem key={t} value={t}>
+              {text.TYPE_SELECT.OPTIONS[t]}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Box>
 
-      <TextField
-        size="small"
-        label={text.SEARCH.LABEL}
-        value={filters.search}
-        onChange={(e) => setFilters({ search: e.target.value })}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && isDirty) onApply();
+      <Box sx={{ flex: '2 1 240px', minWidth: 0 }}>
+        <TextField
+          size="small"
+          fullWidth
+          label={text.SEARCH.LABEL}
+          value={filters.search}
+          onChange={(e) => setFilters({ search: e.target.value })}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && isDirty) onApply();
+          }}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchRounded fontSize="small" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+      </Box>
+
+      {/* forces the multi-selects onto their own row on wide screens */}
+      <Box
+        sx={{
+          flexBasis: '100%',
+          height: 0,
+          display: { xs: 'none', lg: 'block' },
         }}
       />
 
-      <FilterMultiSelect
-        label={text.CATEGORY_FILTER.LABEL}
-        items={categoryItems}
-        value={filters.categoryIds}
-        onChange={(categoryIds) => setFilters({ categoryIds })}
-        minWidth={0}
-      />
+      <Box sx={{ flex: '1 1 220px', minWidth: 0 }}>
+        <FilterMultiSelect
+          label={text.CATEGORY_FILTER.LABEL}
+          items={categoryItems}
+          value={filters.categoryIds}
+          onChange={(categoryIds) => setFilters({ categoryIds })}
+          minWidth={0}
+        />
+      </Box>
 
-      <FilterMultiSelect
-        label={text.ACCOUNT_FILTER.LABEL}
-        items={accountItems}
-        value={filters.accountIds}
-        onChange={(accountIds) => setFilters({ accountIds })}
-        minWidth={0}
-      />
+      <Box sx={{ flex: '1 1 220px', minWidth: 0 }}>
+        <FilterMultiSelect
+          label={text.ACCOUNT_FILTER.LABEL}
+          items={accountItems}
+          value={filters.accountIds}
+          onChange={(accountIds) => setFilters({ accountIds })}
+          minWidth={0}
+        />
+      </Box>
 
-      <FilterMultiSelect
-        label={text.TAG_FILTER.LABEL}
-        items={tagItems}
-        value={filters.tagIds}
-        clearAllLabel={text.TAG_FILTER.CLEAR_ALL}
-        // every tag plus Untagged is the same as no filter; stored as [] so a tag
-        // created later doesn't turn "everything" into a real filter
-        onChange={(tagIds) =>
-          setFilters({
-            tagIds: tagIds.length === tagItems.length ? [] : tagIds,
-          })
-        }
-        minWidth={0}
-      />
+      <Box sx={{ flex: '1 1 220px', minWidth: 0 }}>
+        <FilterMultiSelect
+          label={text.TAG_FILTER.LABEL}
+          items={tagItems}
+          value={filters.tagIds}
+          clearAllLabel={text.TAG_FILTER.CLEAR_ALL}
+          // every tag plus Untagged is the same as no filter; stored as [] so a tag
+          // created later doesn't turn "everything" into a real filter
+          onChange={(tagIds) =>
+            setFilters({
+              tagIds: tagIds.length === tagItems.length ? [] : tagIds,
+            })
+          }
+          minWidth={0}
+        />
+      </Box>
 
       <FormControlLabel
+        sx={{ flex: '0 0 auto', m: 0, whiteSpace: 'nowrap' }}
         control={
           <Switch
+            color="secondary"
             checked={filters.showDeleted}
             onChange={(e) => setFilters({ showDeleted: e.target.checked })}
           />
@@ -193,19 +242,28 @@ export default function MoneyJournalFilters({
         label={text.SHOW_DELETED}
       />
 
-      <Box display="flex" gap={2}>
+      {/* Buttons wrap as one group, never one by one */}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          flex: { xs: '1 1 100%', sm: '0 0 auto' },
+          '& > *': { flex: { xs: 1, sm: '0 0 auto' } },
+        }}
+      >
         <CustomButton
-          variantType="secondary"
+          variantType="outlined"
+          color="secondary"
           onClick={onReset}
-          sx={{ flex: 1 }}
+          sx={compactButtonSx}
         >
           {text.RESET_BUTTON}
         </CustomButton>
         <CustomButton
-          variantType="primary"
+          variantType="contained"
           onClick={onApply}
           disabled={isInitialized ? !isDirty : true}
-          sx={{ flex: 1 }}
+          sx={compactButtonSx}
         >
           {text.APPLY_BUTTON}
         </CustomButton>

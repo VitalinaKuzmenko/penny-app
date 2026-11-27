@@ -10,6 +10,7 @@ import {
   GridSortModel,
 } from '@mui/x-data-grid';
 import { Chip, IconButton, Paper, Stack, Tooltip } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import UndoIcon from '@mui/icons-material/Undo';
@@ -130,8 +131,8 @@ export default function MoneyJournalTable({
           return (
             <span
               style={{
-                color: isMoneyOut ? '#d32f2f' : '#2e7d32',
-                fontWeight: 500,
+                color: isMoneyOut ? '#D94656' : '#047857',
+                fontWeight: 600,
               }}
             >
               {formatMoney(
@@ -166,6 +167,18 @@ export default function MoneyJournalTable({
                     ? 'success'
                     : 'primary'
               }
+              sx={{
+                fontWeight: 600,
+                bgcolor: (t) =>
+                  type === 'EXPENSE'
+                    ? 'background.paper'
+                    : alpha(
+                        type === 'REFUND'
+                          ? t.palette.success.main
+                          : t.palette.primary.main,
+                        0.08,
+                      ),
+              }}
             />
           );
         },
@@ -281,6 +294,13 @@ export default function MoneyJournalTable({
                 <IconButton
                   size="small"
                   aria-label={action.title}
+                  sx={{
+                    bgcolor: action.deleted ? '#FDEBEE' : '#F5EAFB',
+                    color: action.deleted ? '#D94656' : 'secondary.main',
+                    '&:hover': {
+                      bgcolor: action.deleted ? '#FBDDE2' : '#EEDDF8',
+                    },
+                  }}
                   onClick={() =>
                     onChange(params.row, { deleted: action.deleted })
                   }
@@ -305,7 +325,15 @@ export default function MoneyJournalTable({
   );
 
   return (
-    <Paper sx={{ height: 700, width: '100%', borderRadius: 4 }}>
+    <Paper
+      sx={{
+        height: 700,
+        width: '100%',
+        borderRadius: '24px',
+        overflow: 'hidden',
+        bgcolor: '#FFFBF9',
+      }}
+    >
       <DataGrid
         rows={rows}
         rowCount={rowCount}
@@ -345,8 +373,24 @@ export default function MoneyJournalTable({
         }}
         localeText={{ noRowsLabel: text.NO_ROWS }}
         sx={{
+          border: 'none',
+          '--DataGrid-t-header-background-base': '#FBF3FA',
+          '--DataGrid-t-color-border-base': 'rgba(83, 36, 70, 0.08)',
+          '--DataGrid-t-color-background-base': '#FFFBF9',
           '.MuiDataGrid-columnHeaderTitle': {
             fontWeight: 'bold',
+            color: 'secondary.main',
+          },
+          '.MuiCheckbox-root.Mui-checked, .MuiCheckbox-root.MuiCheckbox-indeterminate':
+            {
+              color: 'secondary.main',
+            },
+          '.MuiDataGrid-row.Mui-selected, .MuiDataGrid-row.Mui-selected:hover':
+            {
+              bgcolor: '#F5EAFB',
+            },
+          '.MuiDataGrid-footerContainer': {
+            borderTop: '1px solid rgba(83, 36, 70, 0.08)',
           },
           '.mj-row-deleted': {
             opacity: 0.5,

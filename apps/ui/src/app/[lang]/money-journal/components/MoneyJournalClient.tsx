@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Paper, Snackbar, Stack, Typography } from '@mui/material';
 import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import {
   Account,
   AccountWithActivity,
@@ -19,6 +20,7 @@ import BulkActionsPanel from '@/components/BulkActionsPanel/BulkActionsPanel';
 import BulkCategoryBar from '@/components/BulkCategoryBar/BulkCategoryBar';
 import BulkTagBar from '@/components/BulkTagBar/BulkTagBar';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
+import PageHero from '@/components/PageHero/PageHero';
 import { UiError } from '@/types/interfaces';
 import { getTransactions } from '@/requests/getTransactions';
 import { updateTransactions } from '@/requests/updateTransactions';
@@ -320,15 +322,8 @@ export default function MoneyJournalClient({
   };
 
   return (
-    <Box sx={{ p: { xs: 1, md: 3 } }}>
-      <Box>
-        <Typography variant="h4" fontWeight={600} gutterBottom>
-          {pageText.TITLE}
-        </Typography>
-        <Typography color="text.secondary" mb={3}>
-          {pageText.SUBTITLE}
-        </Typography>
-      </Box>
+    <Box>
+      <PageHero title={pageText.TITLE} subtitle={pageText.SUBTITLE} />
 
       {serverErrors?.map((error) => (
         <ErrorBanner key={error.message} error={error} />
@@ -371,7 +366,9 @@ export default function MoneyJournalClient({
         }
       />
 
-      <TotalsBar totals={data?.totals ?? null} pageText={pageText} />
+      <Box sx={{ mb: 2.5 }}>
+        <TotalsBar totals={data?.totals ?? null} pageText={pageText} />
+      </Box>
 
       <BulkActionsPanel
         selectedCount={selectedRows.length}
@@ -381,7 +378,9 @@ export default function MoneyJournalClient({
             variantType="secondary"
             color="error"
             size="small"
+            startIcon={<DeleteOutline />}
             onClick={() => applyToSelection({ deleted: true })}
+            sx={{ bgcolor: 'background.paper' }}
           >
             {pageText.BULK_CATEGORY_BAR.DELETE_BUTTON}
           </CustomButton>
@@ -447,8 +446,11 @@ export default function MoneyJournalClient({
             bottom: 16,
             mt: 2,
             p: 2,
-            borderRadius: 4,
+            borderRadius: '20px',
             zIndex: 10,
+            bgcolor: '#F5EAFB',
+            border: '1px solid',
+            borderColor: 'secondary.light',
           }}
         >
           <Stack
@@ -457,12 +459,13 @@ export default function MoneyJournalClient({
             alignItems="center"
             justifyContent="space-between"
           >
-            <Typography fontWeight={500}>
+            <Typography fontWeight={700} color="secondary.main">
               {interpolate(pageText.SAVE_BAR.UNSAVED, { count: changeCount })}
             </Typography>
             <Stack direction="row" spacing={2}>
               <CustomButton
                 variantType="text"
+                color="secondary"
                 onClick={discardChanges}
                 disabled={isSaving}
               >
