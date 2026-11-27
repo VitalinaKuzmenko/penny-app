@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Box,
-  Container,
-  Paper,
-  Stack,
-  Tooltip,
-} from '@mui/material';
+import { Box, Container, Paper, Stack, Tooltip } from '@mui/material';
 import FileUploadOutlined from '@mui/icons-material/FileUploadOutlined';
 import { ReactNode, useState } from 'react';
 

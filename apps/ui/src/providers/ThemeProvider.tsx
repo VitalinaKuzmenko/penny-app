@@ -88,7 +88,7 @@ export const theme = createTheme({
       text: '#F6E9F1',
       mutedText: 'rgba(246, 233, 241, 0.72)',
       hover: 'rgba(255, 255, 255, 0.08)',
-      activeBackground: '#F1E8FB', // lavender
+      activeBackground: '#F1DDFD', // lavender
       activeText: plumDark,
     },
   },

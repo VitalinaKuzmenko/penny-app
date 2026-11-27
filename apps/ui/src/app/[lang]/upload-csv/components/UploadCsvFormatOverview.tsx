@@ -62,13 +62,14 @@ const UploadCsvFormatOverview = ({
           <Stack
             key={item.title}
             direction="row"
-            spacing={1.5}
+            spacing={0.75}
             alignItems="center"
             sx={{
               px: { sm: 2 },
               borderLeft: { sm: index > 0 ? '1px solid' : 'none' },
-              borderColor: 'divider',
+              borderColor: 'rgba(83, 36, 70, 0.07)',
               color: 'secondary.main',
+              '& > .MuiSvgIcon-root': { fontSize: 38, flexShrink: 0 },
             }}
           >
             {item.icon}

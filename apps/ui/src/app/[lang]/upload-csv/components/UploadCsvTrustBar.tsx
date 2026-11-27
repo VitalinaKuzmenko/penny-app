@@ -36,8 +36,12 @@ const UploadCsvTrustBar = ({ trustBarTextItems }: UploadCsvTrustBarProps) => (
               borderColor: 'success.light',
             }}
           >
-            <Stack direction="row" spacing={0.75} alignItems="center">
-              <Icon fontSize="small" sx={{ color: 'success.dark' }} />
+            <Stack direction="row" spacing={0.75} alignItems="flex-start">
+              {/* stays on the first line when the title wraps */}
+              <Icon
+                fontSize="small"
+                sx={{ color: 'success.dark', flexShrink: 0, mt: '1px' }}
+              />
               <Typography variant="body2" fontWeight={700} color="text.primary">
                 {item.TITLE}
               </Typography>
