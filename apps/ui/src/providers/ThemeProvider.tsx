@@ -7,7 +7,7 @@ import {
 import CssBaseline from '@mui/material/CssBaseline';
 import { ReactNode } from 'react';
 
-const plum = '#532446';
+const plum = '#592148';
 const plumDark = '#3A1832';
 const radius = 16;
 const softShadow = '0 4px 20px rgba(83, 36, 70, 0.08)';
@@ -57,7 +57,7 @@ export const theme = createTheme({
       main: '#38BDF8',
     },
     background: {
-      default: '#FBF3EA', // warm cream
+      default: '#FEF3F0', // warm cream
       paper: '#FFFFFF',
     },
     text: {

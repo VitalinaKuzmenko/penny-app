@@ -255,7 +255,7 @@ export const Navbar: React.FC<NavbarProps> = ({ headerText }) => {
             alt=""
             aria-hidden
             style={{
-              width: '85%',
+              width: '100%',
               height: 'auto',
               maxHeight: '32vh',
               objectFit: 'contain',
