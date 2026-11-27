@@ -24,7 +24,7 @@ const AccountFilter = ({ accounts, pennysViewPageText }: Props) => {
       items={items}
       value={filters.accountIds}
       onChange={(accountIds) => setFilters({ accountIds })}
-      minWidth={320}
+      minWidth={0}
     />
   );
 };

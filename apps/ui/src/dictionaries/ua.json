@@ -394,6 +394,16 @@
   "DASHBOARD_PAGE": {
     "TITLE": "Мій Penny",
     "SUBTITLE": "Ваша фінансова історія з першого погляду: скільки надійшло, скільки витрачено і як у вас справи загалом.",
+    "INSIGHTS": {
+      "SAVED_TITLE": "Ви заощадили {percent}% доходу",
+      "SAVED_TEXT": "Загалом відкладено: {amount}.",
+      "NO_SAVINGS_TITLE": "У цьому періоді немає заощаджень",
+      "NO_SAVINGS_TEXT": "Доходи: {income}, витрати: {expense}.",
+      "TOP_CATEGORY_TITLE": "{name} — ваша головна категорія",
+      "TOP_CATEGORY_TEXT": "{amount} ({percent}% усіх витрат).",
+      "TOP_MONTH_TITLE": "Найбільше ви витратили в {month}",
+      "TOP_MONTH_TEXT": "Усього витрат: {amount}."
+    },
     "FILTERS": {
       "YEAR_PRESETS": {
         "OLDER": "Раніше",

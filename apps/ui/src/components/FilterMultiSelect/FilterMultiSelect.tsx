@@ -48,7 +48,10 @@ const FilterMultiSelect = ({
   clearAllLabel,
 }: FilterMultiSelectProps) => {
   const allIds = useMemo(() => items.map((i) => i.id), [items]);
-  const isAllSelected = value.length === allIds.length && allIds.length > 0;
+  // value may hold ids that aren't offered here (e.g. hidden transfer
+  // categories), so compare against the offered items, not the length
+  const isAllSelected =
+    allIds.length > 0 && allIds.every((id) => value.includes(id));
 
   const handleChange = (event: SelectChangeEvent<string[]>) => {
     const selected = event.target.value as string[];

@@ -25,10 +25,13 @@ import InsertChartOutlinedRounded from '@mui/icons-material/InsertChartOutlinedR
 
 interface IncomeExpenceStackedChartProps {
   pennysViewPageText: Record<string, any>;
+  // lets the insight cards reuse this chart's data instead of fetching again
+  onData?: (data: IncomeExpenseStackedResponse | null) => void;
 }
 
 export default function IncomeExpenseStackedChart({
   pennysViewPageText,
+  onData,
 }: IncomeExpenceStackedChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
 
@@ -43,6 +46,7 @@ export default function IncomeExpenseStackedChart({
 
     const fetchData = async () => {
       setLoading(true);
+      onData?.(null);
       setError(null);
 
       try {
@@ -53,6 +57,7 @@ export default function IncomeExpenseStackedChart({
         });
 
         setData(result);
+        onData?.(result);
       } catch (err) {
         if (err instanceof ApiError) {
           setError({

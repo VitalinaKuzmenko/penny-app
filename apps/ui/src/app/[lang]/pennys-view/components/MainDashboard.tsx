@@ -19,7 +19,12 @@ import TagSpendChart from './charts/TagSpendChart';
 import DashboardCard from './DashboardCard';
 import SummaryCards from './SummaryCards';
 import PageHero from '@/components/PageHero/PageHero';
-import { GetIncomeExpenseResponse } from 'schemas';
+import InsightCards from './InsightCards';
+import {
+  CategoryBreakdownResponse,
+  GetIncomeExpenseResponse,
+  IncomeExpenseStackedResponse,
+} from 'schemas';
 
 interface MainDashboardProps {
   accounts: AccountWithActivity[];
@@ -34,11 +39,13 @@ const MainDashboard = ({
   serverErrors,
   pennysViewPageText,
 }: MainDashboardProps) => {
-  const { initFilters, isInitialized, appliedFilters } = useDashboardFilters();
+  const { initFilters, isInitialized } = useDashboardFilters();
   const [incomeExpense, setIncomeExpense] =
     useState<GetIncomeExpenseResponse | null>(null);
-  // same year rule as the Income vs Expense chart
-  const year = appliedFilters.startDate?.year() ?? new Date().getFullYear();
+  const [categoryBreakdown, setCategoryBreakdown] =
+    useState<CategoryBreakdownResponse | null>(null);
+  const [monthlyTotals, setMonthlyTotals] =
+    useState<IncomeExpenseStackedResponse | null>(null);
 
   useEffect(() => {
     if (!isInitialized) {
@@ -76,7 +83,6 @@ const MainDashboard = ({
         <Stack spacing={2.5}>
           <SummaryCards
             data={incomeExpense}
-            year={year}
             pennysViewPageText={pennysViewPageText}
           />
 
@@ -105,9 +111,17 @@ const MainDashboard = ({
               <CategoryBreakdownChart
                 categories={categories}
                 pennysViewPageText={pennysViewPageText}
+                onData={setCategoryBreakdown}
               />
             </DashboardCard>
           </Box>
+
+          <InsightCards
+            incomeExpense={incomeExpense}
+            categoryBreakdown={categoryBreakdown}
+            monthlyTotals={monthlyTotals}
+            pennysViewPageText={pennysViewPageText}
+          />
 
           <Box
             sx={{
@@ -122,6 +136,7 @@ const MainDashboard = ({
             <DashboardCard>
               <IncomeExpenseStackedChart
                 pennysViewPageText={pennysViewPageText}
+                onData={setMonthlyTotals}
               />
             </DashboardCard>
             <DashboardCard>

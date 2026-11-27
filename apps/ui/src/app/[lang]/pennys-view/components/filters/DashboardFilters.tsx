@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { Box, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 import { useMemo } from 'react';
 import { useDashboardFilters } from '@/providers/FilterContext';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -23,6 +23,16 @@ interface DashboardFiltersProps {
   pennysViewPageText: Record<string, any>;
 }
 
+// small buttons so Reset and Apply fit on the same row as the filters
+const compactButtonSx = {
+  height: 32,
+  minWidth: 0,
+  px: 1.5,
+  py: 0,
+  fontSize: '0.8rem',
+  borderRadius: '10px',
+} as const;
+
 const DashboardFilters = ({
   accounts,
   categories,
@@ -42,27 +52,25 @@ const DashboardFilters = ({
   const years = useMemo(() => getPresetYears(accounts), [accounts]);
 
   return (
-    <Paper
+    // no card around the filters: each control sits directly on the page background
+    <Box
       sx={{
-        p: { xs: 2, md: 2 },
         mb: 2.5,
-        borderRadius: '20px',
-        bgcolor: '#FFFBF9',
+        // inputs show the page background; only their option lists stay white
+        '& .MuiOutlinedInput-root': { bgcolor: 'transparent' },
       }}
     >
       <Box
-        display="grid"
-        gap={1.5}
-        alignItems="center"
-        gridTemplateColumns={{
-          xs: 'minmax(0, 1fr)',
-          sm: 'repeat(2, minmax(0, 1fr))',
-          md: 'repeat(3, minmax(0, 1fr))',
-          // dates and type stay compact; the multi-selects get the room
-          xl: 'repeat(3, minmax(0, 0.8fr)) repeat(2, minmax(0, 1.4fr)) auto auto',
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 1.5,
+          // every control fills its flex item, whatever the screen size
+          '& .MuiFormControl-root': { width: '100%', minWidth: 0 },
         }}
       >
-        <Box gridColumn="1 / -1">
+        <Box sx={{ flex: '1 1 100%' }}>
           <YearPresets
             years={years}
             selected={getSelectedPreset(
@@ -74,57 +82,76 @@ const DashboardFilters = ({
             disabled={!isInitialized}
           />
         </Box>
+
         {/* Start date */}
-        <DatePicker
-          label={pennysViewPageText.FILTERS.START_DATE.LABEL}
-          value={filters.startDate}
-          onChange={(newValue) => setFilters({ startDate: newValue })}
-          slotProps={{ textField: { size: 'small' } }}
-          format="DD/MM/YYYY"
-        />
+        <Box sx={{ flex: '1 1 150px', minWidth: 0 }}>
+          <DatePicker
+            label={pennysViewPageText.FILTERS.START_DATE.LABEL}
+            value={filters.startDate}
+            onChange={(newValue) => setFilters({ startDate: newValue })}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+            format="DD/MM/YYYY"
+          />
+        </Box>
 
         {/* End date */}
-        <DatePicker
-          label={pennysViewPageText.FILTERS.END_DATE.LABEL}
-          value={filters.endDate}
-          onChange={(newValue) => setFilters({ endDate: newValue })}
-          slotProps={{ textField: { size: 'small' } }}
-          format="DD/MM/YYYY"
-        />
+        <Box sx={{ flex: '1 1 150px', minWidth: 0 }}>
+          <DatePicker
+            label={pennysViewPageText.FILTERS.END_DATE.LABEL}
+            value={filters.endDate}
+            onChange={(newValue) => setFilters({ endDate: newValue })}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+            format="DD/MM/YYYY"
+          />
+        </Box>
 
-        <TypeSelect pennysViewPageText={pennysViewPageText} />
+        <Box sx={{ flex: '1 1 130px', minWidth: 0 }}>
+          <TypeSelect pennysViewPageText={pennysViewPageText} />
+        </Box>
 
-        {/* <CategoryMultiSelect categories={categories} /> */}
-        <CategoryFilter
-          categories={categories}
-          pennysViewPageText={pennysViewPageText}
-        />
+        <Box sx={{ flex: '2 1 220px', minWidth: 0 }}>
+          <CategoryFilter
+            categories={categories}
+            pennysViewPageText={pennysViewPageText}
+          />
+        </Box>
 
-        <AccountFilter
-          accounts={accounts}
-          pennysViewPageText={pennysViewPageText}
-        />
+        <Box sx={{ flex: '2 1 220px', minWidth: 0 }}>
+          <AccountFilter
+            accounts={accounts}
+            pennysViewPageText={pennysViewPageText}
+          />
+        </Box>
 
-        {/* Reset button */}
-        <CustomButton
-          variantType="outlined"
-          onClick={resetFilters}
-          sx={{ height: 40, px: 3 }}
+        {/* Buttons wrap as one group, never one by one */}
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            flex: { xs: '1 1 100%', sm: '0 0 auto' },
+            '& > *': { flex: { xs: 1, sm: '0 0 auto' } },
+          }}
         >
-          {pennysViewPageText.FILTERS.RESET_BUTTON}
-        </CustomButton>
+          <CustomButton
+            variantType="outlined"
+            color="secondary"
+            onClick={resetFilters}
+            sx={compactButtonSx}
+          >
+            {pennysViewPageText.FILTERS.RESET_BUTTON}
+          </CustomButton>
 
-        {/* Apply button */}
-        <CustomButton
-          variantType="contained"
-          onClick={applyFilters}
-          sx={{ height: 40, px: 3 }}
-          disabled={isInitialized ? !isDirty : true}
-        >
-          {pennysViewPageText.FILTERS.APPLY_BUTTON}
-        </CustomButton>
+          <CustomButton
+            variantType="contained"
+            onClick={applyFilters}
+            sx={compactButtonSx}
+            disabled={isInitialized ? !isDirty : true}
+          >
+            {pennysViewPageText.FILTERS.APPLY_BUTTON}
+          </CustomButton>
+        </Box>
       </Box>
-    </Paper>
+    </Box>
   );
 };
 

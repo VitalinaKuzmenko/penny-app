@@ -400,6 +400,16 @@
   "DASHBOARD_PAGE": {
     "TITLE": "Penny's View",
     "SUBTITLE": "Your money story at a glance — see what came in, what went out, and how you're doing overall.",
+    "INSIGHTS": {
+      "SAVED_TITLE": "You saved {percent}% of income",
+      "SAVED_TEXT": "That's {amount} saved in total.",
+      "NO_SAVINGS_TITLE": "No savings in this period",
+      "NO_SAVINGS_TEXT": "Income {income}, expenses {expense}.",
+      "TOP_CATEGORY_TITLE": "{name} is your top category",
+      "TOP_CATEGORY_TEXT": "{amount} ({percent}% of total spending).",
+      "TOP_MONTH_TITLE": "Your highest spending month was {month}",
+      "TOP_MONTH_TEXT": "{amount} in total expenses."
+    },
     "FILTERS": {
       "YEAR_PRESETS": {
         "OLDER": "Older",

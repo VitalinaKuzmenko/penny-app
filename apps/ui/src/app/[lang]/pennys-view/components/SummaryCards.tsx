@@ -15,7 +15,6 @@ import savingsCoins from '../../../../../public/savings_right_coins.png';
 interface SummaryCardsProps {
   // same totals the Income vs Expense chart shows; null while loading or on error
   data: GetIncomeExpenseResponse | null;
-  year: number;
   pennysViewPageText: Record<string, any>;
 }
 
@@ -29,7 +28,6 @@ interface CardConfig {
 
 export default function SummaryCards({
   data,
-  year,
   pennysViewPageText,
 }: SummaryCardsProps) {
   const names = pennysViewPageText.CHARTS.INCOME_EXPENSE.CHART_NAMES;
@@ -125,9 +123,6 @@ export default function SummaryCards({
                   sx={{ color: 'secondary.main', lineHeight: 1.2 }}
                 >
                   {card.label}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {year}
                 </Typography>
               </Stack>
               <Typography

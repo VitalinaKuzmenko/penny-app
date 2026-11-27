@@ -29,11 +29,14 @@ import {
 interface CategoryBreakdownChartProps {
   categories: Category[];
   pennysViewPageText: Record<string, any>;
+  // lets the insight cards reuse this chart's data instead of fetching again
+  onData?: (data: CategoryBreakdownResponse | null) => void;
 }
 
 export default function CategoryBreakdownChart({
   categories,
   pennysViewPageText,
+  onData,
 }: CategoryBreakdownChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
 
@@ -50,6 +53,7 @@ export default function CategoryBreakdownChart({
 
     const fetchData = async () => {
       setLoading(true);
+      onData?.(null);
       setError(null);
 
       try {
@@ -61,6 +65,7 @@ export default function CategoryBreakdownChart({
         });
 
         setData(result);
+        onData?.(result);
       } catch (err) {
         if (err instanceof ApiError) {
           setError({

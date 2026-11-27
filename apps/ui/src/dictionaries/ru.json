@@ -394,6 +394,16 @@
   "DASHBOARD_PAGE": {
     "TITLE": "Мой Penny",
     "SUBTITLE": "Ваша финансовая история с первого взгляда: сколько пришло, сколько ушло и как у вас дела в целом.",
+    "INSIGHTS": {
+      "SAVED_TITLE": "Вы сохранили {percent}% дохода",
+      "SAVED_TEXT": "Всего отложено: {amount}.",
+      "NO_SAVINGS_TITLE": "В этом периоде нет сбережений",
+      "NO_SAVINGS_TEXT": "Доходы: {income}, расходы: {expense}.",
+      "TOP_CATEGORY_TITLE": "{name} — ваша главная категория",
+      "TOP_CATEGORY_TEXT": "{amount} ({percent}% всех расходов).",
+      "TOP_MONTH_TITLE": "Больше всего вы потратили в {month}",
+      "TOP_MONTH_TEXT": "Всего расходов: {amount}."
+    },
     "FILTERS": {
       "YEAR_PRESETS": {
         "OLDER": "Ранее",
