@@ -4,6 +4,7 @@ import { ListTransactionsQuerySchema, UpdateTransactionsSchema } from 'schemas';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { TagsService } from '../tags/tags.service';
+import { excludeInternalTransfers } from '../utils/exclude-transfers';
 import { WinstonLogger } from '../utils/logger/logger';
 
 import { TransactionsService } from './transactions.service';
@@ -150,7 +151,9 @@ describe('TransactionsService', () => {
         expect.objectContaining({ where: listWhere }),
       );
       expect(prisma.transaction.groupBy).toHaveBeenCalledWith(
-        expect.objectContaining({ where: listWhere }),
+        expect.objectContaining({
+          where: { AND: [listWhere, excludeInternalTransfers] },
+        }),
       );
     });
 
@@ -194,7 +197,9 @@ describe('TransactionsService', () => {
         ],
       });
       // the totals follow the tag filter too, so they give the event total
-      expect(prisma.transaction.groupBy.mock.calls[0][0].where).toEqual(where);
+      expect(prisma.transaction.groupBy.mock.calls[0][0].where.AND[0]).toEqual(
+        where,
+      );
     });
 
     it('returns each row’s tags sorted by name', async () => {
@@ -220,16 +225,20 @@ describe('TransactionsService', () => {
 
       const { where: listWhere } = prisma.transaction.findMany.mock.calls[0][0];
       expect(listWhere).toEqual({ userId: USER_ID });
+      const totalsWhere = { AND: [{ userId: USER_ID }, { deletedAt: null }] };
+      expect(prisma.transaction.count).toHaveBeenCalledWith({
+        where: totalsWhere,
+      });
       expect(prisma.transaction.groupBy.mock.calls[0][0].where).toEqual({
-        AND: [{ userId: USER_ID }, { deletedAt: null }],
+        AND: [totalsWhere, excludeInternalTransfers],
       });
     });
 
-    it('totals the whole filtered set: refunds come off spent, transfers count, spent can go negative', async () => {
+    it('totals money like Penny’s View: transfers left out, refunds net off spent down to 0', async () => {
       prisma.transaction.groupBy.mockResolvedValue([
-        { type: 'INCOME', _sum: { amount: '1000' }, _count: { _all: 3 } },
-        { type: 'EXPENSE', _sum: { amount: '30.10' }, _count: { _all: 2 } },
-        { type: 'REFUND', _sum: { amount: '50.20' }, _count: { _all: 1 } },
+        { type: 'INCOME', _sum: { amount: '1000' } },
+        { type: 'EXPENSE', _sum: { amount: '30.10' } },
+        { type: 'REFUND', _sum: { amount: '50.20' } },
       ]);
       prisma.transaction.count.mockResolvedValue(6);
 
@@ -238,14 +247,27 @@ describe('TransactionsService', () => {
       expect(result.rowCount).toBe(6);
       expect(result.totals).toEqual({
         count: 6,
-        spent: -20.1,
+        spent: 0,
         income: 1000,
-        net: 1020.1,
+        net: 1000,
       });
-      // no transfer exclusion, unlike the charts
-      expect(
-        JSON.stringify(prisma.transaction.groupBy.mock.calls[0][0].where),
-      ).not.toContain('isTransfer');
+    });
+
+    it('nets refunds off spent and keeps a negative net when spending beats income', async () => {
+      prisma.transaction.groupBy.mockResolvedValue([
+        { type: 'INCOME', _sum: { amount: '100' } },
+        { type: 'EXPENSE', _sum: { amount: '250.30' } },
+        { type: 'REFUND', _sum: { amount: '50.20' } },
+      ]);
+
+      const { totals } = await service.list(USER_ID, query());
+
+      expect(totals).toEqual({
+        count: 0,
+        spent: 200.1,
+        income: 100,
+        net: -100.1,
+      });
     });
 
     it('returns rows with numeric amounts, ISO dates and a deleted flag', async () => {

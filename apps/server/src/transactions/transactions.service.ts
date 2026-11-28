@@ -11,10 +11,11 @@ import {
   UpdateTransactionsResponse,
 } from 'schemas';
 
-import { emptyTypeTotals } from '../charts/refund-netting';
+import { incomeAndNetExpense, totalsByType } from '../charts/refund-netting';
 import { Prisma, TransactionType } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { byTagName, TagsService } from '../tags/tags.service';
+import { excludeInternalTransfers } from '../utils/exclude-transfers';
 import { WinstonLogger } from '../utils/logger/logger';
 import { notDeleted } from '../utils/not-deleted';
 import { resolveTransactionType } from '../utils/transaction-type';
@@ -317,26 +318,27 @@ export class TransactionsService {
     return where;
   }
 
+  // Money uses the same rules as Penny's View (transfers left out, refunds
+  // net off spend down to 0); the count still covers every matching row
   private async getTotals(where: Prisma.TransactionWhereInput) {
-    const grouped = await this.prisma.transaction.groupBy({
-      by: ['type'],
-      where,
-      _sum: { amount: true },
-      _count: { _all: true },
-    });
+    const [count, grouped] = await Promise.all([
+      this.prisma.transaction.count({ where }),
+      this.prisma.transaction.groupBy({
+        by: ['type'],
+        where: { AND: [where, excludeInternalTransfers] },
+        _sum: { amount: true },
+      }),
+    ]);
 
-    const sums = emptyTypeTotals();
-    let count = 0;
-    for (const g of grouped) {
-      sums[g.type] += Number(g._sum.amount ?? 0);
-      count += g._count._all;
-    }
+    const { income, expense } = incomeAndNetExpense(totalsByType(grouped));
+    const spent = round2(expense);
 
-    // Unlike the charts, refunds beyond spend are not clamped here
-    const spent = round2(sums.EXPENSE - sums.REFUND);
-    const income = round2(sums.INCOME);
-
-    return { count, spent, income, net: round2(income - spent) };
+    return {
+      count,
+      spent,
+      income: round2(income),
+      net: round2(income - spent),
+    };
   }
 
   private async findPage(
