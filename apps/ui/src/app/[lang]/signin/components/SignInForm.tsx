@@ -10,7 +10,15 @@ import {
   Stack,
   InputAdornment,
   IconButton,
+  Link,
 } from '@mui/material';
+import MailOutline from '@mui/icons-material/MailOutline';
+import LockOutlined from '@mui/icons-material/LockOutlined';
+import LoginRounded from '@mui/icons-material/LoginRounded';
+import Image from 'next/image';
+import logo from '../../../../../public/Penny_logo_transparent.png';
+import scene from '../../../../../public/books.png';
+import heart from '../../../../../public/heart_2.png';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import GoogleIcon from '@mui/icons-material/Google';
 
@@ -37,9 +45,9 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<UiError | null>(null);
   // the ?error= value the user closed, so a different OAuth error still shows
-  const [dismissedOauthError, setDismissedOauthError] = useState<
-    string | null
-  >(null);
+  const [dismissedOauthError, setDismissedOauthError] = useState<string | null>(
+    null,
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -110,30 +118,94 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
   return (
-    <Box>
+    <Box sx={{ width: '100%', maxWidth: 560, mx: 'auto' }}>
+      {/* logo is tinted plum with a mask: the shared logo file is cream-coloured */}
+      <Box
+        component="a"
+        href="/"
+        aria-label="Penny"
+        sx={{
+          display: 'block',
+          width: 130,
+          aspectRatio: `${logo.width} / ${logo.height}`,
+          mx: 'auto',
+          mb: 1.5,
+          bgcolor: 'secondary.main',
+          maskImage: `url(${logo.src})`,
+          WebkitMaskImage: `url(${logo.src})`,
+          maskSize: 'contain',
+          WebkitMaskSize: 'contain',
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+          maskPosition: 'center',
+          WebkitMaskPosition: 'center',
+        }}
+      />
+
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
         sx={{
           width: '100%',
-          minWidth: { xs: '100%', sm: 550 },
-          maxWidth: { xs: '100%', sm: 550 },
-          mx: 'auto',
           mb: 2,
-          p: { xs: 2, sm: 5 },
-          borderRadius: 5,
-          boxShadow: 10,
-          bgcolor: 'background.paper',
+          p: { xs: 2.5, sm: 4 },
+          borderRadius: '28px',
+          boxShadow: '0 8px 32px rgba(83, 36, 70, 0.1)',
+          bgcolor: '#FFFBF9',
+          // lavender, rounded inputs as in the design
+          '& .MuiOutlinedInput-root': {
+            bgcolor: '#F7EEFD',
+            borderRadius: '14px',
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#DCC8F0',
+            },
+          },
         }}
       >
-        <Typography
-          variant="h4"
-          align="center"
-          gutterBottom
-          sx={{ fontWeight: 600 }}
-        >
-          {signInPageText.FORM.SIGN_IN_TITLE}
-        </Typography>
+        <Image
+          src={scene}
+          alt=""
+          aria-hidden
+          priority
+          style={{
+            display: 'block',
+            width: '100%',
+            height: 'auto',
+            // the artwork has a faint backdrop; fading its edges blends it into the card
+            maskImage:
+              'radial-gradient(ellipse at center, #000 62%, transparent 100%)',
+            WebkitMaskImage:
+              'radial-gradient(ellipse at center, #000 62%, transparent 100%)',
+          }}
+        />
+
+        <Box sx={{ textAlign: 'center', mt: 1 }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              color: 'secondary.main',
+              fontSize: { xs: '1.7rem', sm: '2.1rem' },
+            }}
+          >
+            {signInPageText.FORM.SIGN_IN_TITLE}{' '}
+            <Image
+              src={heart}
+              alt=""
+              aria-hidden
+              width={90}
+              height={60}
+              style={{
+                display: 'inline-block',
+                verticalAlign: 'top',
+                margin: '-14px -26px -14px -22px',
+              }}
+            />
+          </Typography>
+          <Typography color="text.secondary" sx={{ mt: 1 }}>
+            {signInPageText.FORM.SUBTITLE}
+          </Typography>
+        </Box>
 
         <Stack spacing={2} mt={3}>
           <TextField
@@ -146,6 +218,13 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
                 : ''
             }
             {...register('email')}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MailOutline sx={{ color: 'secondary.main' }} />
+                </InputAdornment>
+              ),
+            }}
           />
 
           <TextField
@@ -163,6 +242,11 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
             }
             {...register('password')}
             InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockOutlined sx={{ color: 'secondary.main' }} />
+                </InputAdornment>
+              ),
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={handleTogglePassword} edge="end">
@@ -176,47 +260,67 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
           <CustomButton
             type="submit"
             variantType="primary"
+            color="secondary"
             loading={isSubmitting}
+            startIcon={<LoginRounded />}
+            sx={{ py: 1.4, fontSize: '1.1rem', borderRadius: '14px' }}
           >
             {signInPageText.FORM.SIGN_IN_BUTTON}
           </CustomButton>
         </Stack>
 
-        <Divider sx={{ my: 6, height: 2, bgcolor: 'primary.light' }} />
+        <Divider
+          sx={{
+            my: 3,
+            color: 'text.secondary',
+            '&::before, &::after': { borderColor: '#DCC8F0' },
+          }}
+        >
+          {signInPageText.FORM.OR}
+        </Divider>
 
-        <Box textAlign="center">
-          <Typography variant="h5" gutterBottom sx={{ my: 2, fontWeight: 600 }}>
+        <CustomButton
+          variantType="outlined"
+          color="secondary"
+          fullWidth
+          onClick={handleGoogleSignInClick}
+          startIcon={<GoogleIcon />}
+          sx={{
+            py: 1.1,
+            borderRadius: '14px',
+            bgcolor: '#F7EEFD',
+            borderColor: '#DCC8F0',
+            color: 'text.primary',
+            '&:hover': { bgcolor: '#F1E4FA', borderColor: '#C9A8E6' },
+          }}
+        >
+          {signInPageText.CONTINUE_WITH_GOOGLE_BUTTON}
+        </CustomButton>
+
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="center"
+          alignItems="center"
+          flexWrap="wrap"
+          sx={{ mt: 3 }}
+        >
+          <Typography color="text.secondary">
             {signInPageText.NEW_USER_TITLE}
           </Typography>
-
-          <CustomButton
-            variantType="secondary"
-            fullWidth
+          <Link
+            component="button"
+            type="button"
+            underline="always"
             onClick={handleSignUpClick}
+            sx={{ fontWeight: 800, color: 'secondary.main', fontSize: '1rem' }}
           >
             {signInPageText.SIGN_UP_BUTTON}
-          </CustomButton>
-        </Box>
-
-        <Divider sx={{ my: 6, height: 2, bgcolor: 'primary.light' }} />
-
-        <Box textAlign="center">
-          <CustomButton
-            variantType="outlined"
-            fullWidth
-            onClick={handleGoogleSignInClick}
-            startIcon={<GoogleIcon />}
-          >
-            {signInPageText.CONTINUE_WITH_GOOGLE_BUTTON}
-          </CustomButton>
-        </Box>
+          </Link>
+        </Stack>
       </Box>
 
-      <ErrorBanner
-        error={error}
-        onClose={handleCloseError}
-        colorMode="color"
-      />
+      <ErrorBanner error={error} onClose={handleCloseError} colorMode="color" />
     </Box>
   );
 }

@@ -87,7 +87,9 @@
 
   "SIGN_IN_PAGE": {
     "FORM": {
-      "SIGN_IN_TITLE": "Sign In",
+      "SIGN_IN_TITLE": "Sign in to Penny",
+      "SUBTITLE": "Access your finances, insights, and more.",
+      "OR": "or",
       "EMAIL_FIELD": "Email",
       "PASSWORD_FIELD": "Password",
       "SIGN_IN_BUTTON": "Sign In",
@@ -111,8 +113,8 @@
         }
       }
     },
-    "NEW_USER_TITLE": "New User",
-    "SIGN_UP_BUTTON": "Create Account",
+    "NEW_USER_TITLE": "New to Penny?",
+    "SIGN_UP_BUTTON": "Create an account",
     "CONTINUE_WITH_GOOGLE_BUTTON": "Continue with Google"
   },
   "REGISTER_PAGE": {

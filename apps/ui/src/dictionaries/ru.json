@@ -87,7 +87,9 @@
 
   "SIGN_IN_PAGE": {
     "FORM": {
-      "SIGN_IN_TITLE": "Войти",
+      "SIGN_IN_TITLE": "Вход в Penny",
+      "SUBTITLE": "Доступ к вашим финансам, аналитике и не только.",
+      "OR": "или",
       "EMAIL_FIELD": "Электронная почта",
       "PASSWORD_FIELD": "Пароль",
       "SIGN_IN_BUTTON": "Войти",
@@ -111,7 +113,7 @@
         }
       }
     },
-    "NEW_USER_TITLE": "Новый пользователь",
+    "NEW_USER_TITLE": "Впервые в Penny?",
     "SIGN_UP_BUTTON": "Создать аккаунт",
     "CONTINUE_WITH_GOOGLE_BUTTON": "Продолжить через Google"
   },
