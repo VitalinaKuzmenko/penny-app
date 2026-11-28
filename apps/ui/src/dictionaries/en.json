@@ -158,7 +158,8 @@
     "CONTINUE_WITH_GOOGLE_BUTTON": "Continue with Google"
   },
   "PROFILE_PAGE": {
-    "TITLE": "Profile",
+    "TITLE": "Your profile",
+    "SUBTITLE": "Manage your account details and sign out when you're done.",
     "NAME": "Name",
     "EMAIL": "Email",
     "SIGN_OUT": "Sign out",

@@ -14,9 +14,11 @@ export default async function ProfilePage({
   const dict = await getDictionary(lang);
   const profilePageText = dict.PROFILE_PAGE;
 
-  //i need to redeploy
   return (
-    <Container maxWidth="sm">
+    <Container
+      maxWidth="xl"
+      sx={{ px: { xs: 0, md: 3 }, maxWidth: { xs: '100%', md: 'xl' } }}
+    >
       <ProfileClientSection profilePageText={profilePageText} />
     </Container>
   );

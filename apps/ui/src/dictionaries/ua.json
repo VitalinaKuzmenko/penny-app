@@ -158,7 +158,8 @@
     "CONTINUE_WITH_GOOGLE_BUTTON": "Продовжити через Google"
   },
   "PROFILE_PAGE": {
-    "TITLE": "Профіль",
+    "TITLE": "Ваш профіль",
+    "SUBTITLE": "Керуйте даними акаунта та виходьте, коли завершите.",
     "NAME": "Ім'я",
     "EMAIL": "Електронна пошта",
     "SIGN_OUT": "Вийти",
