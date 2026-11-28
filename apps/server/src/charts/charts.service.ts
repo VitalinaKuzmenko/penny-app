@@ -16,6 +16,7 @@ import {
 
 import { TransactionType } from '../prisma/generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { excludeInternalTransfers } from '../utils/exclude-transfers';
 import { notDeleted } from '../utils/not-deleted';
 
 import {
@@ -57,19 +58,6 @@ const utcDayRange = (startDate?: string, endDate?: string) => {
       ),
     ),
   };
-};
-
-const excludeInternalTransfers = {
-  OR: [
-    {
-      category: null, // include rows without category
-    },
-    {
-      category: {
-        isTransfer: false,
-      },
-    },
-  ],
 };
 
 @Injectable()

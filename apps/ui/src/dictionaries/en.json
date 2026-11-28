@@ -524,7 +524,7 @@
       "SPENT": "Spent",
       "INCOME": "Income",
       "NET": "Net",
-      "INFO": "Totals for everything that matches the filters, not just this page. Includes internal transfers; refunds come off spent. Deleted transactions are not counted. These can differ from Penny's View, which leaves transfers out."
+      "INFO": "Totals for everything that matches the filters, not just this page. Money totals use the same rules as Penny's View: internal transfers are left out and refunds come off spent. The transaction count includes transfers. Deleted transactions are not counted."
     },
     "TABLE": {
       "COLUMNS": {
