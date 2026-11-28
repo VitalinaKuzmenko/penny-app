@@ -12,14 +12,15 @@ const plumDark = '#3A1832';
 const radius = 16;
 const softShadow = '0 4px 20px rgba(83, 36, 70, 0.08)';
 const hoverShadow = '0 8px 28px rgba(83, 36, 70, 0.14)';
+// The CSS variables are set by next/font in app/[lang]/fonts.ts
 const headingFont =
-  '"Fraunces", "Playfair Display", "Iowan Old Style", Georgia, serif';
+  'var(--font-fraunces), "Fraunces", "Iowan Old Style", Georgia, serif';
 const bodyFont =
-  '"Nunito", "Quicksand", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  'var(--font-nunito-sans), "Nunito Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
 
 const headingStyle = {
   fontFamily: headingFont,
-  fontWeight: 700,
+  fontWeight: 800,
   letterSpacing: '-0.01em',
 };
 
@@ -100,7 +101,7 @@ export const theme = createTheme({
     h3: headingStyle,
     h4: headingStyle,
     h5: headingStyle,
-    h6: { ...headingStyle, fontWeight: 600 },
+    h6: headingStyle,
     button: { textTransform: 'none', fontWeight: 700 },
   },
   components: {

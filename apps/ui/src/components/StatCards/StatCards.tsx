@@ -131,8 +131,9 @@ export default function StatCards({ items, columns }: StatCardsProps) {
                 className="card-value"
                 component="p"
                 sx={{
-                  fontFamily: (t) => t.typography.h1.fontFamily,
-                  fontWeight: 700,
+                  // figures use the body font (Nunito Sans), not the heading serif
+                  fontFamily: (t) => t.typography.fontFamily,
+                  fontWeight: 800,
                   fontSize: 'clamp(1.25rem, 8cqw, 1.9rem)',
                   lineHeight: 1.15,
                   color: card.valueColor ?? 'secondary.main',
