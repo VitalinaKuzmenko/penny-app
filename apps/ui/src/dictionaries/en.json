@@ -120,14 +120,16 @@
   "REGISTER_PAGE": {
     "FORM": {
       "CREATE_ACCOUNT_TITLE": "Create your account",
+      "SUBTITLE": "Get started with Penny and take control of your money.",
+      "OR": "or",
       "ALREADY_HAVE_ACCOUNT": "Already have an account?",
       "SIGN_IN_BUTTON": "Sign In",
       "EMAIL_FIELD": "Email",
       "PASSWORD_FIELD": "Password",
-      "CONFIRM_PASSWORD_FIELD": "Confirm Password",
-      "USERNAME_FIELD": "First Name",
-      "USER_SURNAME_FIELD": "Last Name",
-      "CREATE_ACCOUNT_BUTTON": "Yes, create account!",
+      "CONFIRM_PASSWORD_FIELD": "Confirm password",
+      "USERNAME_FIELD": "First name",
+      "USER_SURNAME_FIELD": "Last name",
+      "CREATE_ACCOUNT_BUTTON": "Create account",
       "ERRORS": {
         "GENERAL": {
           "TITLE": "Something went wrong",

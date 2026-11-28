@@ -17,13 +17,14 @@ export default async function RegisterPage({
   const registerPageText: Record<string, any> = dict.REGISTER_PAGE;
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" disableGutters>
       <Box
         sx={{
-          minHeight: '800px',
+          minHeight: 'calc(100vh - 200px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          py: 2,
         }}
       >
         <RegisterForm registerPageText={registerPageText} />

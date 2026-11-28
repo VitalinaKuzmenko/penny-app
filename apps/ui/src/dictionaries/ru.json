@@ -120,6 +120,8 @@
   "REGISTER_PAGE": {
     "FORM": {
       "CREATE_ACCOUNT_TITLE": "Создайте ваш аккаунт",
+      "SUBTITLE": "Начните работать с Penny и возьмите деньги под контроль.",
+      "OR": "или",
       "ALREADY_HAVE_ACCOUNT": "Уже есть аккаунт?",
       "SIGN_IN_BUTTON": "Войти",
       "EMAIL_FIELD": "Электронная почта",
@@ -127,7 +129,7 @@
       "CONFIRM_PASSWORD_FIELD": "Подтвердите пароль",
       "USERNAME_FIELD": "Имя",
       "USER_SURNAME_FIELD": "Фамилия",
-      "CREATE_ACCOUNT_BUTTON": "Да, создать аккаунт!",
+      "CREATE_ACCOUNT_BUTTON": "Создать аккаунт",
       "ERRORS": {
         "GENERAL": {
           "TITLE": "Что-то пошло не так",
