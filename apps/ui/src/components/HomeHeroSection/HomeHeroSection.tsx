@@ -1,22 +1,24 @@
 'use client';
 
 import { Box, Typography, Stack, Link } from '@mui/material';
+import FileUploadOutlined from '@mui/icons-material/FileUploadOutlined';
 import CustomButton from '../ui/CustomButton/CustomButton';
+import HomeCheckList from '../HomeCheckList/HomeCheckList';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { LanguageType } from '@/utils/interfaces';
+import heroPreview from '../../../public/home_page1.png';
+import heart from '../../../public/heart_2.png';
 
 interface HomeHeroSectionProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   homePageText: Record<string, any>;
-  lang: LanguageType;
 }
 
 export default function HomeHeroSection({
   homePageText,
-  lang,
 }: HomeHeroSectionProps) {
   const router = useRouter();
+  const text = homePageText.HERO_SECTION;
 
   const handleSignUpClick = () => {
     router.push('/register');
@@ -30,98 +32,118 @@ export default function HomeHeroSection({
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+        gridTemplateColumns: {
+          xs: '1fr',
+          lg: 'minmax(0, 0.9fr) minmax(0, 1.1fr)',
+        },
         alignItems: 'center',
-        gap: { xs: 4, md: 8 },
-        py: { xs: 2, md: 4 },
-        px: { xs: 1, md: 0 },
+        gap: { xs: 3, lg: 4 },
+        py: { xs: 1, md: 2 },
+        textAlign: { xs: 'center', lg: 'left' },
       }}
     >
-      {/* LEFT SIDE */}
       <Box>
         <Typography
-          variant="h3"
-          fontWeight={700}
+          variant="h2"
+          component="h1"
           sx={{
+            color: 'secondary.main',
             mb: 2,
-            fontSize: { xs: '2rem', md: '3rem' },
+            fontSize: { xs: '2.1rem', md: '2.9rem' },
+            lineHeight: 1.15,
           }}
         >
-          {homePageText.HERO_SECTION.TITLE}
+          {text.TITLE}{' '}
+          {/* the artwork has empty margins; negative margins trim them so the
+              heart sits next to the title */}
+          <Image
+            src={heart}
+            alt=""
+            aria-hidden
+            width={156}
+            height={104}
+            style={{
+              display: 'inline-block',
+              verticalAlign: 'top',
+              margin: '-24px -42px -22px -42px',
+            }}
+          />
         </Typography>
 
         <Typography
-          variant="body1"
           color="text.secondary"
-          sx={{ mb: 4, maxWidth: 500 }}
+          sx={{ mb: 3, maxWidth: 520, mx: { xs: 'auto', lg: 0 } }}
         >
-          {homePageText.HERO_SECTION.SUBTITLE}
+          {text.SUBTITLE}
         </Typography>
 
-        <Stack direction="column" spacing={3} flexWrap="wrap">
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.5}
+          sx={{ mb: 2.5 }}
+          justifyContent={{ xs: 'center', lg: 'flex-start' }}
+        >
           <CustomButton
-            variantType="primary"
+            variantType="contained"
             onClick={handleUploadCsvClick}
+            startIcon={<FileUploadOutlined />}
             sx={{
-              fontWeight: 600,
-              fontSize: '30px',
-              width: { xs: '100%', sm: '320px' },
-              maxWidth: { xs: '100%', sm: '320px' },
-              minWidth: { xs: '100%', sm: '320px' },
+              py: 1.25,
+              px: 3.5,
+              fontSize: '1.05rem',
+              borderRadius: '14px',
             }}
           >
-            {homePageText.HERO_SECTION.BUTTONS.UPLOAD_CSV}
-          </CustomButton>{' '}
+            {text.BUTTONS.UPLOAD_CSV}
+          </CustomButton>
           <CustomButton
-            sx={{
-              width: { xs: '100%', sm: '220px' },
-              maxWidth: { xs: '100%', sm: '220px' },
-              minWidth: { xs: '100%', sm: '220px' },
-            }}
-            variantType="secondary"
+            variantType="outlined"
             onClick={handleSignUpClick}
+            sx={{
+              py: 1.25,
+              px: 3.5,
+              fontSize: '1.05rem',
+              borderRadius: '14px',
+              bgcolor: 'rgba(255, 255, 255, 0.6)',
+            }}
           >
-            {homePageText.HERO_SECTION.BUTTONS.CREATE_ACCOUNT}
+            {text.BUTTONS.CREATE_ACCOUNT}
           </CustomButton>
         </Stack>
 
-        {/* Subtitle */}
-        <Stack spacing={1} mb={5} mt={3} direction="row">
-          <Typography variant="body2">
-            {homePageText.HERO_SECTION.SUBTEXT}
+        <HomeCheckList items={text.CHECKS} />
+
+        <Stack
+          spacing={1}
+          mt={2}
+          direction="row"
+          justifyContent={{ xs: 'center', lg: 'flex-start' }}
+        >
+          <Typography
+            sx={{ fontSize: '1.1rem', fontWeight: 600 }}
+            color="text.primary"
+          >
+            {text.SUBTEXT}
           </Typography>
-          <Link href="/signin" color="text.primary" variant="body2">
-            {homePageText.HERO_SECTION.SIGN_IN_LINK}
+          <Link
+            href="/signin"
+            color="secondary.main"
+            underline="always"
+            sx={{ fontSize: '1.1rem', fontWeight: 800 }}
+          >
+            {text.SIGN_IN_LINK}
           </Link>
         </Stack>
       </Box>
 
-      {/* RIGHT SIDE */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
-        <Box
-          sx={{
-            position: 'relative',
-            width: '100%',
-            height: { xs: 250, sm: 300, md: 400, lg: 500 },
-            borderRadius: 3,
-            overflow: 'hidden',
-            boxShadow: 3,
-          }}
-        >
-          <Image
-            src={`/dashboard_preview/dashboard_preview_${lang}.png`}
-            alt="Penny dashboard preview"
-            fill
-            style={{ objectFit: 'contain' }}
-            sizes="(max-width: 900px) 100vw, 50vw"
-            priority
-          />
-        </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', minWidth: 0 }}>
+        <Image
+          src={heroPreview}
+          alt="Penny"
+          priority
+          sizes="(max-width: 1200px) 100vw, 55vw"
+          style={{ width: '100%', height: 'auto', maxWidth: 760 }}
+        />
       </Box>
     </Box>
   );

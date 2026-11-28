@@ -1,7 +1,10 @@
 'use client';
 
-import { Paper, Typography, Button, Stack, Box } from '@mui/material';
+import { Typography, Button, Stack, Box } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import InsertDriveFileOutlined from '@mui/icons-material/InsertDriveFileOutlined';
+import Image from 'next/image';
+import uploadIllustration from '../../../../../public/Upload_image.png';
 import { useRef } from 'react';
 
 interface UploadFileContainerProps {
@@ -30,40 +33,46 @@ const UploadFileContainer = ({
   };
 
   return (
-    <Paper
-      elevation={0}
+    <Box
       sx={{
-        my: 4,
         p: { xs: 3, md: 4 },
-        borderRadius: 3,
+        borderRadius: '20px',
         border: '2px dashed',
-        borderColor: 'grey.300',
+        borderColor: 'secondary.light',
+        bgcolor: '#FBF2FE',
         textAlign: 'center',
         transition: 'border-color 0.2s ease',
-        '&:hover': {
-          borderColor: 'primary.main',
-          backgroundColor: 'grey.50',
-        },
+        '&:hover': { borderColor: 'secondary.main' },
       }}
     >
-      <Stack spacing={2} alignItems="center">
-        <UploadFileIcon color="primary" sx={{ fontSize: 40 }} />
+      <Stack spacing={1.5} alignItems="center">
+        <Image
+          src={uploadIllustration}
+          alt=""
+          aria-hidden
+          width={170}
+          height={108}
+          style={{ height: 'auto' }}
+        />
 
-        <Typography fontWeight={600}>{fileContainerText.DRAG_DROP}</Typography>
+        <Typography
+          variant="h5"
+          component="p"
+          sx={{ color: 'secondary.main', fontWeight: 700 }}
+        >
+          {fileContainerText.DRAG_DROP}
+        </Typography>
 
         <Typography variant="body2" color="text.secondary">
           {fileContainerText.OR}
         </Typography>
 
         <Button
-          variant="outlined"
-          color="primary"
+          variant="contained"
+          color="secondary"
           onClick={handleChooseFile}
-          sx={{
-            textTransform: 'none',
-            fontWeight: 600,
-            px: 3,
-          }}
+          startIcon={<InsertDriveFileOutlined />}
+          sx={{ px: 4, py: 1.25, borderRadius: '12px' }}
         >
           {fileContainerText.CHOOSE_FILE}
         </Button>
@@ -71,26 +80,22 @@ const UploadFileContainer = ({
         {selectedFile && (
           <Box
             sx={{
-              mt: 1,
               px: 2,
               py: 1,
-              borderRadius: 2,
-              bgcolor: 'grey.100',
+              borderRadius: '12px',
+              bgcolor: 'background.paper',
               display: 'inline-flex',
               alignItems: 'center',
               gap: 1,
+              maxWidth: '100%',
             }}
           >
-            <UploadFileIcon fontSize="small" color="action" />
-            <Typography variant="body2" fontWeight={500}>
+            <UploadFileIcon fontSize="small" color="secondary" />
+            <Typography variant="body2" fontWeight={600} noWrap>
               {selectedFile.name}
             </Typography>
           </Box>
         )}
-
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-          {fileContainerText.INFO}
-        </Typography>
       </Stack>
 
       {/* Hidden file input */}
@@ -101,7 +106,7 @@ const UploadFileContainer = ({
         hidden
         onChange={handleFileChange}
       />
-    </Paper>
+    </Box>
   );
 };
 

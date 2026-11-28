@@ -1,6 +1,12 @@
 'use client';
 
-import { Box, Container, Typography, Grid } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import ArrowForwardRounded from '@mui/icons-material/ArrowForwardRounded';
+import {
+  InsightsStepMock,
+  ReviewStepMock,
+  UploadStepMock,
+} from './HomeStepMockups';
 
 export default function HomeHowItWorksSection({
   homePageText,
@@ -8,84 +14,75 @@ export default function HomeHowItWorksSection({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   homePageText: Record<string, any>;
 }) {
-  const steps = [
-    {
-      step: homePageText.HOW_IT_WORKS_SECTION.STEPS[0].STEP_NUMBER,
-      title: homePageText.HOW_IT_WORKS_SECTION.STEPS[0].TITLE,
-      description: homePageText.HOW_IT_WORKS_SECTION.STEPS[0].DESCRIPTION,
-    },
-    {
-      step: homePageText.HOW_IT_WORKS_SECTION.STEPS[1].STEP_NUMBER,
-      title: homePageText.HOW_IT_WORKS_SECTION.STEPS[1].TITLE,
-      description: homePageText.HOW_IT_WORKS_SECTION.STEPS[1].DESCRIPTION,
-    },
-    {
-      step: homePageText.HOW_IT_WORKS_SECTION.STEPS[2].STEP_NUMBER,
-      title: homePageText.HOW_IT_WORKS_SECTION.STEPS[2].TITLE,
-      description: homePageText.HOW_IT_WORKS_SECTION.STEPS[2].DESCRIPTION,
-    },
-  ];
-
-  const stepColors = ['primary.main', 'secondary.main', 'info.main'];
+  const text = homePageText.HOW_IT_WORKS_SECTION;
+  const steps: string[] = text.STEPS;
+  const mock = text.MOCK;
+  const mockups = [UploadStepMock, ReviewStepMock, InsightsStepMock];
 
   return (
-    <Box sx={{ py: { xs: 6, md: 10 }, backgroundColor: 'grey.50' }}>
-      <Container maxWidth="lg">
-        {/* Title */}
-        <Typography variant="h4" fontWeight={700} textAlign="center" mb={6}>
-          {homePageText.HOW_IT_WORKS_SECTION.TITLE}
-        </Typography>
+    <Box
+      sx={{
+        mt: { xs: 5, md: 7 },
+        p: { xs: 2, md: 3 },
+        borderRadius: '28px',
+        textAlign: 'center',
+        background: 'linear-gradient(180deg, #F7EFFC 0%, #F3E8FA 100%)',
+      }}
+    >
+      <Typography
+        variant="h4"
+        component="h2"
+        sx={{ color: 'secondary.main', fontSize: { xs: '1.6rem', md: '2rem' } }}
+      >
+        {text.TITLE}
+      </Typography>
+      <Typography color="text.secondary" sx={{ mt: 1, mb: 3 }}>
+        {text.SUBTITLE}
+      </Typography>
 
-        <Grid container spacing={4}>
-          {steps.map((item, index) => (
-            <Grid key={index} size={{ xs: 12, md: 4 }}>
-              <Box
+      <Box
+        component="ol"
+        sx={{
+          listStyle: 'none',
+          m: 0,
+          p: 0,
+          display: 'flex',
+          flexDirection: { xs: 'column', lg: 'row' },
+          // lg: cards stretch to the tallest one so all three match
+          alignItems: { xs: 'center', lg: 'stretch' },
+          justifyContent: 'center',
+          gap: { xs: 1, lg: 1.5 },
+        }}
+      >
+        {mockups.map((Mockup, index) => (
+          <Box component="li" key={steps[index]} sx={{ display: 'contents' }}>
+            <Box
+              sx={{
+                flex: { lg: 1 },
+                minWidth: 0,
+                width: { xs: '100%', sm: 420, lg: 'auto' },
+                maxWidth: '100%',
+                pt: 1.5,
+                display: 'flex',
+              }}
+            >
+              <Mockup label={steps[index]} mock={mock} />
+            </Box>
+            {index < mockups.length - 1 && (
+              <ArrowForwardRounded
+                aria-hidden
                 sx={{
-                  p: 4,
-                  height: '100%',
-                  borderRadius: 3,
-                  backgroundColor: 'background.paper',
-                  boxShadow: 1,
-                  position: 'relative',
-                  overflow: 'hidden',
+                  color: 'secondary.light',
+                  fontSize: 32,
+                  flexShrink: 0,
+                  alignSelf: 'center',
+                  transform: { xs: 'rotate(90deg)', lg: 'none' },
                 }}
-              >
-                {/* Top accent bar */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: 4,
-                    backgroundColor: stepColors[index],
-                  }}
-                />
-
-                {/* Step number */}
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: stepColors[index],
-                    fontWeight: 700,
-                    mb: 1,
-                  }}
-                >
-                  {item.step}
-                </Typography>
-
-                <Typography variant="h6" fontWeight={600} mb={1}>
-                  {item.title}
-                </Typography>
-
-                <Typography variant="body2" color="text.secondary">
-                  {item.description}
-                </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
+              />
+            )}
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 }

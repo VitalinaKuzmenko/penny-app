@@ -21,14 +21,18 @@ import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 import { useTheme } from '@mui/material/styles';
-import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
+import { ChartCardTitle } from '../DashboardCard';
+import BarChartRounded from '@mui/icons-material/BarChartRounded';
 
 interface IncomeExpenseChartProps {
   pennysViewPageText: Record<string, any>;
+  // lets the summary cards reuse this chart's totals instead of fetching again
+  onData?: (data: GetIncomeExpenseResponse | null) => void;
 }
 
 export default function IncomeExpenseChart({
   pennysViewPageText,
+  onData,
 }: IncomeExpenseChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
 
@@ -48,6 +52,7 @@ export default function IncomeExpenseChart({
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+      onData?.(null);
 
       try {
         const result = await getIncomeExpense({
@@ -55,6 +60,7 @@ export default function IncomeExpenseChart({
           accountIds: appliedFilters.accountIds,
         });
         setData(result);
+        onData?.(result);
       } catch (err) {
         if (err instanceof ApiError) {
           setError({
@@ -101,35 +107,39 @@ export default function IncomeExpenseChart({
   ];
 
   return (
-    <Box sx={{ width: '100%', mt: 3 }}>
+    <Box sx={{ width: '100%' }}>
       {/* Title */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <Typography variant="h6" fontWeight={600}>
-          {`${pennysViewPageText.CHARTS.INCOME_EXPENSE.TITLE} (${year})`}
-        </Typography>
+      <ChartCardTitle
+        icon={<BarChartRounded fontSize="inherit" />}
+        title={`${pennysViewPageText.CHARTS.INCOME_EXPENSE.TITLE} (${year})`}
+        tooltip={
+          <>
+            <Typography variant="body2">
+              {pennysViewPageText.CHARTS.INCOME_EXPENSE.TOOLTIP_1}
+            </Typography>
+            <Typography variant="body2">
+              {pennysViewPageText.CHARTS.INCOME_EXPENSE.TOOLTIP_2}
+            </Typography>
+          </>
+        }
+      />
 
-        <InfoTooltip
-          content={
-            <>
-              <Typography variant="body2">
-                {pennysViewPageText.CHARTS.INCOME_EXPENSE.TOOLTIP_1}
-              </Typography>
-
-              <Typography variant="body2">
-                {pennysViewPageText.CHARTS.INCOME_EXPENSE.TOOLTIP_2}
-              </Typography>
-            </>
-          }
-        />
-      </Box>
-
-      <Box sx={{ width: '100%', height: 300 }}>
+      <Box sx={{ width: '100%', height: 250 }}>
         <ResponsiveContainer>
-          <BarChart data={chartData}>
-            <XAxis dataKey="name" />
-            <YAxis />
+          <BarChart data={chartData} margin={{ top: 24, right: 8 }}>
+            <XAxis
+              dataKey="name"
+              tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
+              axisLine={{ stroke: theme.palette.divider }}
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
+              axisLine={{ stroke: theme.palette.divider }}
+              tickLine={false}
+            />
 
-            <Bar dataKey="value">
+            <Bar dataKey="value" radius={[10, 10, 0, 0]} maxBarSize={110}>
               <Cell fill={theme.palette.chart.income} />
               <Cell fill={theme.palette.chart.expense} />
               <Cell fill={theme.palette.chart.savings} />

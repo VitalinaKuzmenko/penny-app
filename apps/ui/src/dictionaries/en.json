@@ -27,87 +27,69 @@
   },
   "HOMEPAGE": {
     "HERO_SECTION": {
-      "TITLE": "Meet Penny — your money companion",
-      "SUBTITLE": "Upload your bank CSV or add cash expenses in seconds. Get instant insights into your spending, income, and savings.",
+      "TITLE": "Meet Penny — your personal money companion",
+      "SUBTITLE": "Turn your bank CSV into clear insights, organized spending, and real control over your money — quickly, privately, and without any bank connection.",
       "BUTTONS": {
         "UPLOAD_CSV": "Upload CSV",
         "CREATE_ACCOUNT": "Create free account"
       },
+      "CHECKS": ["Private & secure", "Connection-free", "Works with any bank"],
       "SUBTEXT": "Already have an account?",
       "SIGN_IN_LINK": "Sign in"
     },
     "FEATURES_SECTION": {
       "FEATURES": [
-        {
-          "TITLE": "Secure",
-          "DESCRIPTION": "No bank login needed"
-        },
-        {
-          "TITLE": "Fast",
-          "DESCRIPTION": "Upload & analyze in seconds"
-        },
-        {
-          "TITLE": "Universal",
-          "DESCRIPTION": "Works with any bank CSV"
-        },
-        {
-          "TITLE": "All-in-one tracking",
-          "DESCRIPTION": "Track cash & card expenses together"
-        }
+        { "TITLE": "Secure & private", "DESCRIPTION": "Your data stays private and is only visible to you." },
+        { "TITLE": "Upload your bank CSV", "DESCRIPTION": "Bring in your transactions in seconds, from any bank." },
+        { "TITLE": "Auto-categorize", "DESCRIPTION": "Penny learns from your history and suggests the best categories." },
+        { "TITLE": "Insights & trends", "DESCRIPTION": "See your spending, income, and patterns at a glance." }
+      ]
+    },
+    "HOW_PENNY_HELPS_SECTION": {
+      "TITLE": "How Penny helps",
+      "SUBTITLE": "Simple tools to turn your transactions into a clearer, healthier money picture.",
+      "ITEMS": [
+        { "TITLE": "Upload & import", "DESCRIPTION": "Add your bank CSV in seconds. It's quick and works with any bank." },
+        { "TITLE": "Auto-categorize", "DESCRIPTION": "Penny suggests categories from your history, so less manual work." },
+        { "TITLE": "See the big picture", "DESCRIPTION": "Track your spending, income, and savings with clear, visual insights." },
+        { "TITLE": "Stay in control", "DESCRIPTION": "Spot patterns, reduce overspending, and build healthier money habits." }
       ]
     },
     "HOW_IT_WORKS_SECTION": {
-      "TITLE": "How it works",
-      "STEPS": [
-        {
-          "STEP_NUMBER": "01",
-          "TITLE": "Upload your data",
-          "DESCRIPTION": "Upload your bank CSV in seconds — simple, secure, and connection-free."
-        },
-        {
-          "STEP_NUMBER": "02",
-          "TITLE": "Take back control",
-          "DESCRIPTION": "No generic auto-categories — you decide how every expense is classified."
-        },
-        {
-          "STEP_NUMBER": "03",
-          "TITLE": "Turn data into clarity",
-          "DESCRIPTION": "Track trends, uncover patterns, and finally understand your spending."
-        }
-      ]
-    },
-    "TESTIMONIALS_SECTION": {
-      "TITLE": "What our users say",
-      "TESTIMONIALS": [
-        {
-          "NAME": "Alex R.",
-          "ROLE": "Freelancer",
-          "TEXT": "Penny helped me finally understand where my money goes every month. Super easy to use!"
-        },
-        {
-          "NAME": "Sophie L.",
-          "ROLE": "Marketing Manager",
-          "TEXT": "I love that I can assign my own categories — no more guessing by the app."
-        },
-        {
-          "NAME": "Michael T.",
-          "ROLE": "Software Engineer",
-          "TEXT": "Seeing trends visually makes budgeting so much simpler and faster."
-        }
-      ]
+      "TITLE": "From upload to insights — in a few simple steps",
+      "SUBTITLE": "Bring in your transactions, let Penny organize them, and see your money come to life in Penny's View.",
+      "STEPS": ["Upload your CSV", "Review & categorize", "See Penny's View"],
+      "MOCK": {
+        "DROP": "Drop your CSV file here",
+        "OR": "or",
+        "CHOOSE": "Choose a file",
+        "COLUMNS": ["Date", "Description", "Category"],
+        "ROWS": [
+        { "DATE": "1 May", "DESCRIPTION": "Starbucks", "CATEGORY": "Food" },
+        { "DATE": "1 May", "DESCRIPTION": "Train ticket", "CATEGORY": "Transport" },
+        { "DATE": "2 May", "DESCRIPTION": "Netflix", "CATEGORY": "Entertainment" }
+        ],
+        "CHART_TITLE": "Income vs Expense (May 2025)",
+        "INCOME": "Income",
+        "EXPENSE": "Expense"
+      }
     },
     "FINAL_CTA_SECTION": {
       "TITLE": "Start taking control of your money today",
-      "SUBTITLE": "Safe, secure, and effortless. Upload your bank CSV in seconds.",
+      "SUBTITLE": "Upload your bank CSV, get organized, and see clear insights in minutes.",
       "BUTTONS": {
         "UPLOAD_CSV": "Upload CSV",
         "CREATE_ACCOUNT": "Create free account"
-      }
+      },
+      "CHECKS": ["Simple to get started", "Private & secure", "No bank connection needed"]
     }
   },
+
   "SIGN_IN_PAGE": {
     "FORM": {
-      "SIGN_IN_TITLE": "Sign In",
+      "SIGN_IN_TITLE": "Sign in to Penny",
+      "SUBTITLE": "Access your finances, insights, and more.",
+      "OR": "or",
       "EMAIL_FIELD": "Email",
       "PASSWORD_FIELD": "Password",
       "SIGN_IN_BUTTON": "Sign In",
@@ -131,21 +113,23 @@
         }
       }
     },
-    "NEW_USER_TITLE": "New User",
-    "SIGN_UP_BUTTON": "Create Account",
+    "NEW_USER_TITLE": "New to Penny?",
+    "SIGN_UP_BUTTON": "Create an account",
     "CONTINUE_WITH_GOOGLE_BUTTON": "Continue with Google"
   },
   "REGISTER_PAGE": {
     "FORM": {
       "CREATE_ACCOUNT_TITLE": "Create your account",
+      "SUBTITLE": "Get started with Penny and take control of your money.",
+      "OR": "or",
       "ALREADY_HAVE_ACCOUNT": "Already have an account?",
       "SIGN_IN_BUTTON": "Sign In",
       "EMAIL_FIELD": "Email",
       "PASSWORD_FIELD": "Password",
-      "CONFIRM_PASSWORD_FIELD": "Confirm Password",
-      "USERNAME_FIELD": "First Name",
-      "USER_SURNAME_FIELD": "Last Name",
-      "CREATE_ACCOUNT_BUTTON": "Yes, create account!",
+      "CONFIRM_PASSWORD_FIELD": "Confirm password",
+      "USERNAME_FIELD": "First name",
+      "USER_SURNAME_FIELD": "Last name",
+      "CREATE_ACCOUNT_BUTTON": "Create account",
       "ERRORS": {
         "GENERAL": {
           "TITLE": "Something went wrong",
@@ -178,7 +162,8 @@
     "CONTINUE_WITH_GOOGLE_BUTTON": "Continue with Google"
   },
   "PROFILE_PAGE": {
-    "TITLE": "Profile",
+    "TITLE": "Your profile",
+    "SUBTITLE": "Manage your account details and sign out when you're done.",
     "NAME": "Name",
     "EMAIL": "Email",
     "SIGN_OUT": "Sign out",
@@ -193,12 +178,12 @@
   },
   "UPLOAD_CSV_PAGE": {
     "TITLE": "Upload CSV",
-    "SUBTITLE": "Import your transactions into Penny in seconds using a clean, structured CSV file downloaded from your bank account.",
+    "SUBTITLE": "Bring in your bank data and let Penny do the heavy lifting. It's quick, secure, and gets your spending insights up to date.",
 
     "ACCOUNTS_ACTIVITY": {
       "TITLE": "Where your data ends",
       "SUBTITLE": "Export from this date onwards. Penny will flag any duplicates.",
-      "NO_TRANSACTIONS": "No transactions yet"
+      "NO_TRANSACTIONS": "—"
     },
 
     "CSV_FORMAT_OVERVIEW": {
@@ -210,14 +195,31 @@
         ["03/01/2025", "Salary", "2500.00"],
         ["05/01/2025", "Coffee", "-3.50"]
       ],
+      "FORMAT_TITLE": "CSV format only",
+      "FORMAT_TEXT": "Accepted file type",
+      "COLUMNS_TITLE": "Required columns",
+      "SIZE_TITLE": "Max file size",
+      "SIZE_TEXT": "5 MB",
+      "HELP_TITLE": "Need a hand getting started?",
       "DOWNLOAD_BUTTON": "Download template",
-      "DOWNLOAD_TEXT": "Use this if you want a ready-to-go file with the correct format."
+      "DOWNLOAD_TEXT": "Use our ready-to-go CSV template with the right columns."
+    },
+
+    "STEPPER": ["Prepare CSV", "Upload", "Review & categorize"],
+
+    "WHAT_NEXT": {
+      "TITLE": "What happens next?",
+      "STEPS": [
+        { "TITLE": "We'll check for duplicate transactions", "TEXT": "So you don't end up with the same spending twice." },
+        { "TITLE": "We'll auto-assign categories", "TEXT": "Penny will suggest the best categories for your transactions." },
+        { "TITLE": "You'll review and categorize", "TEXT": "Quickly confirm, edit, or add any missing categories." }
+      ]
     },
 
     "TRUST_BAR": [
-      "We'll check for missing columns automatically",
-      "You'll be able to edit entries after upload",
-      "Only you can see your uploaded data"
+      { "TITLE": "Duplicate detection", "TEXT": "We'll flag potential duplicates" },
+      { "TITLE": "Editable later", "TEXT": "You can change anything after import" },
+      { "TITLE": "Private & secure", "TEXT": "Your data stays private and is only visible to you" }
     ],
 
     "UPLOAD_FILE": {
@@ -278,13 +280,15 @@
   },
   "TRANSACTIONS_PAGE": {
     "TITLE": "Check your transactions",
-    "SUBTITLE": "Make sure everything looks correct before saving.",
+    "SUBTITLE": "Check your imported transactions, assign categories, and make any edits before adding them to your finances.",
+    "STEPPER": ["Prepare CSV", "Upload", "Review & categorize"],
     "CURRENCY_SELECT": {
       "LABEL": "Currency",
       "PLACEHOLDER": "Select currency"
     },
     "ACCOUNT_SELECT": {
       "LABEL": "Account",
+      "PLACEHOLDER": "Select account",
       "TOOLTIP_NO_ACCOUNTS": "You have no accounts. You need to create an account first.",
       "CREATE_BUTTON": "Create new account",
       "CREATE_TOOLTIP": "Account is your bank account/card. It's a way to group transactions.",
@@ -326,9 +330,12 @@
     },
     "FOOTER": {
       "BACK_TO_HOME_PAGE": "Back to home",
-      "SAVE_BUTTON": "Save & continue",
-      "SAVE_BUTTON_WITH_COUNT": "Save {count} transaction(s)",
-      "SKIPPED_SUFFIX": "({skipped} skipped)"
+      "SAVE_BUTTON": "Go to Penny's View",
+      "TRANSACTIONS_COUNT": "{count} transactions",
+      "SKIPPED_COUNT": "{count} duplicates (skipped)",
+      "READY_TITLE": "Looks good!",
+      "NOT_READY_TITLE": "Almost there!",
+      "READY_TEXT": "Once you're happy with your categories, add these transactions to your finances and see the bigger picture."
     },
     "ERRORS": {
       "IMPORT_NOT_FOUND": {
@@ -378,6 +385,17 @@
   },
   "DASHBOARD_PAGE": {
     "TITLE": "Penny's View",
+    "SUBTITLE": "Your money story at a glance — see what came in, what went out, and how you're doing overall.",
+    "INSIGHTS": {
+      "SAVED_TITLE": "You saved {percent}% of income",
+      "SAVED_TEXT": "That's {amount} saved in total.",
+      "NO_SAVINGS_TITLE": "No savings in this period",
+      "NO_SAVINGS_TEXT": "Income {income}, expenses {expense}.",
+      "TOP_CATEGORY_TITLE": "{name} is your top category",
+      "TOP_CATEGORY_TEXT": "{amount} ({percent}% of total spending).",
+      "TOP_MONTH_TITLE": "Your highest spending month was {month}",
+      "TOP_MONTH_TEXT": "{amount} in total expenses."
+    },
     "FILTERS": {
       "YEAR_PRESETS": {
         "OLDER": "Older",
@@ -608,6 +626,7 @@
   },
   "SETTINGS_PAGE": {
     "TITLE": "Settings",
+    "SUBTITLE": "Customise your categories, tags and accounts to keep Penny organised your way.",
     "TABS": {
       "CATEGORIES": "Categories",
       "TAGS": "Tags",
@@ -623,7 +642,9 @@
       "COLOUR_LABEL": "Colour",
       "ICON_LABEL": "Icon",
       "PREVIEW_LABEL": "Preview",
+      "PREVIEW_HINT": "This is how your category will look.",
       "TRANSACTION_COUNT": "{count} transaction(s)",
+      "TOTAL": "Total: {count}",
       "NAME_REQUIRED": "Enter a name",
       "GENERIC_ERROR": "Something went wrong. Please try again.",
       "LOAD_ERROR": {
@@ -633,9 +654,11 @@
     },
     "CATEGORIES": {
       "ADD": "Add category",
+      "INFO": "Changes here affect how categories appear when you review transactions and in Penny's View.",
       "EMPTY": "No categories yet.",
       "CREATE_TITLE": "Add category",
       "EDIT_TITLE": "Edit category",
+      "DIALOG_SUBTITLE": "Choose a name, colour and icon to organise your transactions.",
       "NAME_PLACEHOLDER": "Category name",
       "TRANSFER_HINT": "Moves between your own accounts. Kept out of the charts, so it can't be deleted.",
       "ALREADY_EXISTS": "A category named “{name}” already exists. To combine them, delete this category and move its transactions to “{name}”.",
@@ -652,9 +675,11 @@
     },
     "TAGS": {
       "ADD": "Add tag",
+      "INFO": "Tags group transactions across categories, so you can find them quickly in the Money Journal.",
       "EMPTY": "No tags yet. Create one here or add tags to transactions in the Money Journal.",
       "CREATE_TITLE": "Add tag",
       "EDIT_TITLE": "Edit tag",
+      "DIALOG_SUBTITLE": "Choose a name and colour to group your transactions.",
       "NAME_PLACEHOLDER": "Tag name",
       "ALREADY_EXISTS": "A tag named “{name}” already exists. To combine them, filter the Money Journal by this tag, add “{name}” to those rows, then delete this tag.",
       "DELETE_DIALOG": {
@@ -665,9 +690,11 @@
     },
     "ACCOUNTS": {
       "ADD": "Add account",
+      "INFO": "Accounts show where your transactions come from. You pick one each time you upload a CSV.",
       "EMPTY": "No accounts yet.",
       "CREATE_TITLE": "Add account",
       "EDIT_TITLE": "Rename account",
+      "DIALOG_SUBTITLE": "Give this account a name you'll easily recognise.",
       "NAME_PLACEHOLDER": "Account name",
       "ALREADY_EXISTS": "An account named “{name}” already exists. Choose a different name.",
       "CANT_DELETE": "This account has transactions (deleted ones included), so it can't be deleted. You can rename it instead.",

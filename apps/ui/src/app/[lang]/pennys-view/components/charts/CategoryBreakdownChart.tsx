@@ -18,7 +18,8 @@ import { Category, CategoryBreakdownResponse } from 'schemas';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
-import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
+import { ChartCardTitle } from '../DashboardCard';
+import DonutLargeRounded from '@mui/icons-material/DonutLargeRounded';
 import {
   CategoryChartLegend,
   CategoryChartTooltip,
@@ -28,11 +29,14 @@ import {
 interface CategoryBreakdownChartProps {
   categories: Category[];
   pennysViewPageText: Record<string, any>;
+  // lets the insight cards reuse this chart's data instead of fetching again
+  onData?: (data: CategoryBreakdownResponse | null) => void;
 }
 
 export default function CategoryBreakdownChart({
   categories,
   pennysViewPageText,
+  onData,
 }: CategoryBreakdownChartProps) {
   const { appliedFilters, isInitialized } = useDashboardFilters();
 
@@ -49,6 +53,7 @@ export default function CategoryBreakdownChart({
 
     const fetchData = async () => {
       setLoading(true);
+      onData?.(null);
       setError(null);
 
       try {
@@ -60,6 +65,7 @@ export default function CategoryBreakdownChart({
         });
 
         setData(result);
+        onData?.(result);
       } catch (err) {
         if (err instanceof ApiError) {
           setError({
@@ -107,22 +113,18 @@ export default function CategoryBreakdownChart({
   const legendItemById = new Map(legendItems.map((i) => [i.id, i]));
 
   return (
-    <Box sx={{ width: '100%', mt: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <Typography variant="h6" fontWeight={600}>
-          {pennysViewPageText.CHARTS.CATEGORY_BREAKDOWN.TITLE}
-        </Typography>
+    <Box sx={{ width: '100%' }}>
+      <ChartCardTitle
+        icon={<DonutLargeRounded fontSize="inherit" />}
+        title={pennysViewPageText.CHARTS.CATEGORY_BREAKDOWN.TITLE}
+        tooltip={
+          <Typography variant="body2">
+            {pennysViewPageText.CHARTS.CATEGORY_BREAKDOWN.TOOLTIP}
+          </Typography>
+        }
+      />
 
-        <InfoTooltip
-          content={
-            <Typography variant="body2">
-              {pennysViewPageText.CHARTS.CATEGORY_BREAKDOWN.TOOLTIP}
-            </Typography>
-          }
-        />
-      </Box>
-
-      <Box sx={{ width: '100%', height: 320 }}>
+      <Box sx={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>
           <PieChart>
             <Pie

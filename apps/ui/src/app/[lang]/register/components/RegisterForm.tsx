@@ -2,9 +2,8 @@
 
 'use client';
 
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import {
-  Box,
   TextField,
   Typography,
   Stack,
@@ -24,6 +23,11 @@ import { getNestedDict, getTranslatedError } from '@/utils/getNestedDict';
 import { UiError } from '@/types/interfaces';
 import { useAuth } from '@/providers/AuthProvider';
 import GoogleIcon from '@mui/icons-material/Google';
+import MailOutline from '@mui/icons-material/MailOutline';
+import LockOutlined from '@mui/icons-material/LockOutlined';
+import PersonOutline from '@mui/icons-material/PersonOutline';
+import PersonAddAltOutlined from '@mui/icons-material/PersonAddAltOutlined';
+import AuthCard from '@/components/AuthCard/AuthCard';
 import {
   RegisterFormInput,
   registerFormSchema,
@@ -90,171 +94,200 @@ export default function RegisterPage({ registerPageText }: RegisterPageProps) {
     window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/google`;
   };
 
+  const adornment = (icon: ReactNode) => (
+    <InputAdornment position="start">{icon}</InputAdornment>
+  );
+  const toggle = (
+    <InputAdornment position="end">
+      <IconButton onClick={handleTogglePassword} edge="end">
+        {showPassword ? <VisibilityOff /> : <Visibility />}
+      </IconButton>
+    </InputAdornment>
+  );
+  const iconSx = { color: 'secondary.main' };
+
   return (
-    <Box>
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
+    <AuthCard
+      title={registerPageText.FORM.CREATE_ACCOUNT_TITLE}
+      subtitle={registerPageText.FORM.SUBTITLE}
+      onSubmit={handleSubmit(onSubmit)}
+      below={
+        <ErrorBanner
+          error={error}
+          onClose={() => setError(null)}
+          colorMode="color"
+        />
+      }
+    >
+      {/* Already have an account */}
+      <Stack
+        direction="row"
+        spacing={1.5}
+        alignItems="center"
+        justifyContent="center"
+        flexWrap="wrap"
+        sx={{ mt: 1, mb: 2 }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          {registerPageText.FORM.ALREADY_HAVE_ACCOUNT}
+        </Typography>
+        <CustomButton
+          variantType="outlined"
+          color="secondary"
+          size="small"
+          onClick={handleSignInClick}
+          sx={{
+            px: 2,
+            borderRadius: '12px',
+            fontWeight: 800,
+            bgcolor: '#F7EEFD',
+            borderColor: '#DCC8F0',
+            '&:hover': { bgcolor: '#F1E4FA', borderColor: '#C9A8E6' },
+          }}
+        >
+          {registerPageText.FORM.SIGN_IN_BUTTON}
+        </CustomButton>
+      </Stack>
+
+      {/* Form Fields */}
+      <Stack spacing={1.5}>
+        <TextField
+          size="small"
+          label={registerPageText.FORM.EMAIL_FIELD}
+          autoComplete="email"
+          error={!!errors.email}
+          helperText={
+            errors.email && errors.email.message
+              ? getTranslatedError(errors.email.message, registerPageText.FORM)
+              : ''
+          }
+          {...register('email')}
+          InputProps={{
+            startAdornment: adornment(<MailOutline sx={iconSx} />),
+          }}
+        />
+
+        <TextField
+          size="small"
+          label={registerPageText.FORM.PASSWORD_FIELD}
+          type={showPassword ? 'text' : 'password'}
+          autoComplete="new-password"
+          error={!!errors.password}
+          helperText={
+            errors.password && errors.password.message
+              ? getTranslatedError(
+                  errors.password.message,
+                  registerPageText.FORM,
+                )
+              : ''
+          }
+          {...register('password')}
+          InputProps={{
+            startAdornment: adornment(<LockOutlined sx={iconSx} />),
+            endAdornment: toggle,
+          }}
+        />
+
+        <TextField
+          size="small"
+          label={registerPageText.FORM.CONFIRM_PASSWORD_FIELD}
+          type={showPassword ? 'text' : 'password'}
+          autoComplete="new-password"
+          error={!!errors.confirmPassword}
+          helperText={
+            errors.confirmPassword && errors.confirmPassword.message
+              ? getTranslatedError(
+                  errors.confirmPassword.message,
+                  registerPageText.FORM,
+                )
+              : ''
+          }
+          {...register('confirmPassword')}
+          InputProps={{
+            startAdornment: adornment(<LockOutlined sx={iconSx} />),
+            endAdornment: toggle,
+          }}
+        />
+
+        <TextField
+          size="small"
+          label={registerPageText.FORM.USERNAME_FIELD}
+          autoComplete="username"
+          error={!!errors.userName}
+          helperText={
+            errors.userName && errors.userName.message
+              ? getTranslatedError(
+                  errors.userName.message,
+                  registerPageText.FORM,
+                )
+              : ''
+          }
+          {...register('userName')}
+          InputProps={{
+            startAdornment: adornment(<PersonOutline sx={iconSx} />),
+          }}
+        />
+
+        <TextField
+          size="small"
+          label={registerPageText.FORM.USER_SURNAME_FIELD}
+          autoComplete="family-name"
+          error={!!errors.userSurname}
+          helperText={
+            errors.userSurname && errors.userSurname.message
+              ? getTranslatedError(
+                  errors.userSurname.message,
+                  registerPageText.FORM,
+                )
+              : ''
+          }
+          {...register('userSurname')}
+          InputProps={{
+            startAdornment: adornment(<PersonOutline sx={iconSx} />),
+          }}
+        />
+
+        {/* Submit Button */}
+        <CustomButton
+          type="submit"
+          variantType="primary"
+          color="secondary"
+          fullWidth
+          loading={isSubmitting}
+          startIcon={<PersonAddAltOutlined />}
+          sx={{ py: 1, fontSize: '1rem', borderRadius: '12px' }}
+        >
+          {registerPageText.FORM.CREATE_ACCOUNT_BUTTON}
+        </CustomButton>
+      </Stack>
+
+      <Divider
         sx={{
-          width: '100%',
-          minWidth: { xs: '100%', sm: 550 },
-          maxWidth: { xs: '100%', sm: 550 },
-          mx: 'auto',
-          mb: 2,
-          p: 5,
-          borderRadius: 5,
-          boxShadow: 10,
-          bgcolor: 'background.paper',
+          my: 1.5,
+          color: 'text.secondary',
+          '&::before, &::after': { borderColor: '#DCC8F0' },
         }}
       >
-        {/* Title */}
-        <Typography
-          variant="h4"
-          align="center"
-          gutterBottom
-          sx={{ fontWeight: 600 }}
-        >
-          {registerPageText.FORM.CREATE_ACCOUNT_TITLE}
-        </Typography>
+        {registerPageText.FORM.OR}
+      </Divider>
 
-        {/* Subtitle */}
-        <Stack spacing={1} alignItems="center" mb={5} mt={3}>
-          <Typography variant="body2" align="center">
-            {registerPageText.FORM.ALREADY_HAVE_ACCOUNT}
-          </Typography>
-          <CustomButton variantType="secondary" onClick={handleSignInClick}>
-            {registerPageText.FORM.SIGN_IN_BUTTON}
-          </CustomButton>
-        </Stack>
-
-        {/* Form Fields */}
-        <Stack spacing={2}>
-          <TextField
-            label={registerPageText.FORM.EMAIL_FIELD}
-            autoComplete="email"
-            error={!!errors.email}
-            helperText={
-              errors.email && errors.email.message
-                ? getTranslatedError(
-                    errors.email.message,
-                    registerPageText.FORM,
-                  )
-                : ''
-            }
-            {...register('email')}
-          />
-
-          <TextField
-            label={registerPageText.FORM.PASSWORD_FIELD}
-            type={showPassword ? 'text' : 'password'}
-            autoComplete="new-password"
-            error={!!errors.password}
-            helperText={
-              errors.password && errors.password.message
-                ? getTranslatedError(
-                    errors.password.message,
-                    registerPageText.FORM,
-                  )
-                : ''
-            }
-            {...register('password')}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleTogglePassword} edge="end">
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <TextField
-            label={registerPageText.FORM.CONFIRM_PASSWORD_FIELD}
-            type={showPassword ? 'text' : 'password'}
-            autoComplete="new-password"
-            error={!!errors.confirmPassword}
-            helperText={
-              errors.confirmPassword && errors.confirmPassword.message
-                ? getTranslatedError(
-                    errors.confirmPassword.message,
-                    registerPageText.FORM,
-                  )
-                : ''
-            }
-            {...register('confirmPassword')}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleTogglePassword} edge="end">
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <TextField
-            label={registerPageText.FORM.USERNAME_FIELD}
-            autoComplete="username"
-            error={!!errors.userName}
-            helperText={
-              errors.userName && errors.userName.message
-                ? getTranslatedError(
-                    errors.userName.message,
-                    registerPageText.FORM,
-                  )
-                : ''
-            }
-            {...register('userName')}
-          />
-
-          <TextField
-            label={registerPageText.FORM.USER_SURNAME_FIELD}
-            autoComplete="family-name"
-            error={!!errors.userSurname}
-            helperText={
-              errors.userSurname && errors.userSurname.message
-                ? getTranslatedError(
-                    errors.userSurname.message,
-                    registerPageText.FORM,
-                  )
-                : ''
-            }
-            {...register('userSurname')}
-          />
-
-          {/* Submit Button */}
-          <CustomButton
-            type="submit"
-            variantType="primary"
-            fullWidth
-            loading={isSubmitting}
-          >
-            {registerPageText.FORM.CREATE_ACCOUNT_BUTTON}
-          </CustomButton>
-
-          <Box sx={{ my: 4 }}>
-            <Divider sx={{ my: 3, height: 2, bgcolor: 'primary.light' }} />
-          </Box>
-
-          <Box textAlign="center">
-            <CustomButton
-              variantType="outlined"
-              fullWidth
-              onClick={handleGoogleSignInClick}
-              startIcon={<GoogleIcon />}
-            >
-              {registerPageText.CONTINUE_WITH_GOOGLE_BUTTON}
-            </CustomButton>
-          </Box>
-        </Stack>
-      </Box>
-      <ErrorBanner
-        error={error}
-        onClose={() => setError(null)}
-        colorMode="color"
-      />
-    </Box>
+      <CustomButton
+        variantType="outlined"
+        color="secondary"
+        fullWidth
+        onClick={handleGoogleSignInClick}
+        startIcon={<GoogleIcon />}
+        sx={{
+          py: 0.75,
+          borderRadius: '12px',
+          bgcolor: '#F7EEFD',
+          borderColor: '#DCC8F0',
+          color: 'text.primary',
+          '&:hover': { bgcolor: '#F1E4FA', borderColor: '#C9A8E6' },
+        }}
+      >
+        {registerPageText.CONTINUE_WITH_GOOGLE_BUTTON}
+      </CustomButton>
+    </AuthCard>
   );
 }

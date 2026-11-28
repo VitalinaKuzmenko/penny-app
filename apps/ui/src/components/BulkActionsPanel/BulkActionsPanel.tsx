@@ -22,7 +22,17 @@ export default function BulkActionsPanel({
   if (!selectedCount) return null;
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, mb: 2, borderRadius: 4 }}>
+    <Paper
+      elevation={0}
+      sx={{
+        p: { xs: 2, md: 2.5 },
+        mb: 2,
+        borderRadius: '20px',
+        bgcolor: '#F5EAFB',
+        border: '1px solid',
+        borderColor: 'secondary.light',
+      }}
+    >
       <Stack
         direction="row"
         alignItems="center"
@@ -30,7 +40,11 @@ export default function BulkActionsPanel({
         spacing={2}
         mb={2}
       >
-        <Typography fontWeight={600} sx={{ whiteSpace: 'nowrap' }}>
+        <Typography
+          variant="h6"
+          component="p"
+          sx={{ whiteSpace: 'nowrap', color: 'secondary.main' }}
+        >
           {selectedCount} {label}
         </Typography>
         {actions}

@@ -1,50 +1,76 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
+import { useState } from 'react';
 
 interface AccountDateCardProps {
   name: string;
   date: string | null;
-  relative: string | null;
   emptyText: string;
+  index?: number;
 }
+
+const tones = ['#FDEBEE', '#E9F8EF', '#EAF0FC', '#F3E8FA'];
 
 // Client component so sx can read the theme; dates are pre-formatted on the server
 export default function AccountDateCard({
   name,
   date,
-  relative,
   emptyText,
+  index = 0,
 }: AccountDateCardProps) {
+  const [truncated, setTruncated] = useState(false);
+
   return (
     <Box
       sx={{
-        p: 2,
-        borderRadius: 3,
-        color: 'primary.contrastText',
-        background: (theme) =>
-          `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
-        boxShadow: '0 6px 14px rgba(4, 22, 70, 0.25)',
+        px: 2,
+        py: 1.25,
+        borderRadius: '16px',
+        bgcolor: tones[index % tones.length],
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 1.5,
+        minWidth: 0,
       }}
     >
-      <Typography variant="body2" sx={{ opacity: 0.75 }} noWrap>
-        {name}
-      </Typography>
-
-      {date ? (
-        <>
-          <Typography variant="h6" fontWeight={700}>
-            {date}
-          </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.75 }}>
-            {relative}
-          </Typography>
-        </>
-      ) : (
-        <Typography variant="body1" sx={{ opacity: 0.75 }} mt={0.5}>
-          {emptyText}
+      <Tooltip title={truncated ? name : ''}>
+        <Typography
+          variant="body2"
+          fontWeight={500}
+          color="text.primary"
+          noWrap
+          onMouseEnter={(e) =>
+            setTruncated(
+              e.currentTarget.scrollWidth > e.currentTarget.clientWidth,
+            )
+          }
+        >
+          {name}
         </Typography>
-      )}
+      </Tooltip>
+
+      <Box
+        sx={{
+          flexShrink: 0,
+          px: 1.75,
+          py: 0.5,
+          borderRadius: 999,
+          bgcolor: 'rgba(243, 228, 252, 0.75)',
+          border: '1px solid rgba(255, 255, 255, 0.8)',
+          boxShadow: '0 2px 6px rgba(83, 36, 70, 0.08)',
+        }}
+      >
+        <Typography
+          variant="body2"
+          fontWeight={600}
+          color={date ? 'text.primary' : 'text.secondary'}
+          noWrap
+        >
+          {date ?? emptyText}
+        </Typography>
+      </Box>
     </Box>
   );
 }

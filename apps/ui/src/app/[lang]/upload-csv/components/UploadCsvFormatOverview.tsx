@@ -1,22 +1,11 @@
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
-import {
-  Box,
-  Card,
-  CardContent,
-  Chip,
-  Divider,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 
 import DownloadIcon from '@mui/icons-material/Download';
-import DescriptionIcon from '@mui/icons-material/Description';
+import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
+import ViewListOutlined from '@mui/icons-material/ViewListOutlined';
+import StorageOutlined from '@mui/icons-material/StorageOutlined';
+import TableChartOutlined from '@mui/icons-material/TableChartOutlined';
 
 interface UploadCsvFormatOverviewProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,7 +16,6 @@ const UploadCsvFormatOverview = ({
   formatOverviewText,
 }: UploadCsvFormatOverviewProps) => {
   const columnNames: string[] = formatOverviewText.COLUMNS;
-  const rows: string[][] = formatOverviewText.EXAMPLE_TABLE;
 
   const downloadCsvTemplate = () => {
     const link = document.createElement('a');
@@ -43,169 +31,115 @@ const UploadCsvFormatOverview = ({
     }, 0);
   };
 
-  return (
-    <Card
-      elevation={0}
-      sx={{
-        borderRadius: 4,
-        backgroundColor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'grey.200',
-      }}
-    >
-      <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-        <Stack spacing={2}>
-          {/* Section Title */}
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <Box
-              sx={{
-                width: 44,
-                height: 44,
-                borderRadius: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: 'primary.main',
-                color: 'primary.contrastText',
-              }}
-            >
-              <DescriptionIcon />
-            </Box>
-            <Typography variant="h6" fontWeight={700}>
-              {formatOverviewText.TITLE}
-            </Typography>
-          </Stack>
+  const infoItems = [
+    {
+      icon: <DescriptionOutlined />,
+      title: formatOverviewText.FORMAT_TITLE,
+      text: formatOverviewText.FORMAT_TEXT,
+    },
+    {
+      icon: <ViewListOutlined />,
+      title: formatOverviewText.COLUMNS_TITLE,
+      text: columnNames.join(', '),
+    },
+    {
+      icon: <StorageOutlined />,
+      title: formatOverviewText.SIZE_TITLE,
+      text: formatOverviewText.SIZE_TEXT,
+    },
+  ];
 
-          {/* Required Columns */}
-          <Box
+  return (
+    <Stack spacing={2}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+          gap: { xs: 2, sm: 0 },
+        }}
+      >
+        {infoItems.map((item, index) => (
+          <Stack
+            key={item.title}
+            direction="row"
+            spacing={0.75}
+            alignItems="center"
             sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              gap: 2,
+              px: { sm: 2 },
+              borderLeft: { sm: index > 0 ? '1px solid' : 'none' },
+              borderColor: 'rgba(83, 36, 70, 0.07)',
+              color: 'secondary.main',
+              '& > .MuiSvgIcon-root': { fontSize: 38, flexShrink: 0 },
             }}
           >
-            <Typography
-              variant="subtitle1"
-              fontWeight={700}
-              gutterBottom
-              sx={{ m: 0 }}
-            >
-              {formatOverviewText.REQUIRED_COLUMNS}
-            </Typography>
-            <Stack direction="row" flexWrap="wrap" sx={{ rowGap: 1 }}>
-              {columnNames.map((col) => (
-                <Chip
-                  key={col}
-                  label={col}
-                  sx={{
-                    fontWeight: 700,
-                    letterSpacing: '0.04em',
-                    borderRadius: 3,
-                    px: 1.75,
-                    py: 0.75,
-                    mr: 1,
-                    background: (theme) =>
-                      `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
-                    color: 'primary.contrastText',
-                    boxShadow: '0 6px 14px rgba(4, 22, 70, 0.25)',
-                  }}
-                />
-              ))}
-            </Stack>
-          </Box>
-
-          <Divider sx={{ my: 6, height: 2, bgcolor: 'primary.light' }} />
-
-          {/* Table + Download */}
-          <Stack direction={{ xs: 'column', md: 'row' }} alignItems="stretch">
-            <Box flex={1}>
-              <Paper
-                elevation={0}
-                sx={{
-                  borderRadius: 3,
-                  border: '1px solid',
-                  borderColor: 'primary.light',
-                  overflowX: 'auto',
-                }}
-              >
-                <Table>
-                  <TableHead>
-                    <TableRow
-                      sx={{
-                        background: (theme) =>
-                          `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
-                      }}
-                    >
-                      {columnNames.map((col, index) => (
-                        <TableCell
-                          align={
-                            index === columnNames.length - 1 ? 'right' : 'left'
-                          }
-                          key={col + index}
-                          sx={{
-                            fontWeight: 600,
-                            color: 'primary.contrastText',
-                          }}
-                        >
-                          {col}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-
-                  <TableBody>
-                    {rows.map((row, index) => (
-                      <TableRow
-                        key={index}
-                        sx={{
-                          '&:hover': {
-                            backgroundColor: 'grey.50',
-                          },
-                        }}
-                      >
-                        <TableCell>{row[0]}</TableCell>
-                        <TableCell>{row[1]}</TableCell>
-                        <TableCell align="right">{row[2]}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Paper>
-            </Box>
-
-            {/* CTA */}
-            <Box
-              sx={{
-                flex: 1,
-                p: 3,
-                borderRadius: 3,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 2,
-              }}
-            >
-              <CustomButton
-                variantType="secondary"
-                onClick={downloadCsvTemplate}
-                startIcon={<DownloadIcon />}
-              >
-                {formatOverviewText.DOWNLOAD_BUTTON}
-              </CustomButton>
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{ textAlign: 'center' }}
-              >
-                {formatOverviewText.DOWNLOAD_TEXT}
+            {item.icon}
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="body2" fontWeight={700} color="text.primary">
+                {item.title}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {item.text}
               </Typography>
             </Box>
           </Stack>
+        ))}
+      </Box>
+
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={2}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        sx={{
+          p: 2,
+          borderRadius: '16px',
+          bgcolor: 'sidebar.activeBackground',
+        }}
+      >
+        <Stack direction="row" spacing={1.5} alignItems="center" flex={1}>
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              flexShrink: 0,
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor: 'rgba(183, 154, 217, 0.35)',
+              color: 'secondary.main',
+            }}
+          >
+            <TableChartOutlined />
+          </Box>
+          <Box>
+            <Typography variant="body2" fontWeight={700} color="text.primary">
+              {formatOverviewText.HELP_TITLE}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {formatOverviewText.DOWNLOAD_TEXT}
+            </Typography>
+          </Box>
         </Stack>
-      </CardContent>
-    </Card>
+
+        <CustomButton
+          variantType="secondary"
+          color="secondary"
+          onClick={downloadCsvTemplate}
+          startIcon={<DownloadIcon />}
+          sx={{
+            flexShrink: 0,
+            bgcolor: '#FDF8FF',
+            color: 'text.primary',
+            borderColor: 'secondary.main',
+            borderRadius: '12px',
+            '& .MuiButton-startIcon': { color: 'secondary.main' },
+            '&:hover': { bgcolor: '#F7EDFC', borderColor: 'secondary.main' },
+          }}
+        >
+          {formatOverviewText.DOWNLOAD_BUTTON}
+        </CustomButton>
+      </Stack>
+    </Stack>
   );
 };
 

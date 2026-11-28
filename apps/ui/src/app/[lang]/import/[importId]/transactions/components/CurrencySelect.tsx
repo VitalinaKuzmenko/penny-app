@@ -2,12 +2,14 @@
 'use client';
 
 import {
+  Box,
   FormControl,
-  InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
 } from '@mui/material';
+import PaymentsOutlined from '@mui/icons-material/PaymentsOutlined';
+import ImportInfoItem from './ImportInfoItem';
 import { GetCurrenciesResponse } from 'schemas';
 import { Currency } from './TransactionsClient';
 
@@ -28,27 +30,44 @@ export default function CurrencySelect({
     onChange(event.target.value as Currency);
 
   return (
-    <FormControl fullWidth>
-      <InputLabel id="currency-label">{pageText.LABEL}</InputLabel>
-      <Select value={value ?? ''} label="Currency" onChange={handleChange}>
-        <MenuItem value="" disabled>
-          {pageText.PLACEHOLDER}
-        </MenuItem>
-
-        {currencies.currencies.map((cur) => (
-          <MenuItem
-            key={cur.code}
-            value={cur.code}
-            sx={{
-              '&:hover': {
-                bgcolor: 'grey.200',
-              },
-            }}
-          >
-            {cur.code}
+    <ImportInfoItem
+      icon={<PaymentsOutlined fontSize="inherit" />}
+      label={pageText.LABEL}
+      labelId="currency-label"
+    >
+      <FormControl fullWidth size="small">
+        <Select
+          value={value ?? ''}
+          labelId="currency-label"
+          onChange={handleChange}
+          displayEmpty
+          renderValue={(selected) =>
+            selected || (
+              <Box component="span" sx={{ color: 'text.secondary' }}>
+                {pageText.PLACEHOLDER}
+              </Box>
+            )
+          }
+        >
+          <MenuItem value="" disabled>
+            {pageText.PLACEHOLDER}
           </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+
+          {currencies.currencies.map((cur) => (
+            <MenuItem
+              key={cur.code}
+              value={cur.code}
+              sx={{
+                '&:hover': {
+                  bgcolor: 'grey.200',
+                },
+              }}
+            >
+              {cur.code}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </ImportInfoItem>
   );
 }

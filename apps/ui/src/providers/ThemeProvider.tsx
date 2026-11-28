@@ -7,19 +7,20 @@ import {
 import CssBaseline from '@mui/material/CssBaseline';
 import { ReactNode } from 'react';
 
-const plum = '#532446';
+const plum = '#592148';
 const plumDark = '#3A1832';
 const radius = 16;
 const softShadow = '0 4px 20px rgba(83, 36, 70, 0.08)';
 const hoverShadow = '0 8px 28px rgba(83, 36, 70, 0.14)';
+// The CSS variables are set by next/font in app/[lang]/fonts.ts
 const headingFont =
-  '"Fraunces", "Playfair Display", "Iowan Old Style", Georgia, serif';
+  'var(--font-fraunces), "Fraunces", "Iowan Old Style", Georgia, serif';
 const bodyFont =
-  '"Nunito", "Quicksand", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  'var(--font-nunito-sans), "Nunito Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
 
 const headingStyle = {
   fontFamily: headingFont,
-  fontWeight: 700,
+  fontWeight: 800,
   letterSpacing: '-0.01em',
 };
 
@@ -57,7 +58,7 @@ export const theme = createTheme({
       main: '#38BDF8',
     },
     background: {
-      default: '#FBF3EA', // warm cream
+      default: '#FEF3F0', // warm cream
       paper: '#FFFFFF',
     },
     text: {
@@ -88,7 +89,7 @@ export const theme = createTheme({
       text: '#F6E9F1',
       mutedText: 'rgba(246, 233, 241, 0.72)',
       hover: 'rgba(255, 255, 255, 0.08)',
-      activeBackground: '#F1E8FB', // lavender
+      activeBackground: '#F1DDFD', // lavender
       activeText: plumDark,
     },
   },
@@ -100,7 +101,7 @@ export const theme = createTheme({
     h3: headingStyle,
     h4: headingStyle,
     h5: headingStyle,
-    h6: { ...headingStyle, fontWeight: 600 },
+    h6: headingStyle,
     button: { textTransform: 'none', fontWeight: 700 },
   },
   components: {
@@ -164,7 +165,16 @@ export const theme = createTheme({
       styleOverrides: { paper: { borderRadius: 14 } },
     },
     MuiAlert: {
-      styleOverrides: { root: { borderRadius: 12 } },
+      styleOverrides: {
+        root: { borderRadius: 12 },
+        // brighter than MUI's default pale warning so it stands out on cream
+        standardWarning: {
+          backgroundColor: '#FFE2B8',
+          color: '#7A4100',
+          border: '1px solid #F7B04D',
+          '& .MuiAlert-icon': { color: '#E07B00' },
+        },
+      },
     },
     MuiTabs: {
       styleOverrides: {

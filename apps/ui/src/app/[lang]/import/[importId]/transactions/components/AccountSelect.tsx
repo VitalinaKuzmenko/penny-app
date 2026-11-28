@@ -3,8 +3,8 @@
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import {
+  Box,
   FormControl,
-  InputLabel,
   ListItemText,
   MenuItem,
   Select,
@@ -13,6 +13,8 @@ import {
 } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { AccountWithActivity } from 'schemas';
+import TocRoundedIcon from '@mui/icons-material/TocRounded';
+import ImportInfoItem from './ImportInfoItem';
 
 import { formatDay } from '@/utils/formatAccountDates';
 
@@ -49,6 +51,12 @@ export default function AccountSelect({
       : pageText.NO_TRANSACTIONS;
 
   const renderSelected = (id: string) => {
+    if (!id)
+      return (
+        <Box component="span" sx={{ color: 'text.secondary' }}>
+          {pageText.PLACEHOLDER}
+        </Box>
+      );
     const acc = accounts.find((a) => a.id === id);
     return acc ? `${acc.name} · ${describeLastDate(acc)}` : '';
   };
@@ -62,42 +70,52 @@ export default function AccountSelect({
       >
         {/* Tooltip requires a non-disabled wrapper */}
         <span style={{ width: '100%', minWidth: 0 }}>
-          <FormControl fullWidth disabled={!hasAccounts}>
-            <InputLabel>{pageText.LABEL}</InputLabel>
-            <Select
-              value={value ?? ''}
-              label={pageText.LABEL}
-              onChange={handleChange}
-              renderValue={renderSelected}
-            >
-              {hasAccounts &&
-                accounts.map((acc) => (
-                  <MenuItem
-                    key={acc.id}
-                    value={acc.id}
-                    sx={{
-                      '&:hover': {
-                        bgcolor: 'grey.200',
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={acc.name}
-                      secondary={describeLastDate(acc)}
-                    />
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
+          <ImportInfoItem
+            icon={<TocRoundedIcon fontSize="inherit" />}
+            label={pageText.LABEL}
+            labelId="account-label"
+          >
+            <FormControl fullWidth size="small" disabled={!hasAccounts}>
+              <Select
+                value={value ?? ''}
+                labelId="account-label"
+                onChange={handleChange}
+                displayEmpty
+                renderValue={renderSelected}
+              >
+                {hasAccounts &&
+                  accounts.map((acc) => (
+                    <MenuItem
+                      key={acc.id}
+                      value={acc.id}
+                      sx={{
+                        '&:hover': {
+                          bgcolor: 'grey.200',
+                        },
+                      }}
+                    >
+                      <ListItemText
+                        primary={acc.name}
+                        secondary={describeLastDate(acc)}
+                      />
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </ImportInfoItem>
         </span>
       </Tooltip>
 
       <Tooltip title={pageText.CREATE_TOOLTIP}>
         <CustomButton
-          variantType="secondary"
+          variantType="outlined"
           onClick={handleCreateNew}
-          // same height as the selects next to it
-          sx={{ height: 56, minWidth: { md: 200 }, width: { xs: '100%' } }}
+          // same height as the small selects next to it
+          sx={{
+            height: 40,
+            whiteSpace: 'nowrap',
+            width: { xs: '100%', sm: 'auto' },
+          }}
         >
           {pageText.CREATE_BUTTON}
         </CustomButton>

@@ -18,7 +18,8 @@ import { getTagSpend } from '@/requests/charts/getTagSpend';
 import { formatCurrency } from '@/utils/formatCurrency';
 import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
-import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
+import { ChartCardTitle } from '../DashboardCard';
+import LocalOfferOutlined from '@mui/icons-material/LocalOfferOutlined';
 import { UiError } from '@/types/interfaces';
 
 const LABEL_MAX_CHARS = 18;
@@ -81,15 +82,12 @@ export default function TagSpendChart({
     : null;
 
   return (
-    <Box sx={{ width: '100%', mt: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <Typography variant="h6" fontWeight={600}>
-          {text.TITLE}
-        </Typography>
-        <InfoTooltip
-          content={<Typography variant="body2">{text.TOOLTIP}</Typography>}
-        />
-      </Box>
+    <Box sx={{ width: '100%' }}>
+      <ChartCardTitle
+        icon={<LocalOfferOutlined fontSize="inherit" />}
+        title={text.TITLE}
+        tooltip={<Typography variant="body2">{text.TOOLTIP}</Typography>}
+      />
 
       {loading ? (
         <Spinner />

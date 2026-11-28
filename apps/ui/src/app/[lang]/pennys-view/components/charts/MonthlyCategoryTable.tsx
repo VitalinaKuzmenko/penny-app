@@ -15,7 +15,8 @@ import { ApiError } from '@/utils/clientApiFetch';
 import { Category, MonthlyCategoryResponse } from 'schemas';
 import CategoryLabel from '@/components/CategoryLabel/CategoryLabel';
 import { hexToRgba } from '@/utils/hexToRgba';
-import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
+import { ChartCardTitle } from '../DashboardCard';
+import TableChartOutlined from '@mui/icons-material/TableChartOutlined';
 
 interface MonthlyCategoryTableProps {
   categories: Category[];
@@ -140,34 +141,42 @@ export default function MonthlyCategoryTable({
   ];
 
   return (
-    <Box sx={{ width: '100%', mt: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <Typography variant="h6" fontWeight={600}>
-          {`${pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TITLE} (${year})`}
-        </Typography>
+    <Box sx={{ width: '100%' }}>
+      <ChartCardTitle
+        icon={<TableChartOutlined fontSize="inherit" />}
+        title={`${pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TITLE} (${year})`}
+        tooltip={
+          <>
+            <Typography variant="body2">
+              {pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TOOLTIP_1}
+            </Typography>
+            <Typography variant="body2">
+              {pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TOOLTIP_2}
+            </Typography>
+          </>
+        }
+      />
 
-        <InfoTooltip
-          content={
-            <>
-              <Typography variant="body2">
-                {pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TOOLTIP_1}
-              </Typography>
-
-              <Typography variant="body2">
-                {pennysViewPageText.CHARTS.MONTHLY_SPENDING_TABLE.TOOLTIP_2}
-              </Typography>
-            </>
-          }
-        />
-      </Box>
-
-      <Paper sx={{ height: 683, width: '100%', borderRadius: 4 }}>
+      <Paper
+        elevation={0}
+        sx={{
+          height: 520,
+          width: '100%',
+          borderRadius: '16px',
+          overflow: 'hidden',
+          border: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
         <DataGrid
           rows={rows}
           columns={columns}
           filterMode="client"
           hideFooter={true}
+          density="compact"
           sx={{
+            border: 'none',
+            '--DataGrid-t-header-background-base': '#FBF3FA',
             '.MuiDataGrid-columnHeaderTitle': {
               fontWeight: 'bold',
             },

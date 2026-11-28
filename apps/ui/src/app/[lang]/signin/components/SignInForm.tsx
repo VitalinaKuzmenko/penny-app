@@ -3,14 +3,17 @@
 'use client';
 
 import {
-  Box,
   Divider,
   TextField,
   Typography,
   Stack,
   InputAdornment,
   IconButton,
+  Link,
 } from '@mui/material';
+import MailOutline from '@mui/icons-material/MailOutline';
+import LockOutlined from '@mui/icons-material/LockOutlined';
+import LoginRounded from '@mui/icons-material/LoginRounded';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import GoogleIcon from '@mui/icons-material/Google';
 
@@ -20,6 +23,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import AuthCard from '@/components/AuthCard/AuthCard';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { LoginSchema, type LoginInput } from 'schemas';
@@ -37,9 +41,9 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<UiError | null>(null);
   // the ?error= value the user closed, so a different OAuth error still shows
-  const [dismissedOauthError, setDismissedOauthError] = useState<
-    string | null
-  >(null);
+  const [dismissedOauthError, setDismissedOauthError] = useState<string | null>(
+    null,
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -110,113 +114,128 @@ export default function SignInForm({ signInPageText }: SignInFormProps) {
   const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
   return (
-    <Box>
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
+    <AuthCard
+      title={signInPageText.FORM.SIGN_IN_TITLE}
+      subtitle={signInPageText.FORM.SUBTITLE}
+      onSubmit={handleSubmit(onSubmit)}
+      below={
+        <ErrorBanner
+          error={error}
+          onClose={handleCloseError}
+          colorMode="color"
+        />
+      }
+    >
+      <Stack spacing={1.5} mt={2}>
+        <TextField
+          size="small"
+          label={signInPageText.FORM.EMAIL_FIELD}
+          autoComplete="email"
+          error={!!errors.email}
+          helperText={
+            errors.email && errors.email.message
+              ? getTranslatedError(errors.email.message, signInPageText.FORM)
+              : ''
+          }
+          {...register('email')}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <MailOutline sx={{ color: 'secondary.main' }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <TextField
+          size="small"
+          label={signInPageText.FORM.PASSWORD_FIELD}
+          type={showPassword ? 'text' : 'password'}
+          autoComplete="current-password"
+          error={!!errors.password}
+          helperText={
+            errors.password && errors.password.message
+              ? getTranslatedError(errors.password.message, signInPageText.FORM)
+              : ''
+          }
+          {...register('password')}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <LockOutlined sx={{ color: 'secondary.main' }} />
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleTogglePassword} edge="end">
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <CustomButton
+          type="submit"
+          variantType="primary"
+          color="secondary"
+          loading={isSubmitting}
+          startIcon={<LoginRounded />}
+          sx={{ py: 1, fontSize: '1rem', borderRadius: '12px' }}
+        >
+          {signInPageText.FORM.SIGN_IN_BUTTON}
+        </CustomButton>
+      </Stack>
+
+      <Divider
         sx={{
-          width: '100%',
-          minWidth: { xs: '100%', sm: 550 },
-          maxWidth: { xs: '100%', sm: 550 },
-          mx: 'auto',
-          mb: 2,
-          p: { xs: 2, sm: 5 },
-          borderRadius: 5,
-          boxShadow: 10,
-          bgcolor: 'background.paper',
+          my: 1.5,
+          color: 'text.secondary',
+          '&::before, &::after': { borderColor: '#DCC8F0' },
         }}
       >
-        <Typography
-          variant="h4"
-          align="center"
-          gutterBottom
-          sx={{ fontWeight: 600 }}
-        >
-          {signInPageText.FORM.SIGN_IN_TITLE}
+        {signInPageText.FORM.OR}
+      </Divider>
+
+      <CustomButton
+        variantType="outlined"
+        color="secondary"
+        fullWidth
+        onClick={handleGoogleSignInClick}
+        startIcon={<GoogleIcon />}
+        sx={{
+          py: 0.75,
+          borderRadius: '12px',
+          bgcolor: '#F7EEFD',
+          borderColor: '#DCC8F0',
+          color: 'text.primary',
+          '&:hover': { bgcolor: '#F1E4FA', borderColor: '#C9A8E6' },
+        }}
+      >
+        {signInPageText.CONTINUE_WITH_GOOGLE_BUTTON}
+      </CustomButton>
+
+      <Stack
+        direction="row"
+        spacing={1}
+        justifyContent="center"
+        alignItems="center"
+        flexWrap="wrap"
+        sx={{ mt: 1.5 }}
+      >
+        <Typography color="text.secondary">
+          {signInPageText.NEW_USER_TITLE}
         </Typography>
-
-        <Stack spacing={2} mt={3}>
-          <TextField
-            label={signInPageText.FORM.EMAIL_FIELD}
-            autoComplete="email"
-            error={!!errors.email}
-            helperText={
-              errors.email && errors.email.message
-                ? getTranslatedError(errors.email.message, signInPageText.FORM)
-                : ''
-            }
-            {...register('email')}
-          />
-
-          <TextField
-            label={signInPageText.FORM.PASSWORD_FIELD}
-            type={showPassword ? 'text' : 'password'}
-            autoComplete="current-password"
-            error={!!errors.password}
-            helperText={
-              errors.password && errors.password.message
-                ? getTranslatedError(
-                    errors.password.message,
-                    signInPageText.FORM,
-                  )
-                : ''
-            }
-            {...register('password')}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleTogglePassword} edge="end">
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <CustomButton
-            type="submit"
-            variantType="primary"
-            loading={isSubmitting}
-          >
-            {signInPageText.FORM.SIGN_IN_BUTTON}
-          </CustomButton>
-        </Stack>
-
-        <Divider sx={{ my: 6, height: 2, bgcolor: 'primary.light' }} />
-
-        <Box textAlign="center">
-          <Typography variant="h5" gutterBottom sx={{ my: 2, fontWeight: 600 }}>
-            {signInPageText.NEW_USER_TITLE}
-          </Typography>
-
-          <CustomButton
-            variantType="secondary"
-            fullWidth
-            onClick={handleSignUpClick}
-          >
-            {signInPageText.SIGN_UP_BUTTON}
-          </CustomButton>
-        </Box>
-
-        <Divider sx={{ my: 6, height: 2, bgcolor: 'primary.light' }} />
-
-        <Box textAlign="center">
-          <CustomButton
-            variantType="outlined"
-            fullWidth
-            onClick={handleGoogleSignInClick}
-            startIcon={<GoogleIcon />}
-          >
-            {signInPageText.CONTINUE_WITH_GOOGLE_BUTTON}
-          </CustomButton>
-        </Box>
-      </Box>
-
-      <ErrorBanner
-        error={error}
-        onClose={handleCloseError}
-        colorMode="color"
-      />
-    </Box>
+        <Link
+          component="button"
+          type="button"
+          underline="always"
+          onClick={handleSignUpClick}
+          sx={{ fontWeight: 800, color: 'secondary.main', fontSize: '1rem' }}
+        >
+          {signInPageText.SIGN_UP_BUTTON}
+        </Link>
+      </Stack>
+    </AuthCard>
   );
 }

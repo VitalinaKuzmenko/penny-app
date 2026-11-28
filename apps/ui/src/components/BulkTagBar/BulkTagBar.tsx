@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Box } from '@mui/material';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import TagPicker from '@/components/TagPicker/TagPicker';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import {
   bulkButtonSx,
   bulkButtonsSx,
@@ -49,7 +50,7 @@ export default function BulkTagBar({
       </Box>
       <Box sx={bulkButtonsSx}>
         <CustomButton
-          variantType="secondary"
+          variantType="contained"
           disabled={!chosen.length}
           onClick={() => {
             onAdd(chosen);
@@ -60,8 +61,9 @@ export default function BulkTagBar({
           {text.ADD_BUTTON}
         </CustomButton>
         <CustomButton
-          variantType="secondary"
+          variantType="outlined"
           disabled={!canRemove}
+          startIcon={<DeleteOutline />}
           onClick={() => {
             onRemove(chosen);
             setChosen([]);

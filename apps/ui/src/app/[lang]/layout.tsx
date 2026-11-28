@@ -7,6 +7,7 @@ import { availableLanguages, LanguageType } from '@/utils/interfaces';
 import { Footer } from '@/components/Footer/Footer';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { fetchUserInfoServer } from '@/requests/fetchUserInfoServer';
+import { fraunces, nunitoSans } from './fonts';
 
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ru' }, { lang: 'ua' }];
@@ -36,7 +37,7 @@ export default async function RootLayout({
   const user = await fetchUserInfoServer();
 
   return (
-    <html lang={lang}>
+    <html lang={lang} className={`${fraunces.variable} ${nunitoSans.variable}`}>
       <body>
         <AppRouterCacheProvider>
           <ThemeProvider>

@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import {
   CATEGORY_ICON_GROUPS,
   CategoryIconGroup,
@@ -27,19 +28,38 @@ export default function CategoryIconPicker({
   return (
     <Box
       role="radiogroup"
-      sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}
     >
       {(Object.keys(CATEGORY_ICON_GROUPS) as CategoryIconGroup[]).map(
         (group) => (
-          <Box key={group}>
+          <Box
+            key={group}
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              gap: { xs: 0.5, sm: 1.5 },
+            }}
+          >
             <Typography
               variant="caption"
-              color="text.secondary"
               component="div"
+              noWrap
+              sx={{
+                width: { sm: 92 },
+                flexShrink: 0,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 999,
+                textAlign: 'center',
+                fontWeight: 600,
+                color: 'text.secondary',
+                bgcolor: 'sidebar.activeBackground',
+              }}
             >
               {iconsText.GROUPS[group] ?? group}
             </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
               {CATEGORY_ICON_GROUPS[group].map((name: CategoryIconName) => {
                 const Icon = CATEGORY_ICON_COMPONENTS[name];
                 const selected = name === value;
@@ -53,12 +73,18 @@ export default function CategoryIconPicker({
                       onClick={() => onChange(name)}
                       sx={{
                         color,
-                        border: '2px solid',
-                        borderColor: selected ? color : 'transparent',
-                        bgcolor: selected ? 'action.selected' : undefined,
+                        width: 40,
+                        height: 40,
+                        borderRadius: '12px',
+                        border: '1.5px solid',
+                        borderColor: selected
+                          ? alpha(color, 0.5)
+                          : 'transparent',
+                        bgcolor: selected ? alpha(color, 0.15) : undefined,
+                        '&:hover': { bgcolor: alpha(color, 0.1) },
                       }}
                     >
-                      <Icon />
+                      <Icon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 );

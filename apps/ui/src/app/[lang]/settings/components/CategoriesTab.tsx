@@ -2,8 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, List, Paper, Skeleton, Typography } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Box } from '@mui/material';
+import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import {
   Category,
   CATEGORY_ICONS,
@@ -14,8 +14,6 @@ import {
   nextPaletteColour,
   UpdateCategoryInput,
 } from 'schemas';
-import CustomButton from '@/components/ui/CustomButton/CustomButton';
-import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import CategoryIcon from '@/components/CategoryIcon/CategoryIcon';
 import { listCategories } from '@/requests/settings/listCategories';
 import { createCategory } from '@/requests/settings/createCategory';
@@ -24,6 +22,7 @@ import { deleteCategory } from '@/requests/settings/deleteCategory';
 import { interpolate } from '@/utils/interpolate';
 import { useSettingsList } from './useSettingsList';
 import SettingsListRow from './SettingsListRow';
+import SettingsListPanel from './SettingsListPanel';
 import SettingsItemDialog, { SettingsItemValues } from './SettingsItemDialog';
 import DeleteCategoryDialog from './DeleteCategoryDialog';
 import { apiErrorDetails } from './apiError';
@@ -124,70 +123,47 @@ export default function CategoriesTab({ text }: CategoriesTabProps) {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <CustomButton
-          variantType="primary"
-          startIcon={<AddIcon />}
-          onClick={() => setEditing('new')}
-          disabled={loading || loadFailed}
-        >
-          {t.ADD}
-        </CustomButton>
-      </Box>
-
-      {loadFailed && (
-        <ErrorBanner
-          error={{
-            title: text.COMMON.LOAD_ERROR.TITLE,
-            message: text.COMMON.LOAD_ERROR.MESSAGE,
-            severity: 'error',
-          }}
-        />
-      )}
-
-      {loading ? (
-        <Skeleton variant="rounded" height={240} />
-      ) : (
-        !loadFailed && (
-          <Paper variant="outlined">
-            {categories.length ? (
-              <List disablePadding>
-                {categories.map((category) => (
-                  <SettingsListRow
-                    key={category.id}
-                    leading={
-                      <CategoryIcon
-                        icon={category.icon}
-                        color={category.color}
-                        fontSize="medium"
-                      />
-                    }
-                    name={category.name}
-                    secondary={interpolate(text.COMMON.TRANSACTION_COUNT, {
-                      count: category.transactionCount,
-                    })}
-                    editLabel={text.COMMON.EDIT}
-                    deleteLabel={text.COMMON.DELETE}
-                    onEdit={() => setEditing(category)}
-                    onDelete={() => setDeletingId(category.id)}
-                    deleteDisabledReason={
-                      category.isTransfer ? t.TRANSFER_HINT : undefined
-                    }
-                  />
-                ))}
-              </List>
-            ) : (
-              <Typography sx={{ p: 2 }} color="text.secondary">
-                {t.EMPTY}
-              </Typography>
-            )}
-          </Paper>
-        )
-      )}
+      <SettingsListPanel
+        icon={<LayersOutlinedIcon />}
+        info={t.INFO}
+        count={categories.length}
+        addLabel={t.ADD}
+        onAdd={() => setEditing('new')}
+        emptyText={t.EMPTY}
+        loading={loading}
+        loadFailed={loadFailed}
+        text={text}
+      >
+        {categories.map((category) => (
+          <SettingsListRow
+            key={category.id}
+            leading={
+              <CategoryIcon
+                icon={category.icon}
+                color={category.color}
+                fontSize="medium"
+              />
+            }
+            tint={category.color}
+            name={category.name}
+            secondary={interpolate(text.COMMON.TRANSACTION_COUNT, {
+              count: category.transactionCount,
+            })}
+            editLabel={text.COMMON.EDIT}
+            deleteLabel={text.COMMON.DELETE}
+            onEdit={() => setEditing(category)}
+            onDelete={() => setDeletingId(category.id)}
+            deleteDisabledReason={
+              category.isTransfer ? t.TRANSFER_HINT : undefined
+            }
+          />
+        ))}
+      </SettingsListPanel>
 
       {editing && (
         <SettingsItemDialog
           title={editing === 'new' ? t.CREATE_TITLE : t.EDIT_TITLE}
+          subtitle={t.DIALOG_SUBTITLE}
           submitLabel={
             editing === 'new' ? text.COMMON.CREATE : text.COMMON.SAVE
           }

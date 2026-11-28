@@ -14,6 +14,7 @@ import {
   ListItemIcon,
 } from '@mui/material';
 import { ReactElement, useMemo } from 'react';
+import { tagChipSx } from '@/components/TagChips/TagChips';
 
 const ALL_VALUE = '__ALL__';
 const MAX_VISIBLE_CHIPS = 2;
@@ -23,6 +24,8 @@ export interface FilterItem {
   label: string;
   // e.g. a category icon, shown in the menu and on the selected chips
   icon?: ReactElement;
+  // tag colour: the selected chip gets the shared tinted tag style
+  color?: string | null;
 }
 
 interface FilterMultiSelectProps {
@@ -45,7 +48,10 @@ const FilterMultiSelect = ({
   clearAllLabel,
 }: FilterMultiSelectProps) => {
   const allIds = useMemo(() => items.map((i) => i.id), [items]);
-  const isAllSelected = value.length === allIds.length && allIds.length > 0;
+  // value may hold ids that aren't offered here (e.g. hidden transfer
+  // categories), so compare against the offered items, not the length
+  const isAllSelected =
+    allIds.length > 0 && allIds.every((id) => value.includes(id));
 
   const handleChange = (event: SelectChangeEvent<string[]>) => {
     const selected = event.target.value as string[];
@@ -89,7 +95,10 @@ const FilterMultiSelect = ({
                   label={item.label}
                   icon={item.icon}
                   size="small"
-                  sx={{ maxWidth: 120 }}
+                  sx={{
+                    maxWidth: 120,
+                    ...(item.color !== undefined && tagChipSx(item.color)),
+                  }}
                 />
               ))}
 

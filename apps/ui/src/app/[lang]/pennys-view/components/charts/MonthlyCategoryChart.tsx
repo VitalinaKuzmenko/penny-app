@@ -20,7 +20,8 @@ import Spinner from '@/components/ui/Spinner/Spinner';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import { UiError } from '@/types/interfaces';
 import { Category, MonthlyCategoryResponse } from 'schemas';
-import InfoTooltip from '@/components/InfoTooltip/InfoTooltip';
+import { ChartCardTitle } from '../DashboardCard';
+import StackedBarChartRounded from '@mui/icons-material/StackedBarChartRounded';
 import {
   CategoryChartLegend,
   CategoryChartTooltip,
@@ -112,32 +113,36 @@ export default function MonthlyCategoryChart({
   const legendItemByName = new Map(legendItems.map((i) => [i.name, i]));
 
   return (
-    <Box sx={{ width: '100%', mt: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <Typography variant="h6" fontWeight={600}>
-          {`${pennysViewPageText.CHARTS.MONTHLY_SPENDING.TITLE} (${year})`}
-        </Typography>
+    <Box sx={{ width: '100%' }}>
+      <ChartCardTitle
+        icon={<StackedBarChartRounded fontSize="inherit" />}
+        title={`${pennysViewPageText.CHARTS.MONTHLY_SPENDING.TITLE} (${year})`}
+        tooltip={
+          <>
+            <Typography variant="body2">
+              {pennysViewPageText.CHARTS.MONTHLY_SPENDING.TOOLTIP_1}
+            </Typography>
+            <Typography variant="body2">
+              {pennysViewPageText.CHARTS.MONTHLY_SPENDING.TOOLTIP_2}
+            </Typography>
+          </>
+        }
+      />
 
-        <InfoTooltip
-          content={
-            <>
-              <Typography variant="body2">
-                {pennysViewPageText.CHARTS.MONTHLY_SPENDING.TOOLTIP_1}
-              </Typography>
-
-              <Typography variant="body2">
-                {pennysViewPageText.CHARTS.MONTHLY_SPENDING.TOOLTIP_2}
-              </Typography>
-            </>
-          }
-        />
-      </Box>
-
-      <Box sx={{ width: '100%', height: 400 }}>
+      <Box sx={{ width: '100%', height: 360 }}>
         <ResponsiveContainer>
           <BarChart data={chartData}>
-            <XAxis dataKey="month" />
-            <YAxis />
+            <XAxis
+              dataKey="month"
+              tick={{ fill: '#7A6573', fontSize: 12 }}
+              axisLine={{ stroke: 'rgba(83, 36, 70, 0.12)' }}
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fill: '#7A6573', fontSize: 12 }}
+              axisLine={{ stroke: 'rgba(83, 36, 70, 0.12)' }}
+              tickLine={false}
+            />
             <Tooltip
               content={(props) => (
                 <CategoryChartTooltip

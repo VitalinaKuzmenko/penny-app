@@ -23,6 +23,16 @@ interface DashboardFiltersProps {
   pennysViewPageText: Record<string, any>;
 }
 
+// small buttons so Reset and Apply fit on the same row as the filters
+const compactButtonSx = {
+  height: 32,
+  minWidth: 0,
+  px: 1.5,
+  py: 0,
+  fontSize: '0.8rem',
+  borderRadius: '10px',
+} as const;
+
 const DashboardFilters = ({
   accounts,
   categories,
@@ -42,73 +52,105 @@ const DashboardFilters = ({
   const years = useMemo(() => getPresetYears(accounts), [accounts]);
 
   return (
+    // no card around the filters: each control sits directly on the page background
     <Box
-      display="grid"
-      gap={2}
-      mb={3}
-      gridTemplateColumns={{
-        xs: '1fr',
-        sm: '1fr 1fr',
-        md: 'repeat(3, 1fr)',
-        lg: 'repeat(7, 1fr)',
+      sx={{
+        mb: 2.5,
+        // inputs show the page background; only their option lists stay white
+        '& .MuiOutlinedInput-root': { bgcolor: 'transparent' },
       }}
     >
-      <Box gridColumn="1 / -1">
-        <YearPresets
-          years={years}
-          selected={getSelectedPreset(
-            appliedFilters.startDate,
-            appliedFilters.endDate,
-          )}
-          onSelectYear={(year) => applyWith(yearRange(year))}
-          text={pennysViewPageText.FILTERS.YEAR_PRESETS}
-          disabled={!isInitialized}
-        />
-      </Box>
-      {/* Start date */}
-      <DatePicker
-        label={pennysViewPageText.FILTERS.START_DATE.LABEL}
-        value={filters.startDate}
-        onChange={(newValue) => setFilters({ startDate: newValue })}
-        slotProps={{ textField: { size: 'small' } }}
-        format="DD/MM/YYYY"
-      />
-
-      {/* End date */}
-      <DatePicker
-        label={pennysViewPageText.FILTERS.END_DATE.LABEL}
-        value={filters.endDate}
-        onChange={(newValue) => setFilters({ endDate: newValue })}
-        slotProps={{ textField: { size: 'small' } }}
-        format="DD/MM/YYYY"
-      />
-
-      <TypeSelect pennysViewPageText={pennysViewPageText} />
-
-      {/* <CategoryMultiSelect categories={categories} /> */}
-      <CategoryFilter
-        categories={categories}
-        pennysViewPageText={pennysViewPageText}
-      />
-
-      <AccountFilter
-        accounts={accounts}
-        pennysViewPageText={pennysViewPageText}
-      />
-
-      {/* Reset button */}
-      <CustomButton variantType="secondary" onClick={resetFilters}>
-        {pennysViewPageText.FILTERS.RESET_BUTTON}
-      </CustomButton>
-
-      {/* Apply button */}
-      <CustomButton
-        variantType="primary"
-        onClick={applyFilters}
-        disabled={isInitialized ? !isDirty : true}
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 1.5,
+          // every control fills its flex item, whatever the screen size
+          '& .MuiFormControl-root': { width: '100%', minWidth: 0 },
+        }}
       >
-        {pennysViewPageText.FILTERS.APPLY_BUTTON}
-      </CustomButton>
+        <Box sx={{ flex: '1 1 100%' }}>
+          <YearPresets
+            years={years}
+            selected={getSelectedPreset(
+              appliedFilters.startDate,
+              appliedFilters.endDate,
+            )}
+            onSelectYear={(year) => applyWith(yearRange(year))}
+            text={pennysViewPageText.FILTERS.YEAR_PRESETS}
+            disabled={!isInitialized}
+          />
+        </Box>
+
+        {/* Start date */}
+        <Box sx={{ flex: '1 1 150px', minWidth: 0 }}>
+          <DatePicker
+            label={pennysViewPageText.FILTERS.START_DATE.LABEL}
+            value={filters.startDate}
+            onChange={(newValue) => setFilters({ startDate: newValue })}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+            format="DD/MM/YYYY"
+          />
+        </Box>
+
+        {/* End date */}
+        <Box sx={{ flex: '1 1 150px', minWidth: 0 }}>
+          <DatePicker
+            label={pennysViewPageText.FILTERS.END_DATE.LABEL}
+            value={filters.endDate}
+            onChange={(newValue) => setFilters({ endDate: newValue })}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+            format="DD/MM/YYYY"
+          />
+        </Box>
+
+        <Box sx={{ flex: '1 1 130px', minWidth: 0 }}>
+          <TypeSelect pennysViewPageText={pennysViewPageText} />
+        </Box>
+
+        <Box sx={{ flex: '2 1 220px', minWidth: 0 }}>
+          <CategoryFilter
+            categories={categories}
+            pennysViewPageText={pennysViewPageText}
+          />
+        </Box>
+
+        <Box sx={{ flex: '2 1 220px', minWidth: 0 }}>
+          <AccountFilter
+            accounts={accounts}
+            pennysViewPageText={pennysViewPageText}
+          />
+        </Box>
+
+        {/* Buttons wrap as one group, never one by one */}
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            flex: { xs: '1 1 100%', sm: '0 0 auto' },
+            '& > *': { flex: { xs: 1, sm: '0 0 auto' } },
+          }}
+        >
+          <CustomButton
+            variantType="outlined"
+            color="secondary"
+            onClick={resetFilters}
+            sx={compactButtonSx}
+          >
+            {pennysViewPageText.FILTERS.RESET_BUTTON}
+          </CustomButton>
+
+          <CustomButton
+            variantType="contained"
+            onClick={applyFilters}
+            sx={compactButtonSx}
+            disabled={isInitialized ? !isDirty : true}
+          >
+            {pennysViewPageText.FILTERS.APPLY_BUTTON}
+          </CustomButton>
+        </Box>
+      </Box>
     </Box>
   );
 };

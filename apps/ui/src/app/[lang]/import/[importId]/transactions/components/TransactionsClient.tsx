@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { Box, Typography, Stack, Container } from '@mui/material';
+import { Box, Container, Paper, Stack, Typography } from '@mui/material';
+import ClearAllRoundedIcon from '@mui/icons-material/ClearAllRounded';
+import BarChartOutlined from '@mui/icons-material/BarChartOutlined';
+import ContentCopyOutlined from '@mui/icons-material/ContentCopyOutlined';
+import ArrowForwardRounded from '@mui/icons-material/ArrowForwardRounded';
+import Image from 'next/image';
+import star from '../../../../../../../public/star_icon.png';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import z from 'zod';
@@ -23,6 +29,8 @@ import { UiError } from '@/types/interfaces';
 import ErrorBanner from '@/components/ErrorBanner/ErrorBanner';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import BulkTagBar from '@/components/BulkTagBar/BulkTagBar';
+import ImportStepper from '@/components/ImportStepper/ImportStepper';
+import PageHero from '@/components/PageHero/PageHero';
 import { ConfirmImportSchema, ConfirmImportInput } from 'schemas';
 import { saveTransactions } from '@/requests/saveTransactions';
 import { mapConfirmImportErrorToUiError } from '@/utils/mapConfirmImportErrorToUiError';
@@ -226,15 +234,14 @@ export default function TransactionsClient({
   }, []);
 
   return (
-    <Container sx={{ p: { xs: 1, md: 3 } }} maxWidth="xl" disableGutters>
-      {/* Title */}
-      <Box>
-        <Typography variant="h4" fontWeight={600} gutterBottom>
-          {transactionsPageText.TITLE}
-        </Typography>
-        <Typography color="text.secondary" mb={3}>
-          {transactionsPageText.SUBTITLE}
-        </Typography>
+    <Container maxWidth="xl" disableGutters>
+      <PageHero
+        title={transactionsPageText.TITLE}
+        subtitle={transactionsPageText.SUBTITLE}
+      />
+
+      <Box sx={{ mt: { xs: 2, md: 4 }, mb: 3 }}>
+        <ImportStepper labels={transactionsPageText.STEPPER} currentStep={2} />
       </Box>
 
       {/* Error display */}
@@ -244,35 +251,40 @@ export default function TransactionsClient({
           <ErrorBanner key={error.message} error={error} />
         ))}
 
-      {/* Inputs: currency, account and "create account" share one aligned row
-          on desktop and stack full-width on phones */}
-      <Box
-        display="grid"
-        gap={2}
-        mb={2}
-        gridTemplateColumns={{
-          xs: 'minmax(0, 1fr)',
-          md: 'minmax(0, 1fr) minmax(0, 2fr) auto',
-        }}
-        alignItems="center"
-      >
-        {/* Currency select */}
-        <CurrencySelect
-          pageText={transactionsPageText.CURRENCY_SELECT}
-          currencies={currencies}
-          value={currency}
-          onChange={setCurrency}
-        />
+      {/* Import info: currency, account and "create account" share one card;
+          they stack full-width on phones */}
+      <Paper sx={{ p: { xs: 2, md: 2.5 }, mb: 2, borderRadius: '20px' }}>
+        <Box
+          display="grid"
+          gap={2}
+          gridTemplateColumns={{
+            xs: 'minmax(0, 1fr)',
+            // currency gets its own row so "create" always sits next to account
+            sm: 'minmax(0, 1fr) auto',
+            lg: 'minmax(0, 1fr) minmax(0, 2fr) auto',
+          }}
+          alignItems="end"
+        >
+          {/* Currency select */}
+          <Box sx={{ gridColumn: { sm: '1 / -1', lg: 'auto' }, minWidth: 0 }}>
+            <CurrencySelect
+              pageText={transactionsPageText.CURRENCY_SELECT}
+              currencies={currencies}
+              value={currency}
+              onChange={setCurrency}
+            />
+          </Box>
 
-        {/* Account select + create */}
-        <AccountSelect
-          pageText={transactionsPageText.ACCOUNT_SELECT}
-          accounts={accountsState}
-          value={accountId}
-          onChange={setAccountId}
-          onCreate={() => setIsCreateModalOpen(true)}
-        />
-      </Box>
+          {/* Account select + create */}
+          <AccountSelect
+            pageText={transactionsPageText.ACCOUNT_SELECT}
+            accounts={accountsState}
+            value={accountId}
+            onChange={setAccountId}
+            onCreate={() => setIsCreateModalOpen(true)}
+          />
+        </Box>
+      </Paper>
 
       {/* Duplicates summary */}
       <DuplicatesBar
@@ -355,33 +367,116 @@ export default function TransactionsClient({
       )}
 
       {/* Footer */}
-      <Stack direction="row" justifyContent="space-between" mt={3}>
-        <CustomButton
-          variantType="text"
-          onClick={goToHomePage}
-          disabledStyling={isSaving}
+      <Paper
+        sx={{
+          mt: 3,
+          p: { xs: 2, md: 2 },
+          borderRadius: '20px',
+          display: 'grid',
+          // stacked below lg; note, counts and buttons in one row from lg
+          gridTemplateColumns: {
+            xs: 'minmax(0, 1fr)',
+            lg: 'minmax(0, 1fr) auto auto',
+          },
+          alignItems: 'center',
+          gap: 2,
+        }}
+      >
+        {/* Readiness note: title follows the Save button's enabled state */}
+        <Stack
+          direction="row"
+          spacing={1.5}
+          alignItems="center"
+          sx={{
+            p: 1.5,
+            borderRadius: '16px',
+            bgcolor: '#FCF7F4',
+          }}
         >
-          {transactionsPageText.FOOTER.BACK_TO_HOME_PAGE}
-        </CustomButton>
+          <Image src={star} alt="" aria-hidden width={34} height={31} />
+          <Box>
+            <Typography fontWeight={700} color="text.primary">
+              {areButtonsEnabled
+                ? transactionsPageText.FOOTER.READY_TITLE
+                : transactionsPageText.FOOTER.NOT_READY_TITLE}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {transactionsPageText.FOOTER.READY_TEXT}
+            </Typography>
+          </Box>
+        </Stack>
 
-        <CustomButton
-          variantType="primary"
-          disabledStyling={!areButtonsEnabled || isSaving}
-          onClick={handleTransactionSave}
+        {/* Actual counts that will be saved and skipped */}
+        {/* the two counts stack on narrower desktops so the row still fits */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'row', lg: 'column', xl: 'row' },
+            flexWrap: 'wrap',
+            alignItems: { xs: 'center', lg: 'flex-start', xl: 'center' },
+            columnGap: 3,
+            rowGap: 1,
+            minWidth: 0,
+            color: 'text.primary',
+          }}
         >
-          {duplicateRows.length
-            ? `${String(
-                transactionsPageText.FOOTER.SAVE_BUTTON_WITH_COUNT,
-              ).replace('{count}', String(rowsToImport.length))}${
-                skippedCount
-                  ? ` ${String(
-                      transactionsPageText.FOOTER.SKIPPED_SUFFIX,
-                    ).replace('{skipped}', String(skippedCount))}`
-                  : ''
-              }`
-            : transactionsPageText.FOOTER.SAVE_BUTTON}
-        </CustomButton>
-      </Stack>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <ClearAllRoundedIcon sx={{ color: 'secondary.main' }} />
+            <Typography variant="body2" fontWeight={600} noWrap>
+              {String(transactionsPageText.FOOTER.TRANSACTIONS_COUNT).replace(
+                '{count}',
+                String(rowsToImport.length),
+              )}
+            </Typography>
+          </Stack>
+          {duplicateRows.length > 0 && (
+            <Stack direction="row" spacing={1} alignItems="center">
+              <ContentCopyOutlined sx={{ color: 'secondary.main' }} />
+              <Typography variant="body2" fontWeight={600} noWrap>
+                {String(transactionsPageText.FOOTER.SKIPPED_COUNT).replace(
+                  '{count}',
+                  String(skippedCount),
+                )}
+              </Typography>
+            </Stack>
+          )}
+        </Box>
+
+        <Stack
+          direction={{ xs: 'column-reverse', sm: 'row' }}
+          spacing={1}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          justifyContent="flex-end"
+        >
+          <CustomButton
+            variantType="text"
+            color="secondary"
+            onClick={goToHomePage}
+            disabledStyling={isSaving}
+          >
+            {transactionsPageText.FOOTER.BACK_TO_HOME_PAGE}
+          </CustomButton>
+
+          <CustomButton
+            variantType="primary"
+            disabledStyling={!areButtonsEnabled || isSaving}
+            onClick={handleTransactionSave}
+            startIcon={
+              <BarChartOutlined sx={{ fontSize: '1.6rem !important' }} />
+            }
+            sx={{
+              py: 1.5,
+              px: 3,
+              fontSize: '1.2rem',
+              borderRadius: '14px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {transactionsPageText.FOOTER.SAVE_BUTTON}
+            <ArrowForwardRounded sx={{ ml: 1 }} />
+          </CustomButton>
+        </Stack>
+      </Paper>
 
       {/* Pop up for create account */}
       <CreateAccountModal

@@ -29,6 +29,14 @@ interface CategoryCellSelectProps {
 
 const chipSx = { mr: 0.5, height: 18, fontSize: 10 };
 
+// Soft lavender "auto" badge, same family as the other accents
+const autoChipSx = {
+  ...chipSx,
+  color: 'secondary.main',
+  borderColor: 'secondary.light',
+  bgcolor: '#F5EAFB',
+};
+
 export default function CategoryCellSelect({
   isMoneyIn,
   value,
@@ -111,9 +119,8 @@ export default function CategoryCellSelect({
                 <Chip
                   label="auto"
                   size="small"
-                  color="info"
                   variant="outlined"
-                  sx={chipSx}
+                  sx={autoChipSx}
                 />
               )}
             </>
