@@ -288,6 +288,7 @@
     },
     "ACCOUNT_SELECT": {
       "LABEL": "Account",
+      "PLACEHOLDER": "Select account",
       "TOOLTIP_NO_ACCOUNTS": "You have no accounts. You need to create an account first.",
       "CREATE_BUTTON": "Create new account",
       "CREATE_TOOLTIP": "Account is your bank account/card. It's a way to group transactions.",

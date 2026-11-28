@@ -3,6 +3,7 @@
 
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import {
+  Box,
   FormControl,
   ListItemText,
   MenuItem,
@@ -50,6 +51,12 @@ export default function AccountSelect({
       : pageText.NO_TRANSACTIONS;
 
   const renderSelected = (id: string) => {
+    if (!id)
+      return (
+        <Box component="span" sx={{ color: 'text.secondary' }}>
+          {pageText.PLACEHOLDER}
+        </Box>
+      );
     const acc = accounts.find((a) => a.id === id);
     return acc ? `${acc.name} · ${describeLastDate(acc)}` : '';
   };
@@ -73,6 +80,7 @@ export default function AccountSelect({
                 value={value ?? ''}
                 labelId="account-label"
                 onChange={handleChange}
+                displayEmpty
                 renderValue={renderSelected}
               >
                 {hasAccounts &&
