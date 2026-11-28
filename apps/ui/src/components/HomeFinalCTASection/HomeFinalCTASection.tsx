@@ -1,8 +1,12 @@
 'use client';
 
-import { Box, Container, Typography, Stack } from '@mui/material';
+import { Box, Typography, Stack } from '@mui/material';
+import FileUploadOutlined from '@mui/icons-material/FileUploadOutlined';
 import CustomButton from '../ui/CustomButton/CustomButton';
+import HomeCheckList from '../HomeCheckList/HomeCheckList';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import scene from '../../../public/home_page10.png';
 
 export default function HomeFinalCTASection({
   homePageText,
@@ -11,6 +15,8 @@ export default function HomeFinalCTASection({
   homePageText: Record<string, any>;
 }) {
   const router = useRouter();
+  const text = homePageText.FINAL_CTA_SECTION;
+
   const handleSignUpClick = () => {
     router.push('/register');
   };
@@ -18,53 +24,89 @@ export default function HomeFinalCTASection({
   const handleUploadCsvClick = () => {
     router.push('/upload-csv');
   };
+
   return (
     <Box
       sx={{
-        py: { xs: 8, md: 12 },
-        backgroundColor: 'primary.main',
-        color: 'primary.contrastText',
+        mt: { xs: 5, md: 7 },
+        px: { xs: 2, md: 4 },
+        py: { xs: 3, md: 4 },
+        borderRadius: '28px',
+        bgcolor: 'sidebar.background',
+        color: 'sidebar.text',
+        display: 'grid',
+        alignItems: 'center',
+        gap: { xs: 2, md: 4 },
+        gridTemplateColumns: {
+          xs: '1fr',
+          md: 'minmax(0, 0.45fr) minmax(0, 1fr)',
+        },
         textAlign: 'center',
       }}
     >
-      <Container maxWidth="md">
-        <Typography variant="h4" fontWeight={700} mb={3}>
-          {homePageText.FINAL_CTA_SECTION.TITLE}
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Image
+          src={scene}
+          alt=""
+          aria-hidden
+          sizes="(max-width: 900px) 60vw, 25vw"
+          style={{ width: '100%', maxWidth: 300, height: 'auto' }}
+        />
+      </Box>
+
+      <Box>
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{
+            color: 'common.white',
+            fontSize: { xs: '1.6rem', md: '2.1rem' },
+          }}
+        >
+          {text.TITLE}
         </Typography>
-        <Typography variant="body1" mb={4}>
-          {homePageText.FINAL_CTA_SECTION.SUBTITLE}
+        <Typography sx={{ mt: 1, mb: 3, color: 'sidebar.mutedText' }}>
+          {text.SUBTITLE}
         </Typography>
 
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
-          spacing={2}
+          spacing={1.5}
           justifyContent="center"
+          sx={{ mb: 2.5 }}
         >
           <CustomButton
-            variantType="outlined"
+            variantType="primary"
             onClick={handleUploadCsvClick}
-            sx={{
-              fontWeight: 800,
-              px: 4,
-              color: 'primary.contrastText',
-              borderColor: 'primary.contrastText',
-            }}
+            startIcon={<FileUploadOutlined />}
+            sx={{ py: 1.25, px: 4, fontSize: '1.05rem', borderRadius: '14px' }}
           >
-            {homePageText.FINAL_CTA_SECTION.BUTTONS.UPLOAD_CSV}
+            {text.BUTTONS.UPLOAD_CSV}
           </CustomButton>
           <CustomButton
-            sx={{
-              px: 4,
-              color: 'primary.contrastText',
-              borderColor: 'primary.contrastText',
-            }}
             variantType="outlined"
             onClick={handleSignUpClick}
+            sx={{
+              py: 1.25,
+              px: 4,
+              fontSize: '1.05rem',
+              borderRadius: '14px',
+              color: 'common.white',
+              borderColor: 'rgba(255, 255, 255, 0.7)',
+              '&:hover': {
+                borderColor: 'common.white',
+                bgcolor: 'rgba(255, 255, 255, 0.08)',
+              },
+            }}
           >
-            {homePageText.FINAL_CTA_SECTION.BUTTONS.CREATE_ACCOUNT}
+            {text.BUTTONS.CREATE_ACCOUNT}
           </CustomButton>
         </Stack>
-      </Container>
+
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <HomeCheckList items={text.CHECKS} tone="dark" />
+        </Box>
+      </Box>
     </Box>
   );
 }
